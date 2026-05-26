@@ -75,7 +75,11 @@ export const SERVICES: Service[] = [
     duration: [60, 90, 120],
     price: 35,
     priceVND: 850000,
-    image: "/images/services/serena-signature-massage.jpg",
+    image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
+    gallery: [
+      "/images/serena_image/z7863130373074_bd43471af11ebd6a27da4edc71b541b6.jpg",
+      "/images/serena_image/z7863130399936_a16c4518ce69d94cc60728eb569ee3ae.jpg",
+    ],
     benefits: [
       "Deep muscle tension release",
       "Improved circulation and lymphatic flow",
@@ -107,7 +111,7 @@ export const SERVICES: Service[] = [
     duration: [60, 90],
     price: 30,
     priceVND: 730000,
-    image: "/images/services/facial-clay-therapy.jpg",
+    image: "/images/serena_image/z7863130203764_6bc950cfa0128b88f9da0f0e14fc8264.jpg",
     benefits: [
       "Deep pore cleansing",
       "Balanced oil production",
@@ -128,7 +132,7 @@ export const SERVICES: Service[] = [
     duration: [75, 90],
     price: 40,
     priceVND: 970000,
-    image: "/images/services/hot-stone-therapy.jpg",
+    image: "/images/serena_image/z7863130373074_bd43471af11ebd6a27da4edc71b541b6.jpg",
     benefits: [
       "Deep muscle penetration",
       "Chronic tension relief",
@@ -149,7 +153,7 @@ export const SERVICES: Service[] = [
     duration: [30, 45, 60],
     price: 18,
     priceVND: 440000,
-    image: "/images/services/foot-massage.jpg",
+    image: "/images/serena_image/z7863130080318_bd46759e1d082e30adb7e1b0a0e90bd0.jpg",
     benefits: [
       "Fatigue and swelling relief",
       "Improved circulation",
@@ -169,7 +173,10 @@ export const SERVICES: Service[] = [
     duration: [120, 150],
     price: 80,
     priceVND: 1950000,
-    image: "/images/services/couple-ritual.jpg",
+    image: "/images/serena_image/z7863130225920_fcbb5881c13f6f51fd437554d30283e4.jpg",
+    gallery: [
+      "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
+    ],
     benefits: [
       "Shared wellness experience",
       "Private couple suite",
@@ -200,7 +207,7 @@ export const SERVICES: Service[] = [
     duration: [45, 60],
     price: 25,
     priceVND: 610000,
-    image: "/images/services/body-scrub-ritual.jpg",
+    image: "/images/serena_image/z7863130399936_a16c4518ce69d94cc60728eb569ee3ae.jpg",
     benefits: [
       "Dead skin cell removal",
       "Smoother, softer skin",

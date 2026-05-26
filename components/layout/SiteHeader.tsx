@@ -6,20 +6,19 @@ import { cn } from "@/lib/utils";
 import TopBar from "./TopBar";
 import MainNav from "./MainNav";
 import MobileNav from "./MobileNav";
-import Button from "@/components/ui/Button";
+import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 
 /**
- * SiteHeader — sticky, scroll-aware header.
- * Structure: TopBar → Header (logo | nav | book btn)
- * Per HOME_WIREFRAME.md: solid on scroll, transparent on hero.
- * Scroll behaviour: adds shadow + slight bg tint after 80px.
+ * SiteHeader — sticky, scroll-aware.
+ * Logo: lotus mark + "SERENA SPA" serif + "Hội An" tagline — matching reference.
+ * Scrolled state: adds warm shadow, slight cream bg solidification.
  */
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 80);
+      setScrolled(window.scrollY > 60);
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -30,42 +29,52 @@ export default function SiteHeader() {
       <TopBar />
       <div
         className={cn(
-          "bg-[var(--color-cream)] transition-shadow duration-300",
-          scrolled ? "shadow-[var(--shadow-header)]" : ""
+          "transition-all duration-300",
+          scrolled
+            ? "bg-[var(--color-cream)] shadow-[var(--shadow-header)]"
+            : "bg-[var(--color-cream)]"
         )}
       >
-        <div className="container-site flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
+        <div className="container-site flex items-center justify-between h-[60px] md:h-[72px]">
+
+          {/* ── Logo ─────────────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2.5 shrink-0 group"
             aria-label="Serena Spa Hội An — Home"
           >
-            {/* Text logo — replace with <Image> when brand logo file is ready */}
-            <div className="flex flex-col leading-none">
-              <span className="font-serif text-xl md:text-2xl font-light tracking-widest text-[var(--color-espresso)] uppercase">
-                Serena
+            {/* Lotus mark */}
+            <LotusMarkSmall
+              size={26}
+              color="var(--color-terracotta)"
+              className="transition-transform duration-300 group-hover:scale-110"
+            />
+
+            {/* Wordmark */}
+            <div className="flex flex-col leading-none gap-0.5">
+              <span
+                className="font-serif text-lg md:text-[22px] tracking-[0.2em] text-[var(--color-espresso)] uppercase"
+                style={{ fontWeight: 500 }}
+              >
+                Serena Spa
               </span>
-              <span className="font-sans text-[9px] md:text-[10px] font-medium tracking-[0.22em] text-[var(--color-terracotta)] uppercase">
-                Spa · Hội An
+              <span className="font-sans text-[9px] font-semibold tracking-[0.28em] text-[var(--color-terracotta)] uppercase">
+                Hội An · Vietnam
               </span>
             </div>
           </Link>
 
-          {/* Desktop nav */}
+          {/* ── Desktop nav ──────────────────────────────────────────────── */}
           <MainNav />
 
-          {/* Right side — Book Now + mobile hamburger */}
+          {/* ── Right — CTA + mobile menu ────────────────────────────────── */}
           <div className="flex items-center gap-3">
-            <Button
+            <Link
               href="/booking"
-              variant="primary"
-              size="sm"
-              className="hidden md:inline-flex"
+              className="btn btn-primary btn-sm hidden md:inline-flex"
             >
               Book Now
-            </Button>
-
+            </Link>
             <MobileNav />
           </div>
         </div>
