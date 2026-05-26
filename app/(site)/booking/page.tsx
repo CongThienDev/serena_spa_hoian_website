@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import { SERVICES, type Service } from "@/data/services";
@@ -1186,12 +1187,12 @@ function SuccessPage({
 
           <AnimatedSection animation="fade" delay={0.3}>
             <div className="flex flex-wrap gap-3 justify-center">
-              <a href="/" className="btn btn-primary">
+              <Link href="/" className="btn btn-primary">
                 Return Home
-              </a>
-              <a href="/services" className="btn btn-outline">
+              </Link>
+              <Link href="/services" className="btn btn-outline">
                 Explore Services
-              </a>
+              </Link>
             </div>
           </AnimatedSection>
         </div>

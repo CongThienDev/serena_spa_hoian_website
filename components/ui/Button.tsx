@@ -66,7 +66,7 @@ export default function Button(props: ButtonProps) {
     );
   }
 
-  const { href: _href, ...buttonProps } = props as ButtonAsButton & { href?: undefined };
+  const buttonProps = props as ButtonAsButton;
   return (
     <button {...buttonProps} className={classes}>
       {children}

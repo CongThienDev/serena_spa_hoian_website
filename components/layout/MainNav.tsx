@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { NAV_ITEMS, type NavItem } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,11 +27,6 @@ export default function MainNav() {
   function handleMouseLeave() {
     closeTimer.current = setTimeout(() => setOpenMenu(null), 120);
   }
-
-  // Close on route change
-  useEffect(() => {
-    setOpenMenu(null);
-  }, [pathname]);
 
   return (
     <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-1">
