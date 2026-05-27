@@ -352,6 +352,12 @@ export function getFeaturedServicesLocalized(
     .map((service) => localizeService(service, locale));
 }
 
+export function getAllServicesLocalized(
+  locale: "vi" | "en" = "en",
+): Service[] {
+  return SERVICES.map((service) => localizeService(service, locale));
+}
+
 export function getSignatureServices(): Service[] {
   return SERVICES.filter((s) => s.isSignature);
 }

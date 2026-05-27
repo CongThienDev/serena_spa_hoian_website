@@ -5,6 +5,7 @@ import { generatePageMetadata } from "@/lib/metadata";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import SectionHeading from "@/components/ui/SectionHeading";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 export const metadata: Metadata = generatePageMetadata({
   title: "Wellness Philosophy — Serena Spa Hội An",
@@ -84,7 +85,8 @@ const galleryImages = [
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function WellnessPage() {
+export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
+  const vi = locale === "vi";
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════════
@@ -96,7 +98,7 @@ export default function WellnessPage() {
           minHeight: "clamp(500px, 80vh, 860px)",
           background: "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
         }}
-        aria-label="Wellness philosophy at Serena Spa"
+        aria-label={vi ? "Triết lý wellness tại Serena Spa" : "Wellness philosophy at Serena Spa"}
       >
         <div
           className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] w-full"
@@ -118,7 +120,7 @@ export default function WellnessPage() {
                   className="font-sans uppercase tracking-[0.22em] text-[var(--color-terracotta)]"
                   style={{ fontSize: "0.72rem" }}
                 >
-                  Our Philosophy
+                  {vi ? "Triết lý của chúng tôi" : "Our Philosophy"}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -136,8 +138,8 @@ export default function WellnessPage() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                Wellness<br />
-                From Within
+                {vi ? "Wellness" : "Wellness"}<br />
+                {vi ? "Từ Bên Trong" : "From Within"}
               </h1>
             </AnimatedSection>
 
@@ -162,18 +164,20 @@ export default function WellnessPage() {
                 className="font-sans text-[var(--color-espresso)] mb-10"
                 style={{ fontSize: "1.0rem", lineHeight: 1.78, maxWidth: "36ch", opacity: 0.75 }}
               >
-                At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit.
+                {vi
+                  ? "Tại Serena, wellness không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần."
+                  : "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit."}
               </p>
             </AnimatedSection>
 
             {/* CTAs */}
             <AnimatedSection animation="slide-up-fade" delay={0.42}>
               <div className="flex flex-wrap gap-3">
-                <Link href="/services" className="btn btn-primary btn-lg">
-                  Explore Treatments
+                <Link href={withLocalePath(locale, "/services")} className="btn btn-primary btn-lg">
+                  {vi ? "Khám phá liệu trình" : "Explore Treatments"}
                 </Link>
-                <Link href="/about" className="btn btn-outline btn-lg">
-                  Our Story
+                <Link href={withLocalePath(locale, "/about")} className="btn btn-outline btn-lg">
+                  {vi ? "Câu chuyện Serena" : "Our Story"}
                 </Link>
               </div>
             </AnimatedSection>
@@ -511,7 +515,7 @@ export default function WellnessPage() {
           <AnimatedSection animation="slide-up-fade" delay={0.3}>
             <div className="flex flex-wrap gap-4 justify-center mt-2">
               <Link
-                href="/booking"
+                href={withLocalePath(locale, "/booking")}
                 className="btn btn-lg"
                 style={{
                   background: "var(--color-terracotta)",
@@ -522,7 +526,7 @@ export default function WellnessPage() {
                 Book a Treatment
               </Link>
               <Link
-                href="/services"
+                href={withLocalePath(locale, "/services")}
                 className="btn btn-lg"
                 style={{
                   background: "transparent",

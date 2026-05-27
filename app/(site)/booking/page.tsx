@@ -6,6 +6,7 @@ import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import { SERVICES, getServiceBySlug } from "@/data/services";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 type CartItem = {
   serviceId: string;
@@ -25,9 +26,10 @@ type ContactForm = {
 const TIME_GROUPS = [
   { label: "Morning", slots: ["09:00", "10:00", "11:00"] },
   { label: "Afternoon", slots: ["14:00", "15:00", "16:00", "17:00", "18:00"] },
-];
+] as const;
 
-export default function BookingPage() {
+export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
+  const vi = locale === "vi";
   const initialSlug = getInitialAddSlug();
   const initialService = initialSlug ? getServiceBySlug(initialSlug) : undefined;
   const [cart, setCart] = useState<CartItem[]>(() =>
@@ -116,16 +118,18 @@ export default function BookingPage() {
       <main className="section-cream">
         <section className="container-site py-20 text-center">
           <LotusMarkSmall size={28} color="var(--color-terracotta)" />
-          <h1 className="mt-4 font-serif text-h2">Booking Request Received</h1>
+          <h1 className="mt-4 font-serif text-h2">{vi ? "Đã nhận yêu cầu đặt lịch" : "Booking Request Received"}</h1>
           <p className="mx-auto mt-3 max-w-xl text-[var(--color-espresso-mid)]">
-            We will confirm your schedule via WhatsApp shortly. Thank you for choosing Serena Spa Hội An.
+            {vi
+              ? "Serena sẽ xác nhận khung giờ qua WhatsApp trong thời gian sớm nhất. Cảm ơn bạn đã chọn Serena Spa Hội An."
+              : "We will confirm your schedule via WhatsApp shortly. Thank you for choosing Serena Spa Hội An."}
           </p>
           <div className="mt-8 flex justify-center gap-3">
-            <Link href="/services" className="btn btn-outline">
-              Add More Services
+            <Link href={withLocalePath(locale, "/services")} className="btn btn-outline">
+              {vi ? "Thêm dịch vụ" : "Add More Services"}
             </Link>
-            <Link href="/" className="btn btn-primary">
-              Back to Home
+            <Link href={withLocalePath(locale, "/")} className="btn btn-primary">
+              {vi ? "Về trang chủ" : "Back to Home"}
             </Link>
           </div>
         </section>
@@ -135,7 +139,7 @@ export default function BookingPage() {
 
   return (
     <main>
-      <section className="relative min-h-[55svh] overflow-hidden" aria-label="Booking hero">
+      <section className="relative min-h-[55svh] overflow-hidden" aria-label={vi ? "Khu vực đặt lịch" : "Booking hero"}>
         <Image
           src="/images/serena_image/z7863130063966_02bca12b005872be63d6ed4054b0cad4.jpg"
           alt="Serena Spa reception"
@@ -147,7 +151,7 @@ export default function BookingPage() {
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(61,31,15,0.82)_0%,rgba(168,92,68,0.58)_100%)]" />
         <div className="relative container-site flex min-h-[55svh] flex-col justify-center py-14 text-white">
           <AnimatedSection animation="fade" delay={0.06}>
-            <span className="eyebrow text-[var(--color-peach-light)]">Minimal Booking Flow</span>
+            <span className="eyebrow text-[var(--color-peach-light)]">{vi ? "Quy trình đặt lịch nhanh" : "Minimal Booking Flow"}</span>
           </AnimatedSection>
           <AnimatedSection animation="slide-up-fade" delay={0.14}>
             <h1
@@ -158,12 +162,14 @@ export default function BookingPage() {
                 textShadow: "0 8px 26px rgba(61,31,15,0.35)",
               }}
             >
-              Select Services. Review Cart. Confirm in a Minute.
+              {vi ? "Chọn dịch vụ. Kiểm tra giỏ. Xác nhận trong 1 phút." : "Select Services. Review Cart. Confirm in a Minute."}
             </h1>
           </AnimatedSection>
           <AnimatedSection animation="fade" delay={0.22}>
             <p className="mt-4 max-w-2xl text-[var(--color-sand)]">
-              Build your treatment plan with multiple services, then submit one booking request.
+              {vi
+                ? "Tạo kế hoạch trị liệu với nhiều dịch vụ và gửi một yêu cầu đặt lịch duy nhất."
+                : "Build your treatment plan with multiple services, then submit one booking request."}
             </p>
           </AnimatedSection>
         </div>
@@ -179,9 +185,10 @@ export default function BookingPage() {
                   isScheduleReady={isScheduleReady}
                   isContactReady={isContactReady}
                   activeStep={activeStep}
+                  locale={locale}
                 />
-                <h2 className="font-serif text-h4">1. Choose Services</h2>
-                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">Tap service, tap duration, done.</p>
+                <h2 className="font-serif text-h4">{vi ? "1. Chọn dịch vụ" : "1. Choose Services"}</h2>
+                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{vi ? "Chọn dịch vụ, chọn thời lượng, hoàn tất." : "Tap service, tap duration, done."}</p>
 
                 <div className="mt-5 grid gap-2">
                   {SERVICES.map((service) => (
@@ -202,7 +209,7 @@ export default function BookingPage() {
                     >
                       <span className="font-sans text-sm text-[var(--color-espresso)]">{service.name}</span>
                       <span className="font-sans text-xs text-[var(--color-warm-gray)]">
-                        From {service.priceVND?.toLocaleString("vi-VN") ?? `${service.price} USD`}
+                        {vi ? "Từ" : "From"} {service.priceVND?.toLocaleString("vi-VN") ?? `${service.price} USD`}
                       </span>
                     </button>
                   ))}
@@ -228,13 +235,13 @@ export default function BookingPage() {
                               color: isAdded ? "white" : undefined,
                             }}
                           >
-                            {isAdded ? `Added ${duration} min` : `Add ${duration} min`}
+                            {isAdded ? (vi ? `Đã thêm ${duration} phút` : `Added ${duration} min`) : (vi ? `Thêm ${duration} phút` : `Add ${duration} min`)}
                           </button>
                         );
                       })}
                     </div>
                     <p className="mt-3 text-xs text-[var(--color-warm-gray)]">
-                      Price shown is per session. You can increase quantity in cart.
+                      {vi ? "Giá hiển thị theo mỗi lần trị liệu. Bạn có thể tăng số lượng trong giỏ." : "Price shown is per session. You can increase quantity in cart."}
                     </p>
                   </div>
                 )}
@@ -244,16 +251,16 @@ export default function BookingPage() {
             <AnimatedSection animation="slide-up-fade" delay={0.08}>
               <div className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
                 <div className="flex items-center justify-between gap-4">
-                  <h2 className="font-serif text-h4">2. Cart & Schedule</h2>
+                  <h2 className="font-serif text-h4">{vi ? "2. Giỏ hàng & lịch hẹn" : "2. Cart & Schedule"}</h2>
                   <span className="rounded-full bg-[var(--color-terracotta-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta-dark)]">
-                    {selectedItems.length} item{selectedItems.length === 1 ? "" : "s"}
+                    {selectedItems.length} {vi ? (selectedItems.length === 1 ? "mục" : "mục") : `item${selectedItems.length === 1 ? "" : "s"}`}
                   </span>
                 </div>
 
                 <div className="mt-5 space-y-3">
                   {selectedItems.length === 0 && (
                     <p className="rounded-xl border border-dashed border-[var(--color-sand-dark)] px-4 py-5 text-sm text-[var(--color-warm-gray)]">
-                      Your cart is empty. Start by adding at least one service.
+                      {vi ? "Giỏ hàng đang trống. Hãy thêm ít nhất một dịch vụ để bắt đầu." : "Your cart is empty. Start by adding at least one service."}
                     </p>
                   )}
                   {selectedItems.map((item) => (
@@ -264,19 +271,19 @@ export default function BookingPage() {
                       <div className="min-w-0">
                         <p className="font-sans text-sm font-medium text-[var(--color-espresso)]">{item.service.name}</p>
                         <p className="text-xs text-[var(--color-warm-gray)]">
-                          {item.durationMinutes} min · {item.unitPrice.toLocaleString("vi-VN")} VND
+                          {item.durationMinutes} {vi ? "phút" : "min"} · {item.unitPrice.toLocaleString("vi-VN")} VND
                         </p>
                       </div>
                       <div className="flex flex-col items-center justify-center gap-1">
                         <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                          Guests
+                          {vi ? "Khách" : "Guests"}
                         </span>
                         <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity - 1)}
                           className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
-                          aria-label="Decrease quantity"
+                          aria-label={vi ? "Giảm số lượng" : "Decrease quantity"}
                         >
                           −
                         </button>
@@ -285,7 +292,7 @@ export default function BookingPage() {
                           type="button"
                           onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity + 1)}
                           className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
-                          aria-label="Increase quantity"
+                          aria-label={vi ? "Tăng số lượng" : "Increase quantity"}
                         >
                           +
                         </button>
@@ -301,7 +308,7 @@ export default function BookingPage() {
                 <div className="mt-5 border-t border-[var(--color-sand)] pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--color-warm-gray)]">
-                      Total · {totalDuration} min
+                      {vi ? "Tổng" : "Total"} · {totalDuration} {vi ? "phút" : "min"}
                     </span>
                     <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalVND.toLocaleString("vi-VN")} VND</span>
                   </div>
@@ -310,13 +317,13 @@ export default function BookingPage() {
                 <div className="mt-6 space-y-4">
                 <div className="space-y-3 rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                    Date *
+                    {vi ? "Ngày *" : "Date *"}
                   </p>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {[
-                      { label: "Today", value: todayISO },
-                      { label: "Tomorrow", value: tomorrowISO },
-                      { label: "Weekend", value: weekendISO },
+                      { label: vi ? "Hôm nay" : "Today", value: todayISO },
+                      { label: vi ? "Ngày mai" : "Tomorrow", value: tomorrowISO },
+                      { label: vi ? "Cuối tuần" : "Weekend", value: weekendISO },
                     ].map((option) => {
                       const isActive = form.date === option.value;
                       return (
@@ -339,7 +346,7 @@ export default function BookingPage() {
 
                   <label className="block">
                     <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                      Or choose another date
+                      {vi ? "Hoặc chọn ngày khác" : "Or choose another date"}
                     </span>
                     <input
                       className="input"
@@ -352,12 +359,16 @@ export default function BookingPage() {
                   </label>
                 </div>
 
-                <Field label="Time" required>
+                <Field label={vi ? "Giờ" : "Time"} required>
                   <div className="space-y-3">
                     {TIME_GROUPS.map((group) => (
                       <div key={group.label}>
                         <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                          {group.label}
+                          {vi
+                            ? group.label === "Morning"
+                              ? "Buổi sáng"
+                              : "Buổi chiều"
+                            : group.label}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {group.slots.map((slot) => {
@@ -388,7 +399,7 @@ export default function BookingPage() {
                   <div className="space-y-3">
                     {!canGoNext && (
                       <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
-                        Complete cart, date and time to continue.
+                        {vi ? "Vui lòng hoàn tất giỏ hàng, ngày và giờ để tiếp tục." : "Complete cart, date and time to continue."}
                       </p>
                     )}
                     <button
@@ -397,7 +408,7 @@ export default function BookingPage() {
                       className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!canGoNext}
                     >
-                      Next
+                      {vi ? "Tiếp tục" : "Next"}
                     </button>
                   </div>
                 </div>
@@ -413,10 +424,11 @@ export default function BookingPage() {
                   isScheduleReady={isScheduleReady}
                   isContactReady={isContactReady}
                   activeStep={activeStep}
+                  locale={locale}
                 />
-                <h2 className="font-serif text-h3">3. Guest details</h2>
+                <h2 className="font-serif text-h3">{vi ? "3. Thông tin khách hàng" : "3. Guest details"}</h2>
                 <p className="mt-1 text-sm text-[var(--color-warm-gray)]">
-                  One final step to confirm your booking.
+                  {vi ? "Thêm một bước cuối để xác nhận yêu cầu đặt lịch." : "One final step to confirm your booking."}
                 </p>
 
                 <button
@@ -426,7 +438,7 @@ export default function BookingPage() {
                   aria-expanded={summaryOpen}
                   aria-controls="booking-summary-details"
                 >
-                  <span>{selectedItems.length} service item(s) · {totalDuration} min · {totalVND.toLocaleString("vi-VN")} VND</span>
+                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration} {vi ? "phút" : "min"} · {totalVND.toLocaleString("vi-VN")} VND</span>
                   <span className="text-[var(--color-terracotta)]">{summaryOpen ? "▴" : "▾"}</span>
                 </button>
 
@@ -437,7 +449,7 @@ export default function BookingPage() {
                   {selectedItems.map((item) => (
                     <div key={`${item.serviceId}-${item.durationMinutes}`} className="flex items-center justify-between gap-3 text-xs">
                       <span className="text-[var(--color-espresso-mid)]">
-                        {item.service.name} · {item.durationMinutes} min × {item.quantity}
+                        {item.service.name} · {item.durationMinutes} {vi ? "phút" : "min"} × {item.quantity}
                       </span>
                       <span className="font-semibold text-[var(--color-espresso)]">{item.lineTotal.toLocaleString("vi-VN")} VND</span>
                     </div>
@@ -445,7 +457,7 @@ export default function BookingPage() {
                 </div>
 
                 <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-                  <Field label="Full name" required>
+                  <Field label={vi ? "Họ và tên" : "Full name"} required>
                     <input
                       className="input"
                       type="text"
@@ -456,7 +468,7 @@ export default function BookingPage() {
                     />
                   </Field>
 
-                  <Field label="Phone / WhatsApp" required>
+                  <Field label={vi ? "Điện thoại / WhatsApp" : "Phone / WhatsApp"} required>
                     <input
                       className="input"
                       type="tel"
@@ -469,9 +481,9 @@ export default function BookingPage() {
 
                   <div className="space-y-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta)]">
-                      Add email or note (optional)
+                      {vi ? "Thêm email hoặc ghi chú (không bắt buộc)" : "Add email or note (optional)"}
                     </p>
-                    <Field label="Email">
+                    <Field label={vi ? "Email" : "Email"}>
                       <input
                         className="input"
                         type="email"
@@ -481,19 +493,19 @@ export default function BookingPage() {
                       />
                     </Field>
 
-                    <Field label="Note">
+                    <Field label={vi ? "Ghi chú" : "Note"}>
                       <textarea
                         className="input min-h-[96px]"
                         value={form.note}
                         onChange={(event) => setForm((prev) => ({ ...prev, note: event.target.value }))}
-                        placeholder="Therapist preference, allergies, special occasion..."
+                        placeholder={vi ? "Kỹ thuật viên mong muốn, dị ứng, dịp đặc biệt..." : "Therapist preference, allergies, special occasion..."}
                       />
                     </Field>
                   </div>
 
                   {!canSubmit && (
                     <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
-                      Complete name and phone to confirm booking.
+                      {vi ? "Vui lòng nhập họ tên và số điện thoại để xác nhận đặt lịch." : "Complete name and phone to confirm booking."}
                     </p>
                   )}
 
@@ -503,14 +515,14 @@ export default function BookingPage() {
                       onClick={() => setActiveStep("build")}
                       className="btn btn-outline flex-1"
                     >
-                      Back
+                      {vi ? "Quay lại" : "Back"}
                     </button>
                     <button
                       type="submit"
                       className="btn btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!canSubmit}
                     >
-                      Confirm Booking Request
+                      {vi ? "Xác nhận yêu cầu đặt lịch" : "Confirm Booking Request"}
                     </button>
                   </div>
                 </form>
@@ -564,20 +576,23 @@ function StepRow({
   isScheduleReady,
   isContactReady,
   activeStep,
+  locale,
 }: {
   hasCart: boolean;
   isScheduleReady: boolean;
   isContactReady: boolean;
   activeStep: "build" | "contact";
+  locale: Locale;
 }) {
+  const vi = locale === "vi";
   const steps = [
-    { label: "Service", done: hasCart },
-    { label: "Schedule", done: isScheduleReady },
-    { label: "Contact", done: isContactReady },
+    { label: vi ? "Dịch vụ" : "Service", done: hasCart },
+    { label: vi ? "Lịch hẹn" : "Schedule", done: isScheduleReady },
+    { label: vi ? "Liên hệ" : "Contact", done: isContactReady },
   ];
 
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-2" aria-label="Booking progress">
+    <div className="mb-5 flex flex-wrap items-center gap-2" aria-label={vi ? "Tiến trình đặt lịch" : "Booking progress"}>
       {steps.map((step) => (
         <span
           key={step.label}
@@ -587,8 +602,8 @@ function StepRow({
             color: step.done ? "var(--color-terracotta-dark)" : "var(--color-warm-gray)",
             backgroundColor:
               step.done ||
-              (activeStep === "build" && step.label !== "Contact") ||
-              (activeStep === "contact" && step.label === "Contact")
+              (activeStep === "build" && step.label !== (vi ? "Liên hệ" : "Contact")) ||
+              (activeStep === "contact" && step.label === (vi ? "Liên hệ" : "Contact"))
                 ? "var(--color-terracotta-muted)"
                 : "transparent",
           }}

@@ -8,10 +8,11 @@ import OrnamentDivider from "@/components/ui/OrnamentDivider";
 import ServiceCard from "@/components/cards/ServiceCard";
 import {
   SERVICES,
-  SERVICE_CATEGORIES,
-  getServiceBySlug,
-  getServicesByCategory,
+  getServiceBySlugLocalized,
+  getServicesByCategoryLocalized,
+  getServiceCategories,
 } from "@/data/services";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 /* ─── Static params ─────────────────────────────────────────────────────── */
 
@@ -25,7 +26,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const service = getServiceBySlugLocalized(slug, "en");
   if (!service) return {};
 
   const title =
@@ -65,16 +66,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /* ─── Page ──────────────────────────────────────────────────────────────── */
 
-export default async function ServiceDetailPage({ params }: Props) {
+export default async function ServiceDetailPage({
+  params,
+  locale = "en",
+}: Props & { locale?: Locale }) {
+  const vi = locale === "vi";
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const service = getServiceBySlugLocalized(slug, locale);
   if (!service) notFound();
 
-  const category = SERVICE_CATEGORIES.find(
+  const category = getServiceCategories(locale).find(
     (c) => c.id === service.categoryId,
   );
 
-  const relatedServices = getServicesByCategory(service.categoryId)
+  const relatedServices = getServicesByCategoryLocalized(service.categoryId, locale)
     .filter((s) => s.id !== service.id)
     .slice(0, 3);
 
@@ -92,14 +97,14 @@ export default async function ServiceDetailPage({ params }: Props) {
         <ol className="flex items-center gap-2 flex-wrap">
           <li>
             <Link
-              href="/"
+              href={withLocalePath(locale, "/")}
               className="font-sans transition-colors duration-200 hover:text-[var(--color-terracotta)]"
               style={{
                 fontSize: "0.8rem",
                 color: "var(--color-warm-gray)",
               }}
             >
-              Home
+              {vi ? "Trang chủ" : "Home"}
             </Link>
           </li>
           <li
@@ -110,14 +115,14 @@ export default async function ServiceDetailPage({ params }: Props) {
           </li>
           <li>
             <Link
-              href="/services"
+              href={withLocalePath(locale, "/services")}
               className="font-sans transition-colors duration-200 hover:text-[var(--color-terracotta)]"
               style={{
                 fontSize: "0.8rem",
                 color: "var(--color-warm-gray)",
               }}
             >
-              Services
+              {vi ? "Dịch vụ" : "Services"}
             </Link>
           </li>
           <li
@@ -174,7 +179,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     letterSpacing: "0.22em",
                   }}
                 >
-                  {category?.label ?? "Treatment"}
+                  {category?.label ?? (vi ? "Liệu trình" : "Treatment")}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -260,7 +265,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       backgroundColor: "var(--color-cream)",
                     }}
                   >
-                    {mins} mins
+                    {mins} {vi ? "phút" : "mins"}
                   </span>
                 ))}
               </div>
@@ -278,7 +283,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       lineHeight: 1.1,
                     }}
                   >
-                    From {service.priceVND.toLocaleString("vi-VN")} VND
+                    {vi ? "Từ" : "From"} {service.priceVND.toLocaleString("vi-VN")} VND
                   </p>
                   <p
                     className="font-sans mt-1"
@@ -297,7 +302,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             <AnimatedSection animation="slide-up-fade" delay={0.48}>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={`/booking?add=${service.slug}`}
+                  href={`${withLocalePath(locale, "/booking")}?add=${service.slug}`}
                   className="btn btn-primary btn-lg flex items-center gap-2"
                 >
                   <svg
@@ -314,13 +319,13 @@ export default async function ServiceDetailPage({ params }: Props) {
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                     />
                   </svg>
-                  Book This Treatment
+                  {vi ? "Đặt liệu trình này" : "Book This Treatment"}
                 </Link>
                 <a
                   href="#details"
                   className="btn btn-outline btn-lg"
                 >
-                  Learn More ↓
+                  {vi ? "Xem thêm ↓" : "Learn More ↓"}
                 </a>
               </div>
             </AnimatedSection>
@@ -371,7 +376,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                   boxShadow: "0 4px 16px rgba(200,116,90,0.45)",
                 }}
               >
-                Signature Treatment
+                {vi ? "Liệu trình đặc trưng" : "Signature Treatment"}
               </div>
             )}
           </div>
@@ -416,7 +421,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                         letterSpacing: "0.22em",
                       }}
                     >
-                      The Experience
+                      {vi ? "Trải nghiệm" : "The Experience"}
                     </span>
                   </div>
                   <OrnamentDivider className="justify-start mb-4" />
@@ -428,7 +433,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       lineHeight: 1.12,
                     }}
                   >
-                    What You&apos;ll Feel
+                    {vi ? "Bạn sẽ cảm nhận" : "What You'll Feel"}
                   </h2>
                   <p
                     className="font-sans text-[var(--color-espresso-mid)] mt-4"
@@ -438,8 +443,9 @@ export default async function ServiceDetailPage({ params }: Props) {
                       maxWidth: "36ch",
                     }}
                   >
-                    Each treatment is designed to restore balance on every
-                    level — body, mind, and spirit.
+                    {vi
+                      ? "Mỗi liệu trình được thiết kế để phục hồi cân bằng ở mọi cấp độ: cơ thể, tâm trí và tinh thần."
+                      : "Each treatment is designed to restore balance on every level — body, mind, and spirit."}
                   </p>
                 </div>
               </AnimatedSection>
@@ -500,7 +506,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       letterSpacing: "0.22em",
                     }}
                   >
-                    Every Visit
+                    {vi ? "Mỗi lần trải nghiệm" : "Every Visit"}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -513,7 +519,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     lineHeight: 1.12,
                   }}
                 >
-                  What&apos;s Included
+                  {vi ? "Liệu trình bao gồm" : "What's Included"}
                 </h2>
               </div>
             </AnimatedSection>
@@ -578,7 +584,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       letterSpacing: "0.22em",
                     }}
                   >
-                    Our Space
+                    {vi ? "Không gian Serena" : "Our Space"}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -590,7 +596,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     lineHeight: 1.15,
                   }}
                 >
-                  Inside the Room
+                  {vi ? "Bên trong phòng trị liệu" : "Inside the Room"}
                 </h2>
               </div>
             </AnimatedSection>
@@ -643,7 +649,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       letterSpacing: "0.22em",
                     }}
                   >
-                    Continue Your Journey
+                    {vi ? "Tiếp tục hành trình" : "Continue Your Journey"}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -656,7 +662,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     lineHeight: 1.12,
                   }}
                 >
-                  You May Also Love
+                  {vi ? "Có thể bạn cũng thích" : "You May Also Love"}
                 </h2>
               </div>
             </AnimatedSection>
@@ -668,7 +674,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                   animation="slide-up-fade"
                   delay={i * 0.08}
                 >
-                  <ServiceCard service={related} className="h-full" />
+                  <ServiceCard service={related} className="h-full" locale={locale} />
                 </AnimatedSection>
               ))}
             </div>
@@ -712,7 +718,7 @@ export default async function ServiceDetailPage({ params }: Props) {
               className="font-sans font-semibold uppercase text-[var(--color-peach-light)]"
               style={{ fontSize: "0.72rem", letterSpacing: "0.22em" }}
             >
-              Your Sanctuary Awaits
+              {vi ? "Không gian chữa lành đang chờ bạn" : "Your Sanctuary Awaits"}
             </span>
           </AnimatedSection>
 
@@ -725,7 +731,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 lineHeight: 1.1,
               }}
             >
-              Reserve This Treatment Today
+              {vi ? "Đặt liệu trình này ngay hôm nay" : "Reserve This Treatment Today"}
             </h2>
           </AnimatedSection>
 
@@ -734,14 +740,15 @@ export default async function ServiceDetailPage({ params }: Props) {
               className="font-sans text-[var(--color-sand)] max-w-md"
               style={{ fontSize: "0.975rem", lineHeight: 1.75 }}
             >
-              Same-day bookings warmly welcomed. Connect with us online or
-              via WhatsApp for instant confirmation.
+              {vi
+                ? "Serena hỗ trợ đặt lịch trong ngày. Liên hệ trực tuyến hoặc qua WhatsApp để xác nhận nhanh."
+                : "Same-day bookings warmly welcomed. Connect with us online or via WhatsApp for instant confirmation."}
             </p>
           </AnimatedSection>
 
           <AnimatedSection animation="slide-up-fade" delay={0.34}>
             <div className="flex flex-wrap gap-4 justify-center mt-2">
-              <Link href={`/booking?add=${service.slug}`} className="btn btn-primary btn-lg">
+              <Link href={`${withLocalePath(locale, "/booking")}?add=${service.slug}`} className="btn btn-primary btn-lg">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="none"
@@ -756,7 +763,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                   />
                 </svg>
-                Book Now
+                {vi ? "Đặt lịch ngay" : "Book Now"}
               </Link>
               <a
                 href="https://wa.me/84xxxxxxxxx"
@@ -764,7 +771,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 rel="noopener noreferrer"
                 className="btn btn-outline-white btn-lg"
               >
-                WhatsApp Us
+                {vi ? "Nhắn WhatsApp" : "WhatsApp Us"}
               </a>
             </div>
           </AnimatedSection>

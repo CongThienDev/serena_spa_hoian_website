@@ -6,6 +6,7 @@ import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import { CONTACT, HOURS, SOCIAL } from "@/data/site";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -18,16 +19,21 @@ type FormFields = {
 };
 
 const TREATMENT_INTERESTS = [
-  { value: "", label: "Select a topic..." },
-  { value: "general", label: "General Inquiry" },
-  { value: "massage", label: "Massage Therapy" },
-  { value: "facial", label: "Facial Treatments" },
-  { value: "body", label: "Body Treatments" },
-  { value: "couple", label: "Couple Packages" },
-  { value: "occasion", label: "Special Occasion" },
+  { value: "", labelEn: "Select a topic...", labelVi: "Chọn chủ đề..." },
+  { value: "general", labelEn: "General Inquiry", labelVi: "Tư vấn chung" },
+  { value: "massage", labelEn: "Massage Therapy", labelVi: "Massage trị liệu" },
+  { value: "facial", labelEn: "Facial Treatments", labelVi: "Chăm sóc da mặt" },
+  { value: "body", labelEn: "Body Treatments", labelVi: "Chăm sóc cơ thể" },
+  { value: "couple", labelEn: "Couple Packages", labelVi: "Gói cặp đôi" },
+  { value: "occasion", labelEn: "Special Occasion", labelVi: "Dịp đặc biệt" },
 ];
 
-export default function ContactPage() {
+export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
+  const vi = locale === "vi";
+  const localizedInterests = TREATMENT_INTERESTS.map((item) => ({
+    value: item.value,
+    label: vi ? item.labelVi : item.labelEn,
+  }));
   const [formState, setFormState] = useState<FormState>("idle");
   const [fields, setFields] = useState<FormFields>({
     name: "",
@@ -57,13 +63,13 @@ export default function ContactPage() {
       {/* ── Page Header ─────────────────────────────────────────────────── */}
       <section
         className="section-cream section-padding text-center"
-        aria-label="Contact page header"
+        aria-label={vi ? "Tiêu đề trang liên hệ" : "Contact page header"}
       >
         <div className="container-content">
           <AnimatedSection animation="fade" delay={0.05}>
             <div className="flex items-center justify-center gap-2.5 mb-5">
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
-              <span className="eyebrow">We&apos;d Love to Hear From You</span>
+              <span className="eyebrow">{vi ? "Serena luôn sẵn sàng lắng nghe bạn" : "We'd Love to Hear From You"}</span>
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
             </div>
           </AnimatedSection>
@@ -79,7 +85,7 @@ export default function ContactPage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              Get in Touch
+              {vi ? "Liên hệ Serena" : "Get in Touch"}
             </h1>
           </AnimatedSection>
 
@@ -88,9 +94,9 @@ export default function ContactPage() {
               className="prose-spa mx-auto mt-5 text-center"
               style={{ maxWidth: "54ch" }}
             >
-              We&apos;re here whenever you need us. Whether you&apos;re booking
-              a treatment or just have a question — reach out and we&apos;ll
-              respond warmly.
+              {vi
+                ? "Dù bạn muốn đặt lịch hay chỉ cần tư vấn, Serena luôn ở đây để hỗ trợ bạn tận tâm."
+                : "We're here whenever you need us. Whether you're booking a treatment or just have a question — reach out and we'll respond warmly."}
             </p>
           </AnimatedSection>
         </div>
@@ -100,7 +106,7 @@ export default function ContactPage() {
       <section
         className="section-cream section-padding"
         style={{ paddingTop: "2rem" }}
-        aria-label="Contact information and form"
+        aria-label={vi ? "Thông tin liên hệ và biểu mẫu" : "Contact information and form"}
       >
         <div className="container-site">
           <div
@@ -132,7 +138,7 @@ export default function ContactPage() {
                         fontWeight: 500,
                       }}
                     >
-                      Our Details
+                      {vi ? "Thông tin của Serena" : "Our Details"}
                     </h2>
                   </AnimatedSection>
 
@@ -141,10 +147,10 @@ export default function ContactPage() {
                     <AnimatedSection animation="slide-up-fade" delay={0.1}>
                       <ContactInfoBlock
                         icon={<LocationIcon />}
-                        label="Visit Us"
+                        label={vi ? "Địa chỉ" : "Visit Us"}
                         value={CONTACT.address}
                         href={CONTACT.googleMapsUrl}
-                        linkLabel="Get directions"
+                        linkLabel={vi ? "Xem chỉ đường" : "Get directions"}
                       />
                     </AnimatedSection>
 
@@ -152,7 +158,7 @@ export default function ContactPage() {
                     <AnimatedSection animation="slide-up-fade" delay={0.15}>
                       <ContactInfoBlock
                         icon={<PhoneIcon />}
-                        label="Call Us"
+                        label={vi ? "Điện thoại" : "Call Us"}
                         value={CONTACT.phoneFormatted}
                         href={`tel:${CONTACT.phone}`}
                       />
@@ -172,7 +178,7 @@ export default function ContactPage() {
                     <AnimatedSection animation="slide-up-fade" delay={0.25}>
                       <ContactInfoBlock
                         icon={<ClockIcon />}
-                        label="Opening Hours"
+                        label={vi ? "Giờ mở cửa" : "Opening Hours"}
                         value={HOURS.label}
                         subValue={`Mon – Fri: ${HOURS.weekdays}  ·  Sat – Sun: ${HOURS.weekends}`}
                       />
@@ -183,9 +189,9 @@ export default function ContactPage() {
                       <ContactInfoBlock
                         icon={<WhatsAppIcon />}
                         label="WhatsApp"
-                        value="Message us directly"
+                        value={vi ? "Nhắn tin trực tiếp với Serena" : "Message us directly"}
                         href={`https://wa.me/${CONTACT.whatsapp}`}
-                        linkLabel="Open WhatsApp"
+                        linkLabel={vi ? "Mở WhatsApp" : "Open WhatsApp"}
                       />
                     </AnimatedSection>
 
@@ -231,7 +237,7 @@ export default function ContactPage() {
                               marginBottom: "0.35rem",
                             }}
                           >
-                            Follow Us
+                            {vi ? "Theo dõi Serena" : "Follow Us"}
                           </p>
                           <div className="flex items-center gap-3">
                             {SOCIAL.instagram && (
@@ -332,7 +338,7 @@ export default function ContactPage() {
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-sm"
                       >
-                        Open in Google Maps
+                        {vi ? "Mở Google Maps" : "Open in Google Maps"}
                       </a>
                     </div>
                   </AnimatedSection>
@@ -345,7 +351,7 @@ export default function ContactPage() {
                     style={{ padding: "clamp(1.5rem, 4vw, 2.5rem)" }}
                   >
                     {formState === "success" ? (
-                      <SuccessState />
+                      <SuccessState locale={locale} />
                     ) : (
                       <>
                         <h2
@@ -355,25 +361,25 @@ export default function ContactPage() {
                             fontWeight: 500,
                           }}
                         >
-                          Send Us a Message
+                          {vi ? "Gửi tin nhắn cho Serena" : "Send Us a Message"}
                         </h2>
                         <p
                           className="font-sans text-[var(--color-warm-gray)] mb-7"
                           style={{ fontSize: "0.9rem" }}
                         >
-                          We&apos;ll get back to you within 24 hours.
+                          {vi ? "Serena sẽ phản hồi trong vòng 24 giờ." : "We'll get back to you within 24 hours."}
                         </p>
 
                         <form onSubmit={handleSubmit} noValidate>
                           <div className="space-y-5">
                             {/* Name */}
-                            <FormField label="Full Name" required>
+                            <FormField label={vi ? "Họ và tên" : "Full Name"} required>
                               <input
                                 type="text"
                                 name="name"
                                 value={fields.name}
                                 onChange={handleChange}
-                                placeholder="Your full name"
+                                placeholder={vi ? "Nhập họ và tên" : "Your full name"}
                                 required
                                 className="input"
                                 autoComplete="name"
@@ -381,7 +387,7 @@ export default function ContactPage() {
                             </FormField>
 
                             {/* Email */}
-                            <FormField label="Email Address" required>
+                            <FormField label={vi ? "Địa chỉ email" : "Email Address"} required>
                               <input
                                 type="email"
                                 name="email"
@@ -395,7 +401,7 @@ export default function ContactPage() {
                             </FormField>
 
                             {/* Phone */}
-                            <FormField label="Phone Number" hint="Optional">
+                            <FormField label={vi ? "Số điện thoại" : "Phone Number"} hint={vi ? "Không bắt buộc" : "Optional"}>
                               <input
                                 type="tel"
                                 name="phone"
@@ -408,7 +414,7 @@ export default function ContactPage() {
                             </FormField>
 
                             {/* Treatment Interest */}
-                            <FormField label="I&apos;m Interested In">
+                            <FormField label={vi ? "Tôi quan tâm" : "I'm Interested In"}>
                               <select
                                 name="interest"
                                 value={fields.interest}
@@ -416,7 +422,7 @@ export default function ContactPage() {
                                 className="input"
                                 style={{ cursor: "pointer" }}
                               >
-                                {TREATMENT_INTERESTS.map((opt) => (
+                                {localizedInterests.map((opt) => (
                                   <option key={opt.value} value={opt.value}>
                                     {opt.label}
                                   </option>
@@ -425,12 +431,12 @@ export default function ContactPage() {
                             </FormField>
 
                             {/* Message */}
-                            <FormField label="Your Message" required>
+                            <FormField label={vi ? "Nội dung tin nhắn" : "Your Message"} required>
                               <textarea
                                 name="message"
                                 value={fields.message}
                                 onChange={handleChange}
-                                placeholder="Tell us how we can help…"
+                                placeholder={vi ? "Hãy cho Serena biết bạn cần hỗ trợ gì…" : "Tell us how we can help…"}
                                 required
                                 rows={4}
                                 className="input"
@@ -466,7 +472,7 @@ export default function ContactPage() {
                                   Sending…
                                 </>
                               ) : (
-                                "Send Message"
+                                (vi ? "Gửi tin nhắn" : "Send Message")
                               )}
                             </button>
                           </div>
@@ -556,7 +562,7 @@ export default function ContactPage() {
             >
               Prefer to book directly?
             </p>
-            <Link href="/booking" className="btn btn-primary btn-sm">
+            <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-sm">
               Book Online
             </Link>
           </div>
@@ -706,7 +712,8 @@ function FormField({
   );
 }
 
-function SuccessState() {
+function SuccessState({ locale }: { locale: Locale }) {
+  const vi = locale === "vi";
   return (
     <div
       style={{
@@ -739,20 +746,20 @@ function SuccessState() {
         className="font-serif text-[var(--color-espresso)]"
         style={{ fontSize: "1.6rem", fontWeight: 500 }}
       >
-        Message Received
+        {vi ? "Đã nhận tin nhắn" : "Message Received"}
       </h3>
       <p
         className="font-sans text-[var(--color-espresso-mid)]"
         style={{ fontSize: "0.95rem", maxWidth: "34ch", lineHeight: 1.7 }}
       >
-        Thank you! We&apos;ll be in touch within 24 hours.
+        {vi ? "Cảm ơn bạn! Serena sẽ phản hồi trong vòng 24 giờ." : "Thank you! We'll be in touch within 24 hours."}
       </p>
       <Link
-        href="/booking"
+        href={withLocalePath(locale, "/booking")}
         className="btn btn-outline btn-sm"
         style={{ marginTop: "0.5rem" }}
       >
-        Book a Treatment
+        {vi ? "Đặt liệu trình" : "Book a Treatment"}
       </Link>
     </div>
   );
