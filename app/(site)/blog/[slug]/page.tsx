@@ -10,7 +10,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) {
-    return generatePageMetadata({ title: "Article Not Found", path: "/blog" });
+    return generatePageMetadata({
+      title: "Article Not Found",
+      description: "The requested journal article could not be found.",
+      path: "/blog",
+      noIndex: true,
+    });
   }
   return generatePageMetadata({
     title: post.seoTitle || post.title,
