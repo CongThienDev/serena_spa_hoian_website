@@ -2,16 +2,19 @@ import Link from "next/link";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { getFeaturedPosts } from "@/data/blog";
+import { type Locale, withLocalePath } from "@/lib/i18n";
+import { getHomeCopy } from "@/data/content-home";
 
-function BlogCard({ post }: { post: ReturnType<typeof getFeaturedPosts>[number] }) {
-  const date = new Date(post.publishedAt).toLocaleDateString("en-US", {
+function BlogCard({ post, locale }: { post: ReturnType<typeof getFeaturedPosts>[number]; locale: Locale }) {
+  const copy = getHomeCopy(locale).blog;
+  const date = new Date(post.publishedAt).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
   return (
-    <Link href={`/blog/${post.slug}`} className="group block h-full">
+    <Link href={withLocalePath(locale, `/blog/${post.slug}`)} className="group block h-full">
       <article
         className="card h-full flex flex-col"
         style={{ borderRadius: "var(--radius-card)" }}
@@ -40,7 +43,7 @@ function BlogCard({ post }: { post: ReturnType<typeof getFeaturedPosts>[number] 
               className="font-sans text-[var(--color-warm-gray)]"
               style={{ fontSize: "0.72rem" }}
             >
-              {post.readingTime} min read
+              {post.readingTime} {copy.minRead}
             </span>
           </div>
 
@@ -73,7 +76,7 @@ function BlogCard({ post }: { post: ReturnType<typeof getFeaturedPosts>[number] 
               className="font-sans font-semibold text-[var(--color-terracotta)] flex items-center gap-1 group-hover:gap-2 transition-all duration-200"
               style={{ fontSize: "0.78rem", letterSpacing: "0.05em" }}
             >
-              Read More
+              {copy.readMore}
               <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -89,8 +92,9 @@ function BlogCard({ post }: { post: ReturnType<typeof getFeaturedPosts>[number] 
  * BlogPreview — 3 featured blog posts.
  * Sits on cream background before the dark CTA footer.
  */
-export default function BlogPreview() {
-  const posts = getFeaturedPosts(3);
+export default function BlogPreview({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).blog;
+  const posts = getFeaturedPosts(3, locale);
 
   return (
     <section
@@ -102,14 +106,14 @@ export default function BlogPreview() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <AnimatedSection animation="slide-up-fade">
             <SectionHeading
-              eyebrow="Wellness Journal"
-              title="From the Journal"
+              eyebrow={copy.eyebrow}
+              title={copy.title}
               titleAs="h2"
             />
           </AnimatedSection>
           <AnimatedSection animation="fade" delay={0.2}>
-            <Link href="/blog" className="btn btn-outline btn-sm flex-shrink-0 self-start md:self-auto">
-              All Articles
+            <Link href={withLocalePath(locale, "/blog")} className="btn btn-outline btn-sm flex-shrink-0 self-start md:self-auto">
+              {copy.allArticles}
             </Link>
           </AnimatedSection>
         </div>
@@ -117,7 +121,7 @@ export default function BlogPreview() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {posts.map((post, i) => (
             <AnimatedSection key={post.id} animation="slide-up-fade" delay={i * 0.09}>
-              <BlogCard post={post} />
+              <BlogCard post={post} locale={locale} />
             </AnimatedSection>
           ))}
         </div>

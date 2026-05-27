@@ -2,6 +2,8 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import OrnamentDivider from "@/components/ui/OrnamentDivider";
 import { getFeaturedTestimonials } from "@/data/testimonials";
+import { type Locale } from "@/lib/i18n";
+import { getHomeCopy } from "@/data/content-home";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -23,19 +25,13 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-const sourceLabel: Record<string, string> = {
-  google: "Google Review",
-  tripadvisor: "TripAdvisor",
-  booking: "Booking.com",
-  direct: "Guest",
-};
-
 /**
  * TestimonialsSection — 3-column testimonial cards.
  * Warm sand background to contrast cream above and below.
  */
-export default function TestimonialsSection() {
-  const testimonials = getFeaturedTestimonials(3);
+export default function TestimonialsSection({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).testimonials;
+  const testimonials = getFeaturedTestimonials(3, locale);
 
   return (
     <section
@@ -46,8 +42,8 @@ export default function TestimonialsSection() {
       <div className="container-site">
         <AnimatedSection animation="slide-up-fade" className="mb-14">
           <SectionHeading
-            eyebrow="Guest Stories"
-            title="What Our Guests Say"
+            eyebrow={copy.eyebrow}
+            title={copy.title}
             align="center"
           />
           <OrnamentDivider className="mt-2" />
@@ -70,7 +66,7 @@ export default function TestimonialsSection() {
                     className="font-sans text-[var(--color-warm-gray)]"
                     style={{ fontSize: "0.7rem", letterSpacing: "0.08em" }}
                   >
-                    {sourceLabel[t.source] ?? t.source}
+                    {copy.source[t.source as keyof typeof copy.source] ?? t.source}
                   </span>
                 </div>
 

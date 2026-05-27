@@ -1,10 +1,10 @@
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import { type Locale } from "@/lib/i18n";
+import { getHomeCopy } from "@/data/content-home";
 
 const reasons = [
   {
-    title: "Professional Therapists",
-    description: "Trained and certified wellness practitioners with years of hands-on expertise.",
     icon: (
       <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
         <circle cx="20" cy="12" r="5" stroke="var(--color-terracotta)" strokeWidth="1.5" />
@@ -14,8 +14,6 @@ const reasons = [
     ),
   },
   {
-    title: "Premium Products",
-    description: "Curated organic and botanical skincare — selected for purity, performance and scent.",
     icon: (
       <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
         <path d="M12 28 C12 20, 16 14, 20 10 C24 14, 28 20, 28 28 C28 33, 24 36, 20 36 C16 36, 12 33, 12 28Z" stroke="var(--color-terracotta)" strokeWidth="1.5" />
@@ -25,8 +23,6 @@ const reasons = [
     ),
   },
   {
-    title: "Private & Peaceful Space",
-    description: "Intimate treatment suites designed for complete privacy, quiet and deep restoration.",
     icon: (
       <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
         <rect x="8" y="16" width="24" height="18" rx="3" stroke="var(--color-terracotta)" strokeWidth="1.5" />
@@ -36,8 +32,6 @@ const reasons = [
     ),
   },
   {
-    title: "Best Price Guarantee",
-    description: "Exceptional luxury at honest value — no hidden charges, no surprises.",
     icon: (
       <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
         <circle cx="20" cy="20" r="13" stroke="var(--color-terracotta)" strokeWidth="1.5" />
@@ -48,11 +42,9 @@ const reasons = [
   },
 ];
 
-/**
- * WhyChooseUs — 4 trust pillars, warm alternate background.
- * Matches the "PROFESSIONAL THERAPISTS / PREMIUM PRODUCTS" trust strip in the reference.
- */
-export default function WhyChooseUs() {
+export default function WhyChooseUs({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).why;
+
   return (
     <section
       className="section-padding section-round-top"
@@ -62,9 +54,9 @@ export default function WhyChooseUs() {
       <div className="container-site">
         <AnimatedSection animation="slide-up-fade">
           <SectionHeading
-            eyebrow="Why Serena"
-            title="Why Guests Choose Us"
-            subtitle="From your first breath in our space to your final sip of herbal tea, every detail is designed around you."
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            subtitle={copy.subtitle}
             align="center"
             className="mb-14"
           />
@@ -72,7 +64,7 @@ export default function WhyChooseUs() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {reasons.map((reason, i) => (
-            <AnimatedSection key={reason.title} animation="slide-up-fade" delay={i * 0.07}>
+            <AnimatedSection key={`${copy.items[i]?.title ?? "item"}-${i}`} animation="slide-up-fade" delay={i * 0.07}>
               <div
                 className="flex flex-col items-center text-center gap-4 rounded-[var(--radius-card)] p-7"
                 style={{
@@ -80,7 +72,6 @@ export default function WhyChooseUs() {
                   boxShadow: "var(--shadow-card)",
                 }}
               >
-                {/* Icon */}
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: "var(--color-cream-dark)" }}
@@ -92,14 +83,14 @@ export default function WhyChooseUs() {
                   className="font-sans font-semibold text-[var(--color-espresso)] uppercase tracking-widest"
                   style={{ fontSize: "0.7rem", letterSpacing: "0.14em" }}
                 >
-                  {reason.title}
+                  {copy.items[i]?.title ?? ""}
                 </h3>
 
                 <p
                   className="font-sans text-[var(--color-warm-gray)]"
                   style={{ fontSize: "0.85rem", lineHeight: 1.7 }}
                 >
-                  {reason.description}
+                  {copy.items[i]?.description ?? ""}
                 </p>
               </div>
             </AnimatedSection>

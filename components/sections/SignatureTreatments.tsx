@@ -2,15 +2,18 @@ import Link from "next/link";
 import ServiceCard from "@/components/cards/ServiceCard";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
-import { getFeaturedServices } from "@/data/services";
+import { getFeaturedServicesLocalized } from "@/data/services";
+import { getHomeCopy } from "@/data/content-home";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 /**
  * SignatureTreatments — "Our Signature Treatments" section.
  * 4-column card grid on desktop, 2-col tablet, 1-col mobile.
  * Includes a dark "Book Your Wellness" sidebar card matching the reference.
  */
-export default function SignatureTreatments() {
-  const services = getFeaturedServices(4);
+export default function SignatureTreatments({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).treatments;
+  const services = getFeaturedServicesLocalized(4, locale);
 
   return (
     <section
@@ -31,7 +34,7 @@ export default function SignatureTreatments() {
                 className="font-sans uppercase tracking-[0.22em] text-[var(--color-terracotta)]"
                 style={{ fontSize: "0.68rem" }}
               >
-                Our Signature Treatments
+                {copy.eyebrow}
               </span>
               <span
                 className="block h-px w-16 md:w-24"
@@ -43,7 +46,7 @@ export default function SignatureTreatments() {
               className="font-serif text-[var(--color-espresso)] mb-2"
               style={{ fontSize: "clamp(1.9rem, 3vw, 2.7rem)", fontWeight: 500, lineHeight: 1.1 }}
             >
-              Our Signature Treatments
+              {copy.title}
             </h2>
             <div className="flex justify-center mt-3 mb-4" aria-hidden="true">
               <LotusMarkSmall size={22} color="var(--color-terracotta)" />
@@ -52,7 +55,7 @@ export default function SignatureTreatments() {
               className="font-sans text-[var(--color-warm-gray)] mx-auto"
               style={{ fontSize: "0.95rem", lineHeight: 1.75, maxWidth: "54ch" }}
             >
-              Each treatment is a carefully designed ritual — blending ancient Vietnamese healing with modern wellness to restore, renew and illuminate.
+              {copy.subtitle}
             </p>
           </div>
         </AnimatedSection>
@@ -62,7 +65,7 @@ export default function SignatureTreatments() {
           {/* Service cards */}
           {services.map((service, i) => (
             <AnimatedSection key={service.id} animation="slide-up-fade" delay={i * 0.08}>
-              <ServiceCard service={service} className="h-full" />
+              <ServiceCard service={service} className="h-full" locale={locale} />
             </AnimatedSection>
           ))}
 
@@ -78,32 +81,32 @@ export default function SignatureTreatments() {
                   className="block font-sans font-semibold uppercase tracking-widest text-[var(--color-peach-light)] mb-4"
                   style={{ fontSize: "0.68rem" }}
                 >
-                  Wellness Booking
+                  {copy.bookingEyebrow}
                 </span>
                 <h3
                   className="font-serif text-white mb-4"
                   style={{ fontSize: "1.7rem", fontWeight: 500, lineHeight: 1.15 }}
                 >
-                  Book Your Wellness Journey
+                  {copy.bookingTitle}
                 </h3>
                 <p
                   className="font-sans text-[var(--color-warm-gray-light)]"
                   style={{ fontSize: "0.875rem", lineHeight: 1.7 }}
                 >
-                  Reserve your treatment online or reach us directly on WhatsApp. Same-day bookings welcome.
+                  {copy.bookingDesc}
                 </p>
               </div>
 
               {/* CTA buttons */}
               <div className="flex flex-col gap-3 mt-8">
-                <Link href="/booking" className="btn btn-primary justify-center">
-                  Reserve a Treatment
+                <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary justify-center">
+                  {copy.bookingPrimary}
                 </Link>
                 <Link
-                  href="/services"
+                  href={withLocalePath(locale, "/services")}
                   className="btn btn-outline-white justify-center"
                 >
-                  View All Services
+                  {copy.bookingSecondary}
                 </Link>
               </div>
             </div>

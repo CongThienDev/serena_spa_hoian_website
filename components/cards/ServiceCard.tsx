@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
 import type { Service } from "@/data/services";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 type ServiceCardProps = {
   service: Service;
   className?: string;
+  locale?: Locale;
 };
 
 /**
@@ -13,23 +15,23 @@ type ServiceCardProps = {
  * Image fills top ~62%, warm card bg, serif name, price + duration below.
  * Hover: image zoom, warm shadow lift, "Book Now" link reveal.
  */
-export default function ServiceCard({ service, className }: ServiceCardProps) {
+export default function ServiceCard({ service, className, locale = "en" }: ServiceCardProps) {
   const minDuration = service.duration[0] ?? 60;
   const maxDuration = service.duration[service.duration.length - 1] ?? 60;
   // Reference format: "60 / 90 mins" or "60 mins"
   const durationLabel =
     service.duration.length > 1
-      ? `${minDuration} / ${maxDuration} mins`
-      : `${minDuration} mins`;
+      ? `${minDuration} / ${maxDuration} ${locale === "vi" ? "phút" : "mins"}`
+      : `${minDuration} ${locale === "vi" ? "phút" : "mins"}`;
 
   // Show VND price if available, else USD
   const priceLabel = service.priceVND
-    ? `From ${service.priceVND.toLocaleString("vi-VN")} VND`
+    ? `${locale === "vi" ? "Từ" : "From"} ${service.priceVND.toLocaleString("vi-VN")} VND`
     : formatPrice(service.price);
 
   return (
     <Link
-      href={`/services/${service.slug}`}
+      href={withLocalePath(locale, `/services/${service.slug}`)}
       className={cn("group block", className)}
       aria-label={`${service.name} — ${durationLabel} from $${service.price}`}
     >
@@ -61,7 +63,7 @@ export default function ServiceCard({ service, className }: ServiceCardProps) {
                 backgroundColor: "var(--color-terracotta)",
               }}
             >
-              Signature
+              {locale === "vi" ? "Đặc trưng" : "Signature"}
             </div>
           )}
 
@@ -75,7 +77,7 @@ export default function ServiceCard({ service, className }: ServiceCardProps) {
             <span
               className="font-sans font-semibold text-white tracking-widest uppercase px-5 py-2 rounded-full border border-white/70 text-xs"
             >
-              Book Now
+              {locale === "vi" ? "Đặt lịch" : "Book Now"}
             </span>
           </div>
         </div>

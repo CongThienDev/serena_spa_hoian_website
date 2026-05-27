@@ -1,0 +1,46 @@
+{
+  "header": {
+    "bookNow": "Book Now",
+    "switchLanguage": "Switch language"
+  },
+  "mobileNav": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "callUs": "Call Us",
+    "mobileNavigation": "Mobile navigation",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "footer": {
+    "services": "Services",
+    "company": "Company",
+    "findUs": "Find Us",
+    "openingHours": "Opening Hours",
+    "aboutUs": "About Us",
+    "faqs": "FAQs",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms",
+    "allRightsReserved": "All rights reserved."
+  },
+  "nav": {
+    "about": "About",
+    "services": "Services",
+    "servicesAll": "All Services",
+    "servicesMassage": "Massage Therapy",
+    "servicesFacial": "Facial Treatments",
+    "servicesBody": "Body Treatments",
+    "servicesCouple": "Couple Packages",
+    "wellness": "Wellness",
+    "wellnessPrograms": "Wellness Programs",
+    "wellnessPackages": "Day Packages",
+    "wellnessRetreats": "Retreats",
+    "gallery": "Gallery",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "metadata": {
+    "siteTitle": "Serena Spa Hội An — Premium Wellness & Massage",
+    "siteDescription": "Discover premium wellness treatments, signature massages, and holistic healing at Serena Spa in Hội An. Book your sanctuary experience today.",
+    "siteName": "Serena Spa Hội An"
+  }
+}

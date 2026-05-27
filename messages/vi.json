@@ -1,0 +1,46 @@
+{
+  "header": {
+    "bookNow": "Đặt lịch",
+    "switchLanguage": "Chuyển ngôn ngữ"
+  },
+  "mobileNav": {
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "callUs": "Gọi ngay",
+    "mobileNavigation": "Điều hướng di động",
+    "expand": "Mở rộng",
+    "collapse": "Thu gọn"
+  },
+  "footer": {
+    "services": "Dịch vụ",
+    "company": "Công ty",
+    "findUs": "Liên hệ",
+    "openingHours": "Giờ mở cửa",
+    "aboutUs": "Về chúng tôi",
+    "faqs": "Câu hỏi thường gặp",
+    "privacyPolicy": "Chính sách bảo mật",
+    "terms": "Điều khoản",
+    "allRightsReserved": "Đã đăng ký bản quyền."
+  },
+  "nav": {
+    "about": "Giới thiệu",
+    "services": "Dịch vụ",
+    "servicesAll": "Tất cả dịch vụ",
+    "servicesMassage": "Massage trị liệu",
+    "servicesFacial": "Chăm sóc da mặt",
+    "servicesBody": "Chăm sóc cơ thể",
+    "servicesCouple": "Gói đôi",
+    "wellness": "Wellness",
+    "wellnessPrograms": "Chương trình wellness",
+    "wellnessPackages": "Gói trong ngày",
+    "wellnessRetreats": "Retreat",
+    "gallery": "Thư viện ảnh",
+    "blog": "Blog",
+    "contact": "Liên hệ"
+  },
+  "metadata": {
+    "siteTitle": "Serena Spa Hội An — Wellness & Massage cao cấp",
+    "siteDescription": "Khám phá các liệu trình wellness cao cấp, massage đặc trưng và hành trình phục hồi toàn diện tại Serena Spa Hội An.",
+    "siteName": "Serena Spa Hội An"
+  }
+}

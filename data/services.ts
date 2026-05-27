@@ -32,6 +32,13 @@ export type Service = {
   seoDescription?: string;
 };
 
+type LocalizedServiceOverride = Partial<
+  Pick<
+    Service,
+    "name" | "tagline" | "description" | "benefits" | "includes" | "seoTitle" | "seoDescription"
+  >
+>;
+
 export const SERVICE_CATEGORIES: ServiceCategory[] = [
   {
     id: "massage",
@@ -218,6 +225,92 @@ export const SERVICES: Service[] = [
   },
 ];
 
+const CATEGORY_LABELS_VI: Record<string, { label: string; description: string }> = {
+  massage: {
+    label: "Massage trị liệu",
+    description: "Khôi phục cân bằng và giải phóng căng thẳng với các liệu pháp massage đặc trưng kết hợp kỹ thuật Việt Nam và hiện đại.",
+  },
+  facial: {
+    label: "Chăm sóc da mặt",
+    description: "Đánh thức vẻ rạng rỡ tự nhiên với các liệu trình facial giàu dưỡng chất thực vật và nghi thức chăm da toàn diện.",
+  },
+  body: {
+    label: "Chăm sóc cơ thể",
+    description: "Nghi thức toàn thân giúp làm sạch, nuôi dưỡng và tái tạo năng lượng từ đầu đến chân.",
+  },
+  couple: {
+    label: "Gói cặp đôi",
+    description: "Chia sẻ món quà wellness cùng người thương với những khoảnh khắc kết nối sâu và bình yên.",
+  },
+};
+
+const SERVICES_VI: Record<string, LocalizedServiceOverride> = {
+  "serena-signature-massage": {
+    name: "Serena Signature Massage",
+    tagline: "Liệu trình được yêu thích nhất",
+    description:
+      "Hành trình phục hồi sâu, kết hợp kỹ thuật Thụy Điển và Việt Nam để giải phóng căng cơ toàn thân. Túi thảo dược ấm, tinh dầu thơm và lực tay chuẩn xác giúp cơ thể trở về trạng thái cân bằng.",
+    benefits: [
+      "Giải phóng căng cơ sâu",
+      "Cải thiện tuần hoàn và lưu thông bạch huyết",
+      "Giảm stress và lo âu",
+      "Ngủ sâu và ngon hơn",
+      "Phục hồi năng lượng",
+    ],
+    includes: [
+      "Ngâm chân thảo dược chào đón",
+      "Massage toàn thân",
+      "Chườm thảo dược nóng",
+      "Chăm sóc da đầu và cổ vai gáy",
+      "Trà thảo mộc sau liệu trình",
+    ],
+  },
+  "facial-clay-therapy": {
+    name: "Facial Clay Therapy",
+    tagline: "Làm sạch sâu, sáng da tự nhiên",
+    description:
+      "Liệu trình thanh lọc với đất sét khoáng và chiết xuất thực vật giúp làm sạch sâu lỗ chân lông, cân bằng dầu và trả lại làn da tươi sáng.",
+  },
+  "hot-stone-therapy": {
+    name: "Hot Stone Therapy",
+    tagline: "Hơi ấm cổ truyền, chữa lành hiện đại",
+    description:
+      "Đá bazan ấm trượt dài theo cơ giúp tác động sâu hơn tay massage thông thường. Nhiệt ấm dịu tan căng cơ mạn tính và đưa tâm trí vào trạng thái tĩnh.",
+  },
+  "foot-massage": {
+    name: "Foot Massage",
+    tagline: "Vững vàng từng bước chân",
+    description:
+      "Sau những ngày dạo phố Hội An, liệu trình reflexology chân giúp giảm mỏi, cải thiện tuần hoàn và tái cân bằng năng lượng qua các huyệt đạo trọng điểm.",
+  },
+  "couple-ritual": {
+    name: "Couple Ritual",
+    tagline: "Hai tâm hồn, một chốn bình yên",
+    description:
+      "Trải nghiệm thư giãn sâu cùng người thương trong phòng đôi riêng tư, với massage toàn thân, facial và nghi thức nâng ly đầy tinh tế.",
+  },
+  "body-scrub-ritual": {
+    name: "Body Scrub Ritual",
+    tagline: "Làm mới. Rạng rỡ. Tỏa sáng.",
+    description:
+      "Nghi thức tẩy tế bào chết toàn thân bằng muối biển, cà phê hoặc nghệ theo nhu cầu da. Giúp da mịn màng, tăng tuần hoàn và sáng khỏe tự nhiên.",
+  },
+};
+
+function localizeService(service: Service, locale: "vi" | "en"): Service {
+  if (locale === "en") return service;
+  return { ...service, ...(SERVICES_VI[service.id] ?? {}) };
+}
+
+export function getServiceCategories(locale: "vi" | "en" = "en"): ServiceCategory[] {
+  if (locale === "en") return SERVICE_CATEGORIES;
+  return SERVICE_CATEGORIES.map((cat) => ({
+    ...cat,
+    label: CATEGORY_LABELS_VI[cat.id]?.label ?? cat.label,
+    description: CATEGORY_LABELS_VI[cat.id]?.description ?? cat.description,
+  }));
+}
+
 /* ── Helper functions ───────────────────────────────────────────────────────
 ─────────────────────────────────────────────────────────────────────────── */
 
@@ -225,12 +318,38 @@ export function getServiceBySlug(slug: string): Service | undefined {
   return SERVICES.find((s) => s.slug === slug);
 }
 
+export function getServiceBySlugLocalized(
+  slug: string,
+  locale: "vi" | "en" = "en",
+): Service | undefined {
+  const service = SERVICES.find((s) => s.slug === slug);
+  return service ? localizeService(service, locale) : undefined;
+}
+
 export function getServicesByCategory(categoryId: string): Service[] {
   return SERVICES.filter((s) => s.categoryId === categoryId);
 }
 
+export function getServicesByCategoryLocalized(
+  categoryId: string,
+  locale: "vi" | "en" = "en",
+): Service[] {
+  return SERVICES.filter((s) => s.categoryId === categoryId).map((service) =>
+    localizeService(service, locale),
+  );
+}
+
 export function getFeaturedServices(limit = 4): Service[] {
   return SERVICES.filter((s) => s.isFeatured).slice(0, limit);
+}
+
+export function getFeaturedServicesLocalized(
+  limit = 4,
+  locale: "vi" | "en" = "en",
+): Service[] {
+  return SERVICES.filter((s) => s.isFeatured)
+    .slice(0, limit)
+    .map((service) => localizeService(service, locale));
 }
 
 export function getSignatureServices(): Service[] {

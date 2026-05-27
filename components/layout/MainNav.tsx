@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef } from "react";
-import { NAV_ITEMS, type NavItem } from "@/data/site";
+import { getNavItems, type NavItem } from "@/data/navigation";
+import { getDictionary } from "@/data/i18n";
+import {
+  localeFromPathname,
+  type Locale,
+  withLocalePath,
+} from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -16,6 +22,9 @@ import { motion, AnimatePresence } from "framer-motion";
  */
 export default function MainNav() {
   const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDictionary(locale);
+  const navItems = getNavItems(locale);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -30,22 +39,28 @@ export default function MainNav() {
 
   return (
     <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-1">
-      {NAV_ITEMS.map((item) => (
+      {navItems.map((item) => (
         <NavMenuItem
           key={item.label}
           item={item}
-          isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+          locale={locale}
+          isActive={
+            pathname === withLocalePath(locale, item.href) ||
+            pathname.startsWith(withLocalePath(locale, item.href) + "/")
+          }
           isOpen={openMenu === item.label}
           onMouseEnter={() => handleMouseEnter(item.label)}
           onMouseLeave={handleMouseLeave}
         />
       ))}
+      <LanguageSwitcher locale={locale} label={t.header.switchLanguage} pathname={pathname} />
     </nav>
   );
 }
 
 type NavMenuItemProps = {
   item: NavItem;
+  locale: Locale;
   isActive: boolean;
   isOpen: boolean;
   onMouseEnter: () => void;
@@ -54,6 +69,7 @@ type NavMenuItemProps = {
 
 function NavMenuItem({
   item,
+  locale,
   isActive,
   isOpen,
   onMouseEnter,
@@ -68,7 +84,7 @@ function NavMenuItem({
       onMouseLeave={onMouseLeave}
     >
       <Link
-        href={item.href}
+        href={withLocalePath(locale, item.href)}
         className={cn(
           "relative flex items-center gap-1 px-3 py-2 text-sm font-medium tracking-wide",
           "text-[var(--color-espresso)] hover:text-[var(--color-terracotta)]",
@@ -119,7 +135,7 @@ function NavMenuItem({
               )}
             >
               {item.children?.map((child) => (
-                <DropdownItem key={child.href} item={child} />
+                <DropdownItem key={child.href} item={child} locale={locale} />
               ))}
             </motion.div>
           )}
@@ -129,13 +145,13 @@ function NavMenuItem({
   );
 }
 
-function DropdownItem({ item }: { item: NavItem }) {
+function DropdownItem({ item, locale }: { item: NavItem; locale: Locale }) {
   const pathname = usePathname();
-  const isActive = pathname === item.href;
+  const isActive = pathname === withLocalePath(locale, item.href);
 
   return (
     <Link
-      href={item.href}
+      href={withLocalePath(locale, item.href)}
       role="menuitem"
       className={cn(
         "block px-5 py-2.5 text-sm",
@@ -145,6 +161,30 @@ function DropdownItem({ item }: { item: NavItem }) {
       )}
     >
       {item.label}
+    </Link>
+  );
+}
+
+function LanguageSwitcher({
+  locale,
+  label,
+  pathname,
+}: {
+  locale: Locale;
+  label: string;
+  pathname: string;
+}) {
+  const targetLocale: Locale = locale === "vi" ? "en" : "vi";
+  const nextHref = withLocalePath(targetLocale, pathname);
+
+  return (
+    <Link
+      href={nextHref}
+      aria-label={label}
+      className="ml-3 inline-flex items-center gap-1 rounded-full border border-[var(--color-sand)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-espresso)] transition-colors duration-200 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
+    >
+      <span aria-hidden="true">🌐</span>
+      <span>{locale.toUpperCase()} | {targetLocale.toUpperCase()}</span>
     </Link>
   );
 }

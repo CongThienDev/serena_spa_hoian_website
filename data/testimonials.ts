@@ -19,6 +19,10 @@ export type Testimonial = {
   isFeatured?: boolean;
 };
 
+type LocalizedTestimonialOverride = Partial<
+  Pick<Testimonial, "country" | "service" | "text">
+>;
+
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: "t-01",
@@ -94,6 +98,47 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-export function getFeaturedTestimonials(limit = 3): Testimonial[] {
-  return TESTIMONIALS.filter((t) => t.isFeatured).slice(0, limit);
+const TESTIMONIALS_VI: Record<string, LocalizedTestimonialOverride> = {
+  "t-01": {
+    country: "Úc",
+    service: "Serena Signature Massage",
+    text: "Đây là trải nghiệm spa tuyệt vời nhất mà tôi từng có ở Đông Nam Á. Không gian rất thư giãn, kỹ thuật viên tay nghề cao và túi thảo dược nóng giúp tôi phục hồi hoàn toàn.",
+  },
+  "t-02": {
+    country: "Vương quốc Anh",
+    service: "Couple Ritual",
+    text: "Chúng tôi đặt gói trị liệu cặp đôi cho dịp kỷ niệm và mọi thứ thực sự hoàn hảo. Phòng riêng, sự tinh tế trong từng chi tiết và chất lượng liệu trình đều rất ấn tượng.",
+  },
+  "t-03": {
+    country: "Hàn Quốc",
+    service: "Facial Clay Therapy",
+    text: "Tôi được concierge khách sạn giới thiệu Serena Spa và thật sự rất hài lòng. Liệu trình facial xuất sắc, da sạch và sáng rõ hơn sau buổi trị liệu.",
+  },
+  "t-04": {
+    country: "Hoa Kỳ",
+    service: "Hot Stone Therapy",
+    text: "Ban đầu tôi khá nghi ngờ massage đá nóng, nhưng trải nghiệm này đã thay đổi hoàn toàn suy nghĩ của tôi. Nhiệt đá đi sâu vào vùng cơ căng và giúp thư giãn tuyệt đối.",
+  },
+  "t-06": {
+    country: "Pháp",
+    service: "Foot Massage",
+    text: "Sau nhiều ngày đi bộ quanh Hội An, bàn chân tôi được giải cứu hoàn toàn với liệu trình massage chân 60 phút rất chính xác và thư giãn.",
+  },
+};
+
+function localizeTestimonial(
+  testimonial: Testimonial,
+  locale: "vi" | "en",
+): Testimonial {
+  if (locale === "en") return testimonial;
+  return { ...testimonial, ...(TESTIMONIALS_VI[testimonial.id] ?? {}) };
+}
+
+export function getFeaturedTestimonials(
+  limit = 3,
+  locale: "vi" | "en" = "en",
+): Testimonial[] {
+  return TESTIMONIALS.filter((t) => t.isFeatured)
+    .slice(0, limit)
+    .map((item) => localizeTestimonial(item, locale));
 }

@@ -1,9 +1,11 @@
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import { type Locale } from "@/lib/i18n";
+import { getHomeCopy } from "@/data/content-home";
 
 type Pillar = {
   icon: React.ReactNode;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 };
 
 const pillars: Pillar[] = [
@@ -134,12 +136,13 @@ const pillars: Pillar[] = [
  * FeatureStrip — 4 brand pillars inside a floating white rounded card.
  * Matches the reference: card lifts above the hero, strong box-shadow.
  */
-export default function FeatureStrip() {
+export default function FeatureStrip({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).features;
   return (
     <section
       className="relative z-10"
       style={{ backgroundColor: "var(--color-cream)" }}
-      aria-label="Our wellness pillars"
+      aria-label={copy.sectionAria}
     >
       {/* Floating card container — overlaps hero bottom */}
       <div className="container-site">
@@ -153,8 +156,11 @@ export default function FeatureStrip() {
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6 lg:gap-x-0 lg:divide-x lg:divide-[var(--color-sand)]">
               {pillars.map((pillar, i) => (
+                (() => {
+                  const item = copy.items[i] ?? copy.items[0];
+                  return (
                 <AnimatedSection
-                  key={pillar.title}
+                  key={`${item?.title ?? "pillar"}-${i}`}
                   animation="slide-up-fade"
                   delay={0.06 + i * 0.08}
                   className="flex flex-col items-center text-center px-4 lg:px-8 gap-4"
@@ -172,16 +178,18 @@ export default function FeatureStrip() {
                       className="font-sans font-semibold text-[var(--color-espresso)] tracking-wide uppercase"
                       style={{ fontSize: "0.7rem", letterSpacing: "0.15em" }}
                     >
-                      {pillar.title}
+                      {item?.title ?? ""}
                     </h3>
                     <p
                       className="font-sans text-[var(--color-warm-gray)]"
                       style={{ fontSize: "0.82rem", lineHeight: 1.65 }}
                     >
-                      {pillar.description}
+                      {item?.description ?? ""}
                     </p>
                   </div>
                 </AnimatedSection>
+                  );
+                })()
               ))}
             </div>
           </div>

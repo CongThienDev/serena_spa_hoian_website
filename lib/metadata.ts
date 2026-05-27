@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl } from "./utils";
+import { type Locale } from "./i18n";
 
 type PageMetadataOptions = {
   title: string;
@@ -8,6 +9,7 @@ type PageMetadataOptions = {
   ogImage?: string;
   noIndex?: boolean;
   keywords?: string[];
+  locale?: Locale;
 };
 
 /**
@@ -25,8 +27,12 @@ export function generatePageMetadata({
   ogImage = "/images/branding/og-default.jpg",
   noIndex = false,
   keywords = [],
+  locale = "vi",
 }: PageMetadataOptions): Metadata {
-  const url = absoluteUrl(path);
+  const normalizedPath = path === "/" ? "" : path;
+  const url = absoluteUrl(`/${locale}${normalizedPath}`);
+  const viUrl = absoluteUrl(`/vi${normalizedPath}`);
+  const enUrl = absoluteUrl(`/en${normalizedPath}`);
 
   return {
     title,
@@ -39,18 +45,18 @@ export function generatePageMetadata({
     ],
     alternates: {
       canonical: url,
-      // Future i18n: uncomment when locales are added
-      // languages: {
-      //   "en": absoluteUrl(`/en${path}`),
-      //   "vi": absoluteUrl(`/vi${path}`),
-      //   "ko": absoluteUrl(`/ko${path}`),
-      // },
+      languages: {
+        vi: viUrl,
+        en: enUrl,
+        "x-default": viUrl,
+      },
     },
     openGraph: {
       title,
       description,
       url,
       type: "website",
+      locale: locale === "vi" ? "vi_VN" : "en_US",
       images: [
         {
           url: absoluteUrl(ogImage),

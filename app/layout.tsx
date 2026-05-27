@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { normalizeLocale } from "@/lib/i18n";
 
 /* ── Fonts ──────────────────────────────────────────────────────────────────
    Cormorant Garamond — luxury serif for all headings
@@ -87,6 +88,13 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
+  alternates: {
+    languages: {
+      vi: "/vi",
+      en: "/en",
+      "x-default": "/vi",
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -99,14 +107,19 @@ export const viewport: Viewport = {
    Wraps all routes. Font CSS variables available globally.
    Actual page chrome (header/footer) lives in (site)/layout.tsx
 ─────────────────────────────────────────────────────────────────────────── */
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params?: Promise<{ locale?: string }>;
 }>) {
+  const routeParams = params ? await params : undefined;
+  const locale = normalizeLocale(routeParams?.locale);
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${cormorant.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
