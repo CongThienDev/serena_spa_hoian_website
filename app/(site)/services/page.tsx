@@ -8,31 +8,33 @@ import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import OrnamentDivider from "@/components/ui/OrnamentDivider";
 import ServiceCard from "@/components/cards/ServiceCard";
 import {
-  SERVICES,
-  SERVICE_CATEGORIES,
+  getAllServicesLocalized,
+  getServiceCategories,
 } from "@/data/services";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 /* ─── Category filter pill ──────────────────────────────────────────────── */
 
 type FilterId = "all" | string;
 
-const ALL_FILTER = { id: "all", label: "All Services" } as const;
-
 /* ─── Page component ────────────────────────────────────────────────────── */
 
-export default function ServicesPage() {
+export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
+  const vi = locale === "vi";
+  const ALL_FILTER = { id: "all", label: vi ? "Tất cả dịch vụ" : "All Services" } as const;
+  const SERVICE_CATEGORIES = getServiceCategories(locale);
+  const localizedServices = getAllServicesLocalized(locale);
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
 
   const filteredServices =
     activeFilter === "all"
-      ? SERVICES
-      : SERVICES.filter((s) => s.categoryId === activeFilter);
+      ? localizedServices
+      : localizedServices.filter((s) => s.categoryId === activeFilter);
 
-  /* Group services by category for the "All" view */
-  const groupedByCategory: Record<string, typeof SERVICES> = {};
+  const groupedByCategory: Record<string, typeof localizedServices> = {};
   if (activeFilter === "all") {
     for (const category of SERVICE_CATEGORIES) {
-      const categoryServices = SERVICES.filter(
+      const categoryServices = localizedServices.filter(
         (s) => s.categoryId === category.id,
       );
       if (categoryServices.length > 0) {
@@ -53,7 +55,7 @@ export default function ServicesPage() {
           background:
             "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
         }}
-        aria-label="Serena Spa Treatments & Rituals"
+        aria-label={vi ? "Liệu trình tại Serena Spa" : "Serena Spa Treatments & Rituals"}
       >
         <div
           className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] w-full"
@@ -80,7 +82,7 @@ export default function ServicesPage() {
                     letterSpacing: "0.22em",
                   }}
                 >
-                  Our Services
+                  {vi ? "Dịch vụ của Serena" : "Our Services"}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -98,9 +100,9 @@ export default function ServicesPage() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                Treatments<br />
+                {vi ? "Liệu trình" : "Treatments"}<br />
                 <span style={{ color: "var(--color-terracotta)" }}>
-                  &amp; Rituals
+                  {vi ? "& Nghi thức" : "& Rituals"}
                 </span>
               </h1>
             </AnimatedSection>
@@ -121,9 +123,9 @@ export default function ServicesPage() {
                   fontStyle: "italic",
                 }}
               >
-                Every treatment is a ritual. Every ritual, a return to yourself.
-                Explore our full collection of massages, facials, body rituals,
-                and couple experiences.
+                {vi
+                  ? "Mỗi liệu trình là một nghi thức. Mỗi nghi thức là hành trình trở về cân bằng của chính bạn."
+                  : "Every treatment is a ritual. Every ritual, a return to yourself. Explore our full collection of massages, facials, body rituals, and couple experiences."}
               </p>
             </AnimatedSection>
           </div>
@@ -190,7 +192,7 @@ export default function ServicesPage() {
           borderColor: "var(--color-sand)",
           boxShadow: "0 2px 16px rgba(61,31,15,0.06)",
         }}
-        aria-label="Filter treatments by category"
+        aria-label={vi ? "Lọc dịch vụ theo danh mục" : "Filter treatments by category"}
       >
         <div className="container-site">
           <div className="flex items-center gap-2 overflow-x-auto py-4 no-scrollbar">
@@ -217,7 +219,7 @@ export default function ServicesPage() {
       <section
         className="section-padding"
         style={{ backgroundColor: "var(--color-cream)" }}
-        aria-label="All treatments"
+        aria-label={vi ? "Tất cả liệu trình" : "All treatments"}
       >
         <div className="container-site">
           {showGrouped ? (
@@ -261,7 +263,7 @@ export default function ServicesPage() {
                         animation="slide-up-fade"
                         delay={catIdx * 0.04 + i * 0.06}
                       >
-                        <ServiceCard service={service} className="h-full" />
+                        <ServiceCard service={service} className="h-full" locale={locale} />
                       </AnimatedSection>
                     ))}
                   </div>
@@ -278,7 +280,7 @@ export default function ServicesPage() {
                     animation="slide-up-fade"
                     delay={i * 0.07}
                   >
-                    <ServiceCard service={service} className="h-full" />
+                    <ServiceCard service={service} className="h-full" locale={locale} />
                   </AnimatedSection>
                 ))}
               </div>
@@ -288,7 +290,7 @@ export default function ServicesPage() {
                   className="text-center font-sans text-[var(--color-warm-gray)] py-16"
                   style={{ fontSize: "1rem" }}
                 >
-                  No treatments found in this category.
+                  {vi ? "Không có dịch vụ trong danh mục này." : "No treatments found in this category."}
                 </p>
               )}
             </AnimatedSection>
@@ -300,7 +302,7 @@ export default function ServicesPage() {
       <section
         className="section-padding"
         style={{ backgroundColor: "var(--color-sand)" }}
-        aria-label="Book your treatment"
+        aria-label={vi ? "Đặt liệu trình" : "Book your treatment"}
       >
         <div className="container-site">
           <AnimatedSection animation="slide-up-fade">
@@ -317,7 +319,7 @@ export default function ServicesPage() {
                   letterSpacing: "0.22em",
                 }}
               >
-                Begin Today
+                {vi ? "Bắt đầu hôm nay" : "Begin Today"}
               </span>
 
               {/* Heading */}
@@ -329,7 +331,7 @@ export default function ServicesPage() {
                   lineHeight: 1.1,
                 }}
               >
-                Ready to Begin Your Journey?
+                {vi ? "Sẵn sàng bắt đầu hành trình?" : "Ready to Begin Your Journey?"}
               </h2>
 
               {/* Tagline */}
@@ -337,12 +339,12 @@ export default function ServicesPage() {
                 className="font-sans text-[var(--color-espresso-mid)]"
                 style={{ fontSize: "1rem", lineHeight: 1.7 }}
               >
-                Same-day bookings welcome · Hội An, Vietnam
+                {vi ? "Hỗ trợ đặt lịch trong ngày · Hội An, Việt Nam" : "Same-day bookings welcome · Hội An, Vietnam"}
               </p>
 
               {/* CTAs */}
               <div className="flex flex-wrap gap-3 justify-center">
-                <Link href="/booking" className="btn btn-primary btn-lg">
+                <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-lg">
                   <svg
                     className="w-4 h-4 flex-shrink-0"
                     fill="none"
@@ -357,7 +359,7 @@ export default function ServicesPage() {
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                     />
                   </svg>
-                  Book Now
+                  {vi ? "Đặt lịch ngay" : "Book Now"}
                 </Link>
 
                 <a

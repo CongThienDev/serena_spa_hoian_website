@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CONTACT } from "@/data/site";
+import { getDictionary } from "@/data/i18n";
+import { localeFromPathname, withLocalePath } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ContactAction = {
@@ -23,6 +27,9 @@ type ContactAction = {
  */
 export default function FloatingContactWidget() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDictionary(locale);
 
   const actions: ContactAction[] = [
     {
@@ -145,7 +152,7 @@ export default function FloatingContactWidget() {
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
             </svg>
-            <span className="text-[10px] font-medium tracking-wide">Call</span>
+            <span className="text-[10px] font-medium tracking-wide">{t.mobileNav.callUs}</span>
           </a>
 
           {/* Zalo */}
@@ -177,16 +184,16 @@ export default function FloatingContactWidget() {
           </a>
 
           {/* Book Now */}
-          <a
-            href="/booking"
+          <Link
+            href={withLocalePath(locale, "/booking")}
             className="flex flex-col items-center justify-center gap-1 py-3 bg-[var(--color-terracotta)] text-white hover:bg-[var(--color-terracotta-dark)] transition-colors duration-200 min-h-[56px]"
             aria-label="Book a treatment"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-[10px] font-medium tracking-wide">Book</span>
-          </a>
+            <span className="text-[10px] font-medium tracking-wide">{t.header.bookNow}</span>
+          </Link>
         </div>
       </div>
     </>

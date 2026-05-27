@@ -19,6 +19,10 @@ export type BlogPost = {
   seoDescription?: string;
 };
 
+type LocalizedPostOverride = Partial<
+  Pick<BlogPost, "title" | "excerpt" | "category" | "seoTitle" | "seoDescription">
+>;
+
 export const BLOG_POSTS: BlogPost[] = [
   {
     id: "b-01",
@@ -96,10 +100,64 @@ export const BLOG_POSTS: BlogPost[] = [
   },
 ];
 
-export function getFeaturedPosts(limit = 3): BlogPost[] {
-  return BLOG_POSTS.filter((p) => p.isFeatured).slice(0, limit);
+const BLOG_POSTS_VI: Record<string, LocalizedPostOverride> = {
+  "b-01": {
+    title: "Cẩm Nang Đầy Đủ Về Liệu Trình Spa Ở Hội An",
+    excerpt:
+      "Từ massage truyền thống Việt Nam đến các nghi thức wellness hiện đại, khám phá trọn vẹn hành trình phục hồi tại Hội An và lý do Serena Spa luôn khác biệt.",
+    category: "Cẩm nang wellness",
+    seoTitle: "Liệu Trình Spa Tốt Nhất Ở Hội An — Cẩm Nang Toàn Diện",
+    seoDescription:
+      "Khám phá các liệu trình spa và massage nổi bật tại Hội An, từ truyền thống đến cao cấp, trong cẩm nang đầy đủ của Serena Spa.",
+  },
+  "b-02": {
+    title: "5 Lợi Ích Sâu Sắc Của Massage Đá Nóng Bạn Nên Biết",
+    excerpt:
+      "Đá núi lửa cổ xưa kết hợp khoa học wellness hiện đại. Tìm hiểu vì sao liệu pháp đá nóng đi sâu hơn massage thông thường và luôn được khách yêu thích.",
+    category: "Hướng dẫn liệu trình",
+    seoTitle: "Lợi Ích Massage Đá Nóng — Điều Bạn Cần Biết | Serena Spa",
+    seoDescription:
+      "Tìm hiểu lợi ích nổi bật của massage đá nóng, từ giảm đau cơ sâu đến thư giãn tinh thần, tại Serena Spa Hội An.",
+  },
+  "b-03": {
+    title: "Massage Cặp Đôi Ở Hội An: Trải Nghiệm Lãng Mạn Hoàn Hảo",
+    excerpt:
+      "Đang lên kế hoạch nghỉ dưỡng lãng mạn ở Hội An? Khám phá vì sao retreat wellness cho cặp đôi là trải nghiệm đáng nhớ nhất và cách chuẩn bị một ngày spa hoàn hảo.",
+    category: "Trải nghiệm",
+    seoTitle: "Massage Cặp Đôi Ở Hội An — Trải Nghiệm Spa Lãng Mạn",
+    seoDescription:
+      "Lên kế hoạch cho trải nghiệm spa cặp đôi trọn vẹn tại Hội An với phòng riêng, liệu trình đôi và nghi thức thư giãn tinh tế.",
+  },
+  "b-04": {
+    title: "Nghệ Thuật Massage Việt: Kỹ Thuật Cổ Truyền, Chữa Lành Hiện Đại",
+    excerpt:
+      "Việt Nam sở hữu một trong những truyền thống massage phong phú nhất, bắt nguồn từ y học dân gian và triết lý năng lượng qua nhiều thế kỷ.",
+    category: "Kiến thức wellness",
+  },
+  "b-05": {
+    title: "Vì Sao Phong Cách Japandi Giúp Chữa Lành Sâu Hơn",
+    excerpt:
+      "Sự giao thoa giữa tối giản Nhật Bản và ấm áp Bắc Âu tạo nên không gian giúp quá trình phục hồi diễn ra tự nhiên hơn.",
+    category: "Văn hoá spa",
+  },
+};
+
+function localizePost(post: BlogPost, locale: "vi" | "en"): BlogPost {
+  if (locale === "en") return post;
+  return { ...post, ...(BLOG_POSTS_VI[post.id] ?? {}) };
 }
 
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return BLOG_POSTS.find((p) => p.slug === slug);
+export function getFeaturedPosts(limit = 3, locale: "vi" | "en" = "en"): BlogPost[] {
+  return BLOG_POSTS.filter((p) => p.isFeatured)
+    .slice(0, limit)
+    .map((post) => localizePost(post, locale));
+}
+
+export function getPostBySlug(slug: string, locale: "vi" | "en" = "en"): BlogPost | undefined {
+  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  return post ? localizePost(post, locale) : undefined;
+}
+
+export function getAllPosts(locale: "vi" | "en" = "en"): BlogPost[] {
+  return BLOG_POSTS.map((post) => localizePost(post, locale));
 }

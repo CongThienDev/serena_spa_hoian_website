@@ -4,7 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { NAV_ITEMS, CONTACT, type NavItem } from "@/data/site";
+import { CONTACT } from "@/data/site";
+import { getDictionary } from "@/data/i18n";
+import { getNavItems, type NavItem } from "@/data/navigation";
+import {
+  localeFromPathname,
+  type Locale,
+  withLocalePath,
+} from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,6 +22,9 @@ import { cn } from "@/lib/utils";
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDictionary(locale);
+  const navItems = getNavItems(locale);
 
   function close() {
     setIsOpen(false);
@@ -30,7 +40,7 @@ export default function MobileNav() {
           "text-[var(--color-espresso)] hover:text-[var(--color-terracotta)]",
           "transition-colors duration-200"
         )}
-        aria-label={isOpen ? "Close menu" : "Open menu"}
+        aria-label={isOpen ? t.mobileNav.closeMenu : t.mobileNav.openMenu}
         aria-expanded={isOpen}
         aria-controls="mobile-nav-drawer"
       >
@@ -75,7 +85,7 @@ export default function MobileNav() {
           <motion.nav
             id="mobile-nav-drawer"
             role="dialog"
-            aria-label="Mobile navigation"
+            aria-label={t.mobileNav.mobileNavigation}
             aria-modal="true"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -89,7 +99,7 @@ export default function MobileNav() {
             {/* Drawer header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--color-sand)]">
               <Link
-                href="/"
+                href={withLocalePath(locale, "/")}
                 onClick={close}
                 className="font-serif text-xl text-[var(--color-espresso)]"
               >
@@ -98,7 +108,7 @@ export default function MobileNav() {
               <button
                 onClick={close}
                 className="w-11 h-11 flex items-center justify-center text-[var(--color-espresso-mid)]"
-                aria-label="Close menu"
+                aria-label={t.mobileNav.closeMenu}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -108,11 +118,15 @@ export default function MobileNav() {
 
             {/* Nav items */}
             <ul className="flex-1 px-6 py-6 space-y-1">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <MobileNavItem
                   key={item.label}
                   item={item}
-                  isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+                  locale={locale}
+                  isActive={
+                    pathname === withLocalePath(locale, item.href) ||
+                    pathname.startsWith(withLocalePath(locale, item.href) + "/")
+                  }
                   onClose={close}
                 />
               ))}
@@ -121,17 +135,17 @@ export default function MobileNav() {
             {/* Bottom — contact actions */}
             <div className="px-6 py-6 border-t border-[var(--color-sand)] space-y-3">
               <Link
-                href="/booking"
+                href={withLocalePath(locale, "/booking")}
                 onClick={close}
                 className="btn btn-primary w-full justify-center"
               >
-                Book Now
+                {t.header.bookNow}
               </Link>
               <a
                 href={`tel:${CONTACT.phone}`}
                 className="btn btn-outline w-full justify-center"
               >
-                Call Us
+                {t.mobileNav.callUs}
               </a>
             </div>
           </motion.nav>
@@ -143,19 +157,21 @@ export default function MobileNav() {
 
 type MobileNavItemProps = {
   item: NavItem;
+  locale: Locale;
   isActive: boolean;
   onClose: () => void;
 };
 
-function MobileNavItem({ item, isActive, onClose }: MobileNavItemProps) {
+function MobileNavItem({ item, locale, isActive, onClose }: MobileNavItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const t = getDictionary(locale);
   const hasChildren = item.children && item.children.length > 0;
 
   return (
     <li>
       <div className="flex items-center justify-between">
         <Link
-          href={item.href}
+          href={withLocalePath(locale, item.href)}
           onClick={onClose}
           className={cn(
             "flex-1 py-3 text-base font-medium",
@@ -175,7 +191,7 @@ function MobileNavItem({ item, isActive, onClose }: MobileNavItemProps) {
               "text-[var(--color-warm-gray)] hover:text-[var(--color-terracotta)]",
               "transition-colors duration-200"
             )}
-            aria-label={`${isExpanded ? "Collapse" : "Expand"} ${item.label}`}
+            aria-label={`${isExpanded ? t.mobileNav.collapse : t.mobileNav.expand} ${item.label}`}
             aria-expanded={isExpanded}
           >
             <svg
@@ -205,7 +221,7 @@ function MobileNavItem({ item, isActive, onClose }: MobileNavItemProps) {
             {item.children?.map((child) => (
               <li key={child.href}>
                 <Link
-                  href={child.href}
+                  href={withLocalePath(locale, child.href)}
                   onClick={onClose}
                   className={cn(
                     "block py-2.5 text-sm",

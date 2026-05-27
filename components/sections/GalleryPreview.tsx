@@ -2,13 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import { type Locale, withLocalePath } from "@/lib/i18n";
 
 /**
  * GalleryPreview — asymmetric masonry using real Serena Spa interior photography.
  * Desktop: 3-column CSS grid, first image spans 2 rows (cinematic anchor).
  * Mobile: 2-column uniform grid.
  */
-export default function GalleryPreview() {
+export default function GalleryPreview({ locale = "en" }: { locale?: Locale }) {
+  const eyebrow = locale === "vi" ? "Không gian Serena" : "Our Space";
+  const title = locale === "vi" ? "Bên trong Serena" : "Inside Serena";
+  const buttonLabel = locale === "vi" ? "Xem toàn bộ thư viện" : "View Full Gallery";
   return (
     <section
       className="section-padding"
@@ -19,15 +23,15 @@ export default function GalleryPreview() {
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
           <AnimatedSection animation="slide-up-fade">
-            <SectionHeading
-              eyebrow="Our Space"
-              title="Inside Serena"
+              <SectionHeading
+              eyebrow={eyebrow}
+              title={title}
               titleAs="h2"
             />
           </AnimatedSection>
           <AnimatedSection animation="fade" delay={0.2}>
-            <Link href="/gallery" className="btn btn-outline btn-sm flex-shrink-0 self-start md:self-auto">
-              View Full Gallery
+            <Link href={withLocalePath(locale, "/gallery")} className="btn btn-outline btn-sm flex-shrink-0 self-start md:self-auto">
+              {buttonLabel}
             </Link>
           </AnimatedSection>
         </div>

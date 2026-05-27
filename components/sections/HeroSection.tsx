@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
+import { type Locale, withLocalePath } from "@/lib/i18n";
+import { getHomeCopy } from "@/data/content-home";
 
 /**
  * HeroSection — cinematic split layout matching the reference mockup.
@@ -11,7 +13,8 @@ import { LotusMarkSmall } from "@/components/ui/LotusIcon";
  * Right panel: bleeds to right viewport edge for full cinematic impact.
  * Mobile: stacked, image on top with portrait crop.
  */
-export default function HeroSection() {
+export default function HeroSection({ locale = "en" }: { locale?: Locale }) {
+  const copy = getHomeCopy(locale).hero;
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -58,7 +61,7 @@ export default function HeroSection() {
                 className="font-sans uppercase tracking-[0.22em] text-[var(--color-terracotta)]"
                 style={{ fontSize: "0.8rem" }}
               >
-                A Place to Glow
+                {copy.eyebrow}
               </span>
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
             </div>
@@ -76,9 +79,9 @@ export default function HeroSection() {
                 letterSpacing: "-0.012em",
               }}
             >
-              Premium<br />
-              Relaxation<br />
-              &amp; Healing
+              {copy.title[0]}<br />
+              {copy.title[1]}<br />
+              {copy.title[2]}
             </h1>
           </AnimatedSection>
 
@@ -103,9 +106,7 @@ export default function HeroSection() {
               className="font-sans text-[var(--color-espresso-mid)] mb-10"
               style={{ fontSize: "1.05rem", lineHeight: 1.72, maxWidth: "33ch" }}
             >
-              Awaken your energy, release your stress
-              <br />
-              and let your natural glow shine.
+              {copy.tagline}
             </p>
           </AnimatedSection>
 
@@ -113,18 +114,18 @@ export default function HeroSection() {
           <AnimatedSection animation="slide-up-fade" delay={0.42}>
             <div className="flex flex-wrap gap-3">
               {/* Primary: calendar icon */}
-              <Link href="/booking" className="btn btn-primary btn-sm flex items-center gap-2 px-6 py-3">
+              <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-sm flex items-center gap-2 px-6 py-3">
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                 </svg>
-                Book Your Escape
+                {copy.ctaPrimary}
               </Link>
               {/* Secondary: lotus leaf icon */}
               <Link
-                href="/services"
+                href={withLocalePath(locale, "/services")}
                 className="btn btn-outline btn-sm flex items-center gap-2 px-6 py-3"
               >
-                Explore Services
+                {copy.ctaSecondary}
                 <LotusMarkSmall size={16} color="currentColor" />
               </Link>
             </div>

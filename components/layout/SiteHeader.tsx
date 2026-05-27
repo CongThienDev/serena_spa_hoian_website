@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import TopBar from "./TopBar";
 import MainNav from "./MainNav";
 import MobileNav from "./MobileNav";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
+import { getDictionary } from "@/data/i18n";
+import { localeFromPathname, withLocalePath } from "@/lib/i18n";
 
 /**
  * SiteHeader — sticky, scroll-aware.
@@ -15,6 +18,9 @@ import { LotusMarkSmall } from "@/components/ui/LotusIcon";
  */
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDictionary(locale);
 
   useEffect(() => {
     function onScroll() {
@@ -39,7 +45,7 @@ export default function SiteHeader() {
 
           {/* ── Logo ─────────────────────────────────────────────────────── */}
           <Link
-            href="/"
+            href={withLocalePath(locale, "/")}
             className="flex items-center gap-2.5 shrink-0 group"
             aria-label="Serena Spa Hội An — Home"
           >
@@ -70,10 +76,10 @@ export default function SiteHeader() {
           {/* ── Right — CTA + mobile menu ────────────────────────────────── */}
           <div className="flex items-center gap-3">
             <Link
-              href="/booking"
+              href={withLocalePath(locale, "/booking")}
               className="btn btn-primary btn-sm hidden md:inline-flex"
             >
-              Book Now
+              {t.header.bookNow}
             </Link>
             <MobileNav />
           </div>

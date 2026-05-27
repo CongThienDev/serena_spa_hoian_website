@@ -1,5 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { SITE, CONTACT, HOURS, SOCIAL, NAV_ITEMS } from "@/data/site";
+import { SITE, CONTACT, HOURS, SOCIAL } from "@/data/site";
+import { getDictionary } from "@/data/i18n";
+import { getNavItems } from "@/data/navigation";
+import { localeFromPathname, withLocalePath } from "@/lib/i18n";
+import { usePathname } from "next/navigation";
 
 /**
  * Footer — 4-column layout on desktop, stacked on mobile.
@@ -7,6 +13,11 @@ import { SITE, CONTACT, HOURS, SOCIAL, NAV_ITEMS } from "@/data/site";
  * Per HOME_WIREFRAME.md footer structure.
  */
 export default function Footer() {
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const t = getDictionary(locale);
+  const navItems = getNavItems(locale);
+  const servicesNav = navItems.find((n) => n.href === "/services");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -22,7 +33,7 @@ export default function Footer() {
           {/* Column 1 — Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link
-              href="/"
+              href={withLocalePath(locale, "/")}
               className="inline-flex flex-col leading-none mb-5"
               aria-label="Serena Spa — Home"
             >
@@ -72,13 +83,13 @@ export default function Footer() {
           {/* Column 2 — Services links */}
           <div>
             <h3 className="font-sans text-xs font-semibold tracking-widest uppercase text-[var(--color-peach)] mb-5">
-              Services
+              {t.footer.services}
             </h3>
             <ul className="space-y-3 text-sm text-[var(--color-warm-gray-light)]">
-              {NAV_ITEMS.find((n) => n.label === "Services")?.children?.map((child) => (
+              {servicesNav?.children?.map((child) => (
                 <li key={child.href}>
                   <Link
-                    href={child.href}
+                    href={withLocalePath(locale, child.href)}
                     className="hover:text-[var(--color-peach)] transition-colors duration-200"
                   >
                     {child.label}
@@ -91,20 +102,20 @@ export default function Footer() {
           {/* Column 3 — Company */}
           <div>
             <h3 className="font-sans text-xs font-semibold tracking-widest uppercase text-[var(--color-peach)] mb-5">
-              Company
+              {t.footer.company}
             </h3>
             <ul className="space-y-3 text-sm text-[var(--color-warm-gray-light)]">
               {[
-                { label: "About Us",       href: "/about" },
-                { label: "Wellness",       href: "/wellness" },
-                { label: "Gallery",        href: "/gallery" },
-                { label: "Blog",           href: "/blog" },
-                { label: "Contact",        href: "/contact" },
-                { label: "FAQs",           href: "/faq" },
+                { label: t.footer.aboutUs, href: "/about" },
+                { label: t.nav.wellness, href: "/wellness" },
+                { label: t.nav.gallery, href: "/gallery" },
+                { label: t.nav.blog, href: "/blog" },
+                { label: t.nav.contact, href: "/contact" },
+                { label: t.footer.faqs, href: "/faq" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link
-                    href={item.href}
+                    href={withLocalePath(locale, item.href)}
                     className="hover:text-[var(--color-peach)] transition-colors duration-200"
                   >
                     {item.label}
@@ -117,7 +128,7 @@ export default function Footer() {
           {/* Column 4 — Contact / Hours */}
           <div>
             <h3 className="font-sans text-xs font-semibold tracking-widest uppercase text-[var(--color-peach)] mb-5">
-              Find Us
+              {t.footer.findUs}
             </h3>
             <address className="not-italic space-y-3 text-sm text-[var(--color-warm-gray-light)]">
               <p className="leading-relaxed">{CONTACT.address}</p>
@@ -142,7 +153,7 @@ export default function Footer() {
 
               <p className="pt-1">
                 <span className="block text-xs uppercase tracking-widest text-[var(--color-warm-gray)] mb-1">
-                  Opening Hours
+                  {t.footer.openingHours}
                 </span>
                 {HOURS.label}
               </p>
@@ -155,18 +166,18 @@ export default function Footer() {
       <div className="border-t border-[var(--color-espresso-mid)]">
         <div className="container-site flex flex-col sm:flex-row items-center justify-between gap-3 py-5 text-xs text-[var(--color-warm-gray)]">
           <p>
-            © {currentYear} {SITE.name}. All rights reserved.
+            © {currentYear} {SITE.name}. {t.footer.allRightsReserved}
           </p>
           <nav aria-label="Legal links">
             <ul className="flex items-center gap-4">
               <li>
-                <Link href="/privacy-policy" className="hover:text-[var(--color-peach)] transition-colors duration-200">
-                  Privacy Policy
+                <Link href={withLocalePath(locale, "/privacy-policy")} className="hover:text-[var(--color-peach)] transition-colors duration-200">
+                  {t.footer.privacyPolicy}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-[var(--color-peach)] transition-colors duration-200">
-                  Terms
+                <Link href={withLocalePath(locale, "/terms")} className="hover:text-[var(--color-peach)] transition-colors duration-200">
+                  {t.footer.terms}
                 </Link>
               </li>
             </ul>
