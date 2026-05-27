@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   DEFAULT_LOCALE,
-  detectPreferredLocale,
   isLocale,
 } from "@/lib/i18n";
 
@@ -34,7 +33,7 @@ export function proxy(request: NextRequest) {
   const cookieLocale = request.cookies.get("preferred_locale")?.value;
   const locale = isLocale(cookieLocale ?? "")
     ? cookieLocale
-    : detectPreferredLocale(request.headers.get("accept-language")) ?? DEFAULT_LOCALE;
+    : DEFAULT_LOCALE;
 
   const url = request.nextUrl.clone();
   url.pathname = `/${locale}${pathname}`;
