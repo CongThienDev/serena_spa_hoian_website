@@ -41,6 +41,24 @@ const philosophyPillars = [
   },
 ];
 
+const philosophyPillarsVi = [
+  {
+    number: "01",
+    heading: "Cơ thể",
+    body: "Chúng tôi bắt đầu từ cơ thể. Các kỹ thuật viên trị liệu được đào tạo bài bản giúp giải phóng căng cơ bằng lực tay chuẩn xác, nhiệt ấm và thảo dược.",
+  },
+  {
+    number: "02",
+    heading: "Tâm trí",
+    body: "Một tâm trí tĩnh lặng là nền tảng của chữa lành. Nghi thức tại Serena kết hợp hơi thở, hương thơm và khoảng lặng có chủ đích để đưa bạn vào trạng thái phục hồi sâu.",
+  },
+  {
+    number: "03",
+    heading: "Tinh thần",
+    body: "Khi cơ thể và tâm trí dịu lại, tinh thần cũng được nuôi dưỡng. Chúng tôi tạo nên những khoảng không tĩnh tại để bạn kết nối lại với điều quan trọng nhất.",
+  },
+];
+
 const approachSteps = [
   {
     step: "01",
@@ -61,6 +79,29 @@ const approachSteps = [
     step: "04",
     heading: "The Close",
     body: "As your treatment concludes, we guide you gently back with herbal tea, a warm towel ritual, and a moment of quiet before you re-enter the world.",
+  },
+];
+
+const approachStepsVi = [
+  {
+    step: "01",
+    heading: "Nghi thức chào đón",
+    body: "Ngay từ khoảnh khắc bước vào, hành trình chuyển trạng thái đã bắt đầu. Ngâm chân ấm, trà thảo mộc và âm nhạc nhẹ nhàng giúp cơ thể cảm thấy an toàn.",
+  },
+  {
+    step: "02",
+    heading: "Đánh giá chuyên sâu",
+    body: "Kỹ thuật viên dành thời gian lắng nghe nhu cầu của bạn: vùng căng mỏi, độ nhạy cảm và mục tiêu phục hồi trước khi bắt đầu liệu trình.",
+  },
+  {
+    step: "03",
+    heading: "Thực hiện liệu trình",
+    body: "Mỗi thao tác đều được thực hiện với sự hiện diện trọn vẹn. Chúng tôi sử dụng tinh dầu thực vật, thảo dược ấm và kỹ thuật được tinh luyện qua nhiều thế hệ.",
+  },
+  {
+    step: "04",
+    heading: "Khép lại nhẹ nhàng",
+    body: "Khi liệu trình kết thúc, bạn được dẫn trở lại nhịp bình thường bằng khăn ấm, trà thảo mộc và một khoảnh khắc tĩnh lặng.",
   },
 ];
 
@@ -87,6 +128,8 @@ const galleryImages = [
 
 export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
   const vi = locale === "vi";
+  const localizedPhilosophyPillars = vi ? philosophyPillarsVi : philosophyPillars;
+  const localizedApproachSteps = vi ? approachStepsVi : approachSteps;
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════════
@@ -98,7 +141,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
           minHeight: "clamp(500px, 80vh, 860px)",
           background: "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
         }}
-        aria-label={vi ? "Triết lý wellness tại Serena Spa" : "Wellness philosophy at Serena Spa"}
+        aria-label={vi ? "Triết lý chăm sóc toàn diện tại Serena Spa" : "Wellness philosophy at Serena Spa"}
       >
         <div
           className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] w-full"
@@ -138,7 +181,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                {vi ? "Wellness" : "Wellness"}<br />
+                {vi ? "An dưỡng" : "Wellness"}<br />
                 {vi ? "Từ Bên Trong" : "From Within"}
               </h1>
             </AnimatedSection>
@@ -165,7 +208,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 style={{ fontSize: "1.0rem", lineHeight: 1.78, maxWidth: "36ch", opacity: 0.75 }}
               >
                 {vi
-                  ? "Tại Serena, wellness không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần."
+                  ? "Tại Serena, chăm sóc toàn diện không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần."
                   : "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit."}
               </p>
             </AnimatedSection>
@@ -236,11 +279,11 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-round-top section-padding"
         style={{ background: "var(--color-cream)" }}
-        aria-label="Our wellness philosophy pillars"
+        aria-label={vi ? "Ba trụ cột triết lý chăm sóc toàn diện" : "Our wellness philosophy pillars"}
       >
         <div className="container-site">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
-            {philosophyPillars.map((pillar, i) => (
+            {localizedPhilosophyPillars.map((pillar, i) => (
               <AnimatedSection key={pillar.number} animation="slide-up-fade" delay={0.1 * i}>
                 <article className="flex flex-col gap-4">
                   {/* Large serif number */}
@@ -287,14 +330,14 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ background: "var(--color-section-warm)" }}
-        aria-label="Our spa environment"
+        aria-label={vi ? "Không gian tại Serena Spa" : "Our spa environment"}
       >
         <div className="container-site">
           {/* Heading */}
           <AnimatedSection animation="slide-up-fade" className="mb-10 md:mb-14">
             <SectionHeading
-              eyebrow="Our Environment"
-              title="A Space Designed for Stillness"
+              eyebrow={vi ? "Không gian trị liệu" : "Our Environment"}
+              title={vi ? "Không gian được thiết kế cho tĩnh tại" : "A Space Designed for Stillness"}
               align="center"
             />
           </AnimatedSection>
@@ -372,21 +415,21 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ background: "var(--color-cream)" }}
-        aria-label="The Serena method — our approach"
+        aria-label={vi ? "Phương pháp Serena" : "The Serena method — our approach"}
       >
         <div className="container-site">
           {/* Heading */}
           <AnimatedSection animation="slide-up-fade" className="mb-10 md:mb-14">
             <SectionHeading
-              eyebrow="How We Work"
-              title="The Serena Method"
+              eyebrow={vi ? "Cách chúng tôi thực hiện" : "How We Work"}
+              title={vi ? "Phương pháp Serena" : "The Serena Method"}
               align="center"
             />
           </AnimatedSection>
 
           {/* 4 cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {approachSteps.map((step, i) => (
+            {localizedApproachSteps.map((step, i) => (
               <AnimatedSection key={step.step} animation="slide-up-fade" delay={0.1 * i}>
                 <article
                   className="card flex flex-col gap-5 h-full"
@@ -468,7 +511,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="relative section-padding"
         style={{ background: "var(--color-espresso)" }}
-        aria-label="Begin your wellness journey — book a treatment"
+        aria-label={vi ? "Bắt đầu hành trình chăm sóc toàn diện — đặt liệu trình" : "Begin your wellness journey — book a treatment"}
       >
         {/* Warm tint overlay */}
         <div
@@ -493,7 +536,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 lineHeight: 1.1,
               }}
             >
-              Begin Your Wellness Journey
+              {vi ? "Bắt đầu hành trình an dưỡng" : "Begin Your Wellness Journey"}
             </h2>
           </AnimatedSection>
 
@@ -507,7 +550,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 lineHeight: 1.75,
               }}
             >
-              One hour with us can change the way you feel for days.
+              {vi ? "Chỉ một giờ tại Serena có thể giúp bạn cảm nhận khác biệt trong nhiều ngày." : "One hour with us can change the way you feel for days."}
             </p>
           </AnimatedSection>
 
@@ -523,7 +566,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   border: "none",
                 }}
               >
-                Book a Treatment
+                {vi ? "Đặt liệu trình" : "Book a Treatment"}
               </Link>
               <Link
                 href={withLocalePath(locale, "/services")}
@@ -534,7 +577,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   border: "1.5px solid rgba(255,255,255,0.55)",
                 }}
               >
-                View All Services
+                {vi ? "Xem tất cả dịch vụ" : "View All Services"}
               </Link>
             </div>
           </AnimatedSection>

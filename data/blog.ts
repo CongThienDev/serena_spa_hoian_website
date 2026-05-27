@@ -157,3 +157,7 @@ export function getPostBySlug(slug: string, locale: "vi" | "en" = "en"): BlogPos
   const post = BLOG_POSTS.find((p) => p.slug === slug);
   return post ? localizePost(post, locale) : undefined;
 }
+
+export function getAllPosts(locale: "vi" | "en" = "en"): BlogPost[] {
+  return BLOG_POSTS.map((post) => localizePost(post, locale));
+}

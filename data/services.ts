@@ -270,30 +270,91 @@ const SERVICES_VI: Record<string, LocalizedServiceOverride> = {
     tagline: "Làm sạch sâu, sáng da tự nhiên",
     description:
       "Liệu trình thanh lọc với đất sét khoáng và chiết xuất thực vật giúp làm sạch sâu lỗ chân lông, cân bằng dầu và trả lại làn da tươi sáng.",
+    benefits: [
+      "Làm sạch sâu lỗ chân lông",
+      "Cân bằng tiết dầu",
+      "Cải thiện bề mặt da",
+      "Tăng độ rạng rỡ tự nhiên",
+    ],
+    includes: [
+      "Làm sạch và tẩy tế bào chết dịu nhẹ",
+      "Đắp mặt nạ đất sét khoáng",
+      "Massage mặt thư giãn",
+      "Dưỡng ẩm phục hồi",
+    ],
   },
   "hot-stone-therapy": {
     name: "Hot Stone Therapy",
     tagline: "Hơi ấm cổ truyền, chữa lành hiện đại",
     description:
       "Đá bazan ấm trượt dài theo cơ giúp tác động sâu hơn tay massage thông thường. Nhiệt ấm dịu tan căng cơ mạn tính và đưa tâm trí vào trạng thái tĩnh.",
+    benefits: [
+      "Tác động sâu vào cơ",
+      "Giảm căng cơ mạn tính",
+      "Tăng tuần hoàn máu",
+      "Làm dịu tâm trí",
+    ],
+    includes: [
+      "Massage toàn thân với đá nóng",
+      "Kỹ thuật day ấn chuyên sâu",
+      "Tinh dầu thư giãn",
+      "Khăn ấm sau liệu trình",
+    ],
   },
   "foot-massage": {
     name: "Foot Massage",
     tagline: "Vững vàng từng bước chân",
     description:
       "Sau những ngày dạo phố Hội An, liệu trình reflexology chân giúp giảm mỏi, cải thiện tuần hoàn và tái cân bằng năng lượng qua các huyệt đạo trọng điểm.",
+    benefits: [
+      "Giảm mệt mỏi và sưng nề bàn chân",
+      "Cải thiện tuần hoàn",
+      "Kích hoạt huyệt đạo phản xạ",
+      "Cảm giác vững vàng, thư thái",
+    ],
+    includes: [
+      "Ngâm chân thảo dược",
+      "Massage phản xạ bàn chân",
+      "Thư giãn bắp chân",
+      "Trà thảo mộc sau liệu trình",
+    ],
   },
   "couple-ritual": {
     name: "Couple Ritual",
     tagline: "Hai tâm hồn, một chốn bình yên",
     description:
       "Trải nghiệm thư giãn sâu cùng người thương trong phòng đôi riêng tư, với massage toàn thân, facial và nghi thức nâng ly đầy tinh tế.",
+    benefits: [
+      "Trải nghiệm phục hồi cùng nhau",
+      "Không gian phòng đôi riêng tư",
+      "Liệu trình đồng thời cho hai người",
+      "Tăng kết nối cảm xúc",
+    ],
+    includes: [
+      "Phòng trị liệu cặp đôi riêng",
+      "Massage toàn thân cho hai người",
+      "Chăm sóc da mặt cho hai người",
+      "Đồ uống chào mừng",
+      "Trái cây theo mùa",
+    ],
   },
   "body-scrub-ritual": {
     name: "Body Scrub Ritual",
     tagline: "Làm mới. Rạng rỡ. Tỏa sáng.",
     description:
       "Nghi thức tẩy tế bào chết toàn thân bằng muối biển, cà phê hoặc nghệ theo nhu cầu da. Giúp da mịn màng, tăng tuần hoàn và sáng khỏe tự nhiên.",
+    benefits: [
+      "Loại bỏ tế bào chết",
+      "Da mịn và mềm hơn",
+      "Tăng tuần hoàn",
+      "Làn da sáng khỏe tự nhiên",
+    ],
+    includes: [
+      "Tẩy tế bào chết toàn thân",
+      "Làm sạch và ủ dưỡng",
+      "Dưỡng ẩm toàn thân",
+      "Trà thảo mộc thư giãn",
+    ],
   },
 };
 

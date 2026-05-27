@@ -3,7 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { generateLocalizedRouteMetadata } from "@/lib/route-metadata";
 import { normalizeLocale, withLocalePath } from "@/lib/i18n";
-import { getFeaturedPosts } from "@/data/blog";
+import { getAllPosts } from "@/data/blog";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function LocalizedBlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: localeInput } = await params;
   const locale = normalizeLocale(localeInput);
-  const posts = getFeaturedPosts(50, locale);
+  const posts = getAllPosts(locale);
 
   return (
     <main>

@@ -543,7 +543,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
           backgroundColor: "var(--color-espresso)",
           padding: "2.5rem 1.25rem",
         }}
-        aria-label="Quick booking link"
+        aria-label={vi ? "Liên kết đặt lịch nhanh" : "Quick booking link"}
       >
         <div className="container-site">
           <div
@@ -560,10 +560,10 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
               className="font-sans text-[var(--color-sand)]"
               style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}
             >
-              Prefer to book directly?
+              {vi ? "Bạn muốn đặt trực tiếp?" : "Prefer to book directly?"}
             </p>
             <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-sm">
-              Book Online
+              {vi ? "Đặt lịch online" : "Book Online"}
             </Link>
           </div>
         </div>
