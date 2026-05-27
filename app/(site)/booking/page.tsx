@@ -152,7 +152,11 @@ export default function BookingPage() {
           <AnimatedSection animation="slide-up-fade" delay={0.14}>
             <h1
               className="mt-3 max-w-3xl font-serif text-[clamp(2.3rem,5vw,4.8rem)] leading-[0.95]"
-              style={{ color: "var(--color-warm-white)" }}
+              style={{
+                color: "var(--color-warm-white)",
+                WebkitTextFillColor: "var(--color-warm-white)",
+                textShadow: "0 8px 26px rgba(61,31,15,0.35)",
+              }}
             >
               Select Services. Review Cart. Confirm in a Minute.
             </h1>
