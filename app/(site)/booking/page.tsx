@@ -150,8 +150,11 @@ export default function BookingPage() {
             <span className="eyebrow text-[var(--color-peach-light)]">Minimal Booking Flow</span>
           </AnimatedSection>
           <AnimatedSection animation="slide-up-fade" delay={0.14}>
-            <h1 className="mt-3 max-w-3xl font-serif text-[clamp(2.3rem,5vw,4.8rem)] leading-[0.95]">
-              Select Services. Review Cart. Confirm in 1 Minute.
+            <h1
+              className="mt-3 max-w-3xl font-serif text-[clamp(2.3rem,5vw,4.8rem)] leading-[0.95]"
+              style={{ color: "var(--color-warm-white)" }}
+            >
+              Select Services. Review Cart. Confirm in a Minute.
             </h1>
           </AnimatedSection>
           <AnimatedSection animation="fade" delay={0.22}>
