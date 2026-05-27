@@ -1,1221 +1,619 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
-import { SERVICES, type Service } from "@/data/services";
+import { SERVICES, getServiceBySlug } from "@/data/services";
 
-/* ── Types ──────────────────────────────────────────────────────────────── */
-
-type BookingStep = "form" | "success";
-
-type BookingFormState = {
+type CartItem = {
   serviceId: string;
-  durationMinutes: number | null;
+  durationMinutes: number;
+  quantity: number;
+};
+
+type ContactForm = {
   date: string;
   time: string;
   name: string;
-  email: string;
   phone: string;
-  specialRequests: string;
-  addGuest: boolean;
+  email: string;
+  note: string;
 };
 
-const TIME_SLOTS = [
-  { value: "09:00", label: "9:00 AM" },
-  { value: "10:00", label: "10:00 AM" },
-  { value: "11:00", label: "11:00 AM" },
-  { value: "14:00", label: "2:00 PM" },
-  { value: "15:00", label: "3:00 PM" },
-  { value: "16:00", label: "4:00 PM" },
-  { value: "17:00", label: "5:00 PM" },
-  { value: "18:00", label: "6:00 PM" },
+const TIME_GROUPS = [
+  { label: "Morning", slots: ["09:00", "10:00", "11:00"] },
+  { label: "Afternoon", slots: ["14:00", "15:00", "16:00", "17:00", "18:00"] },
 ];
 
-/* ── Page ───────────────────────────────────────────────────────────────── */
-
 export default function BookingPage() {
-  const [step, setStep] = useState<BookingStep>("form");
-  const [form, setForm] = useState<BookingFormState>({
-    serviceId: "",
-    durationMinutes: null,
+  const initialSlug = getInitialAddSlug();
+  const initialService = initialSlug ? getServiceBySlug(initialSlug) : undefined;
+  const [cart, setCart] = useState<CartItem[]>(() =>
+    initialService
+      ? [{ serviceId: initialService.id, durationMinutes: initialService.duration[0] ?? 60, quantity: 1 }]
+      : [],
+  );
+  const [activeServiceId, setActiveServiceId] = useState<string>(initialService?.id ?? SERVICES[0]?.id ?? "");
+  const [form, setForm] = useState<ContactForm>({
     date: "",
     time: "",
     name: "",
-    email: "",
     phone: "",
-    specialRequests: "",
-    addGuest: false,
+    email: "",
+    note: "",
   });
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [activeStep, setActiveStep] = useState<"build" | "contact">("build");
+  const [recentAddKey, setRecentAddKey] = useState<string | null>(null);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
-  const selectedService = SERVICES.find((s) => s.id === form.serviceId) ?? null;
+  const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
-  function setField<K extends keyof BookingFormState>(
-    key: K,
-    value: BookingFormState[K]
-  ) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const selectedItems = useMemo(
+    () =>
+      cart
+        .map((item) => {
+          const service = SERVICES.find((s) => s.id === item.serviceId);
+          if (!service) return null;
+          const unitPrice = service.priceVND ?? Math.round(service.price * 25000);
+          return {
+            ...item,
+            service,
+            unitPrice,
+            lineTotal: unitPrice * item.quantity,
+          };
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null),
+    [cart],
+  );
+
+  const totalVND = selectedItems.reduce((sum, item) => sum + item.lineTotal, 0);
+  const totalDuration = selectedItems.reduce(
+    (sum, item) => sum + item.durationMinutes * item.quantity,
+    0,
+  );
+  const hasCart = selectedItems.length > 0;
+  const isScheduleReady = Boolean(form.date && form.time);
+  const isContactReady = Boolean(form.name.trim() && form.phone.trim());
+  const canGoNext = hasCart && isScheduleReady;
+  const canSubmit = hasCart && isScheduleReady && isContactReady;
+  const todayISO = getLocalDateISO(0);
+  const tomorrowISO = getLocalDateISO(1);
+  const weekendISO = getNextWeekendISO();
+
+  function handleAddCurrentService(duration: number) {
+    if (!activeService) return;
+    const feedbackKey = `${activeService.id}-${duration}`;
+    setCart((prev) => addOrIncreaseItem(prev, activeService.id, duration));
+    setRecentAddKey(feedbackKey);
   }
 
-  function handleSelectService(service: Service) {
-    setForm((prev) => ({
-      ...prev,
-      serviceId: service.id,
-      durationMinutes: service.duration[0] ?? null,
-    }));
+  function updateQuantity(serviceId: string, durationMinutes: number, nextQuantity: number) {
+    if (nextQuantity <= 0) {
+      setCart((prev) => prev.filter((item) => !(item.serviceId === serviceId && item.durationMinutes === durationMinutes)));
+      return;
+    }
+
+    setCart((prev) =>
+      prev.map((item) =>
+        item.serviceId === serviceId && item.durationMinutes === durationMinutes
+          ? { ...item, quantity: nextQuantity }
+          : item,
+      ),
+    );
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStep("success");
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!canSubmit) return;
+    setIsSuccess(true);
   }
 
-  if (step === "success") {
-    return <SuccessPage service={selectedService} form={form} />;
+  if (isSuccess) {
+    return (
+      <main className="section-cream">
+        <section className="container-site py-20 text-center">
+          <LotusMarkSmall size={28} color="var(--color-terracotta)" />
+          <h1 className="mt-4 font-serif text-h2">Booking Request Received</h1>
+          <p className="mx-auto mt-3 max-w-xl text-[var(--color-espresso-mid)]">
+            We will confirm your schedule via WhatsApp shortly. Thank you for choosing Serena Spa Hội An.
+          </p>
+          <div className="mt-8 flex justify-center gap-3">
+            <Link href="/services" className="btn btn-outline">
+              Add More Services
+            </Link>
+            <Link href="/" className="btn btn-primary">
+              Back to Home
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
     <main>
-      {/* ── Hero Header ─────────────────────────────────────────────────── */}
-      <section
-        style={{
-          background:
-            "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
-          padding: "clamp(4rem, 8vw, 7rem) 1.25rem",
-          textAlign: "center",
-        }}
-        aria-label="Booking page header"
-      >
-        <div className="container-content">
-          <AnimatedSection animation="fade" delay={0.05}>
-            <div className="flex items-center justify-center gap-2.5 mb-5">
-              <LotusMarkSmall size={14} color="var(--color-terracotta)" />
-              <span className="eyebrow">Make a Reservation</span>
-              <LotusMarkSmall size={14} color="var(--color-terracotta)" />
-            </div>
+      <section className="relative min-h-[55svh] overflow-hidden" aria-label="Booking hero">
+        <Image
+          src="/images/serena_image/z7863130063966_02bca12b005872be63d6ed4054b0cad4.jpg"
+          alt="Serena Spa reception"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(61,31,15,0.82)_0%,rgba(168,92,68,0.58)_100%)]" />
+        <div className="relative container-site flex min-h-[55svh] flex-col justify-center py-14 text-white">
+          <AnimatedSection animation="fade" delay={0.06}>
+            <span className="eyebrow text-[var(--color-peach-light)]">Minimal Booking Flow</span>
           </AnimatedSection>
-
-          <AnimatedSection animation="slide-up-fade" delay={0.12}>
-            <h1
-              className="font-serif text-[var(--color-espresso)]"
-              style={{
-                fontSize: "clamp(2.6rem, 5vw, 5.2rem)",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                lineHeight: 1.0,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Book Your Escape
+          <AnimatedSection animation="slide-up-fade" delay={0.14}>
+            <h1 className="mt-3 max-w-3xl font-serif text-[clamp(2.3rem,5vw,4.8rem)] leading-[0.95]">
+              Select Services. Review Cart. Confirm in 1 Minute.
             </h1>
           </AnimatedSection>
-
-          <AnimatedSection animation="slide-up-fade" delay={0.2}>
-            <p
-              className="prose-spa mx-auto mt-5 text-center"
-              style={{ maxWidth: "48ch" }}
-            >
-              Reserve your treatment in seconds. Same-day bookings welcome.
+          <AnimatedSection animation="fade" delay={0.22}>
+            <p className="mt-4 max-w-2xl text-[var(--color-sand)]">
+              Build your treatment plan with multiple services, then submit one booking request.
             </p>
           </AnimatedSection>
-
-          {/* Lotus divider */}
-          <AnimatedSection animation="fade" delay={0.28}>
-            <div
-              className="flex items-center justify-center gap-4 mt-8"
-              aria-hidden="true"
-            >
-              <span
-                className="block h-px w-16"
-                style={{
-                  background:
-                    "linear-gradient(to right, transparent, var(--color-terracotta))",
-                  opacity: 0.45,
-                }}
-              />
-              <LotusMarkSmall size={20} color="var(--color-terracotta)" />
-              <span
-                className="block h-px w-16"
-                style={{
-                  background:
-                    "linear-gradient(to left, transparent, var(--color-terracotta))",
-                  opacity: 0.45,
-                }}
-              />
-            </div>
-          </AnimatedSection>
         </div>
       </section>
 
-      {/* ── Booking Form + Sidebar ───────────────────────────────────────── */}
-      <section
-        className="section-cream section-padding"
-        aria-label="Booking form"
-      >
-        <div className="container-site">
-          {/* Step indicator */}
-          <AnimatedSection animation="fade" delay={0.05}>
-            <StepIndicator />
-          </AnimatedSection>
+      <section className="section-cream section-padding" aria-label="Booking workspace">
+        {activeStep === "build" ? (
+          <div className="container-site mx-auto grid w-full max-w-[72rem] gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+            <AnimatedSection animation="slide-up-fade">
+              <div className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+                <StepRow
+                  hasCart={hasCart}
+                  isScheduleReady={isScheduleReady}
+                  isContactReady={isContactReady}
+                  activeStep={activeStep}
+                />
+                <h2 className="font-serif text-h4">1. Choose Services</h2>
+                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">Tap service, tap duration, done.</p>
 
-          {/* Main layout: form + side image */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: "2rem",
-              marginTop: "2.5rem",
-            }}
-            className="lg:grid-cols-[1fr_320px]"
-          >
-            {/* ── Form Card ─────────────────────────────────────────── */}
-            <AnimatedSection animation="slide-up-fade" delay={0.1}>
-              <form
-                onSubmit={handleSubmit}
-                className="card"
-                style={{ padding: "clamp(1.5rem, 4vw, 2.5rem)", maxWidth: "860px" }}
-                noValidate
-              >
-                {/* Section A: Treatment Selection */}
-                <FormSection
-                  title="Select Your Treatment"
-                  badge="A"
-                  description="Choose the treatment that calls to you."
-                >
-                  <div className="space-y-3">
-                    {SERVICES.map((service) => (
-                      <ServiceCard
-                        key={service.id}
-                        service={service}
-                        isSelected={form.serviceId === service.id}
-                        selectedDuration={form.durationMinutes}
-                        onSelect={() => handleSelectService(service)}
-                        onSelectDuration={(mins) =>
-                          setField("durationMinutes", mins)
-                        }
-                      />
-                    ))}
-                  </div>
-                </FormSection>
-
-                <SectionDivider />
-
-                {/* Section B: Date & Time */}
-                <FormSection
-                  title="Date & Time"
-                  badge="B"
-                  description="We welcome same-day bookings."
-                >
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr",
-                      gap: "1.5rem",
-                    }}
-                    className="sm:grid-cols-[1fr_1fr]"
-                  >
-                    {/* Date */}
-                    <div>
-                      <label
-                        className="font-sans font-medium text-[var(--color-espresso)]"
-                        style={{
-                          fontSize: "0.82rem",
-                          letterSpacing: "0.03em",
-                          display: "block",
-                          marginBottom: "0.4rem",
-                        }}
-                      >
-                        Preferred Date
-                        <span style={{ color: "var(--color-terracotta)" }}>
-                          {" "}
-                          *
-                        </span>
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={form.date}
-                        onChange={(e) => setField("date", e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
-                        className="input"
-                        style={{ cursor: "pointer" }}
-                      />
-                    </div>
-
-                    {/* Time slots — full width below date on small, same row on sm+ */}
-                    <div
-                      style={{ gridColumn: "1 / -1" }}
-                      className="sm:col-span-2"
+                <div className="mt-5 grid gap-2">
+                  {SERVICES.map((service) => (
+                    <button
+                      key={service.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveServiceId(service.id);
+                        setRecentAddKey(null);
+                      }}
+                      className="flex items-center justify-between rounded-xl border px-4 py-3 text-left transition"
+                      style={{
+                        borderColor:
+                          activeServiceId === service.id ? "var(--color-terracotta)" : "var(--color-sand)",
+                        backgroundColor:
+                          activeServiceId === service.id ? "var(--color-terracotta-muted)" : "transparent",
+                      }}
                     >
-                      <p
-                        className="font-sans font-medium text-[var(--color-espresso)]"
-                        style={{
-                          fontSize: "0.82rem",
-                          letterSpacing: "0.03em",
-                          marginBottom: "0.6rem",
-                        }}
-                      >
-                        Preferred Time
-                        <span style={{ color: "var(--color-terracotta)" }}>
-                          {" "}
-                          *
-                        </span>
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "0.5rem",
-                        }}
-                      >
-                        {TIME_SLOTS.map((slot) => (
+                      <span className="font-sans text-sm text-[var(--color-espresso)]">{service.name}</span>
+                      <span className="font-sans text-xs text-[var(--color-warm-gray)]">
+                        From {service.priceVND?.toLocaleString("vi-VN") ?? `${service.price} USD`}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {activeService && (
+                  <div className="mt-6 border-t border-[var(--color-sand)] pt-5">
+                    <p className="font-serif text-lg text-[var(--color-espresso)]">{activeService.name}</p>
+                    <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{activeService.tagline}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {activeService.duration.map((duration) => {
+                        const key = `${activeService.id}-${duration}`;
+                        const isAdded = recentAddKey === key;
+                        return (
                           <button
-                            key={slot.value}
+                            key={key}
                             type="button"
-                            onClick={() => setField("time", slot.value)}
+                            onClick={() => handleAddCurrentService(duration)}
+                            className="btn btn-outline btn-sm"
                             style={{
-                              padding: "0.45rem 1.1rem",
-                              borderRadius: "var(--radius-pill)",
-                              fontSize: "0.82rem",
-                              fontFamily: "var(--font-sans)",
-                              fontWeight: 500,
-                              border:
-                                form.time === slot.value
-                                  ? "1.5px solid var(--color-terracotta)"
-                                  : "1.5px solid var(--color-sand-dark)",
-                              backgroundColor:
-                                form.time === slot.value
-                                  ? "var(--color-terracotta)"
-                                  : "transparent",
-                              color:
-                                form.time === slot.value
-                                  ? "white"
-                                  : "var(--color-espresso-mid)",
-                              cursor: "pointer",
-                              transition: "all 0.18s",
+                              borderColor: isAdded ? "var(--color-terracotta)" : undefined,
+                              backgroundColor: isAdded ? "var(--color-terracotta)" : undefined,
+                              color: isAdded ? "white" : undefined,
                             }}
                           >
-                            {slot.label}
+                            {isAdded ? `Added ${duration} min` : `Add ${duration} min`}
                           </button>
-                        ))}
-                      </div>
+                        );
+                      })}
                     </div>
+                    <p className="mt-3 text-xs text-[var(--color-warm-gray)]">
+                      Price shown is per session. You can increase quantity in cart.
+                    </p>
                   </div>
-                </FormSection>
-
-                <SectionDivider />
-
-                {/* Section C: Your Details */}
-                <FormSection
-                  title="Your Details"
-                  badge="C"
-                  description="How should we confirm your booking?"
-                >
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr",
-                      gap: "1.25rem",
-                    }}
-                    className="sm:grid-cols-2"
-                  >
-                    {/* Name */}
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <InputLabel required>Full Name</InputLabel>
-                      <input
-                        type="text"
-                        required
-                        value={form.name}
-                        onChange={(e) => setField("name", e.target.value)}
-                        placeholder="Your full name"
-                        className="input"
-                        autoComplete="name"
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <InputLabel>Email Address</InputLabel>
-                      <input
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setField("email", e.target.value)}
-                        placeholder="your@email.com"
-                        className="input"
-                        autoComplete="email"
-                      />
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-                      <InputLabel required>Phone / WhatsApp</InputLabel>
-                      <input
-                        type="tel"
-                        required
-                        value={form.phone}
-                        onChange={(e) => setField("phone", e.target.value)}
-                        placeholder="+84 ..."
-                        className="input"
-                        autoComplete="tel"
-                      />
-                    </div>
-
-                    {/* Special Requests */}
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <InputLabel>Special Requests</InputLabel>
-                      <textarea
-                        value={form.specialRequests}
-                        onChange={(e) =>
-                          setField("specialRequests", e.target.value)
-                        }
-                        placeholder="Allergies, preferences, special occasions…"
-                        rows={3}
-                        className="input"
-                        style={{ resize: "vertical", minHeight: "90px" }}
-                      />
-                    </div>
-
-                    {/* Add Guest toggle */}
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <button
-                        type="button"
-                        onClick={() => setField("addGuest", !form.addGuest)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.7rem",
-                          padding: "0.75rem 1.1rem",
-                          borderRadius: "var(--radius-card-sm)",
-                          border: form.addGuest
-                            ? "1.5px solid var(--color-terracotta)"
-                            : "1.5px solid var(--color-sand)",
-                          backgroundColor: form.addGuest
-                            ? "var(--color-terracotta-muted)"
-                            : "var(--color-warm-white)",
-                          cursor: "pointer",
-                          width: "100%",
-                          transition: "all 0.18s",
-                        }}
-                      >
-                        <span
-                          style={{
-                            width: "1.25rem",
-                            height: "1.25rem",
-                            borderRadius: "4px",
-                            border: form.addGuest
-                              ? "2px solid var(--color-terracotta)"
-                              : "2px solid var(--color-sand-dark)",
-                            backgroundColor: form.addGuest
-                              ? "var(--color-terracotta)"
-                              : "transparent",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                            transition: "all 0.18s",
-                          }}
-                          aria-hidden="true"
-                        >
-                          {form.addGuest && (
-                            <svg
-                              width="10"
-                              height="10"
-                              viewBox="0 0 10 10"
-                              fill="none"
-                            >
-                              <path
-                                d="M1.5 5L4 7.5L8.5 2"
-                                stroke="white"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </span>
-                        <span
-                          className="font-sans text-[var(--color-espresso)]"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          Add a guest (couple package or group booking)
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </FormSection>
-
-                <SectionDivider />
-
-                {/* Section D: Summary + Submit (visible on mobile, hidden on lg) */}
-                <div className="lg:hidden">
-                  <BookingSummaryInline
-                    service={selectedService}
-                    form={form}
-                  />
-                  <div style={{ marginTop: "1.5rem" }}>
-                    <SubmitButton />
-                  </div>
-                </div>
-
-                {/* Submit — desktop only (summary is in sidebar) */}
-                <div className="hidden lg:block" style={{ marginTop: "2rem" }}>
-                  <SubmitButton />
-                </div>
-              </form>
+                )}
+              </div>
             </AnimatedSection>
 
-            {/* ── Sticky side panel — desktop only ──────────────────── */}
-            <div
-              className="hidden lg:block"
-              style={{ position: "relative" }}
-              aria-label="Booking summary and spa image"
-            >
-              <div style={{ position: "sticky", top: "6rem" }}>
-                {/* Booking summary card */}
-                <AnimatedSection animation="fade" delay={0.2}>
-                  <BookingSummaryCard service={selectedService} form={form} />
-                </AnimatedSection>
-
-                {/* Spa image strip */}
-                <AnimatedSection animation="fade" delay={0.3}>
-                  <div
-                    className="relative overflow-hidden"
-                    style={{
-                      borderRadius: "var(--radius-card)",
-                      marginTop: "1rem",
-                      height: "300px",
-                    }}
-                  >
-                    <Image
-                      src="/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg"
-                      alt="Serena Spa couple treatment room — warm and serene"
-                      fill
-                      className="object-cover"
-                      sizes="320px"
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to top, rgba(61,31,15,0.55) 0%, transparent 60%)",
-                      }}
-                      aria-hidden="true"
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: "1rem",
-                        left: "1rem",
-                        right: "1rem",
-                      }}
-                    >
-                      <p
-                        className="font-serif text-white"
-                        style={{ fontSize: "1rem", fontWeight: 500 }}
-                      >
-                        Your sanctuary awaits
-                      </p>
-                    </div>
-                  </div>
-                </AnimatedSection>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Trust Strip ─────────────────────────────────────────────────── */}
-      <section
-        style={{
-          backgroundColor: "var(--color-section-deep)",
-          padding: "clamp(2rem, 4vw, 3rem) 1.25rem",
-        }}
-        aria-label="Trust pillars"
-      >
-        <div className="container-site">
-          <AnimatedSection animation="fade" delay={0.05}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {[
-                { icon: "⚡", label: "Same-day Bookings" },
-                { icon: "✓", label: "No Hidden Fees" },
-                { icon: "↩", label: "Flexible Cancellation" },
-                { icon: "✦", label: "Expert Therapists" },
-              ].map((pillar) => (
-                <div
-                  key={pillar.label}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    justifyContent: "center",
-                  }}
-                >
-                  <span
-                    className="font-serif text-[var(--color-terracotta)]"
-                    style={{ fontSize: "1.2rem" }}
-                    aria-hidden="true"
-                  >
-                    {pillar.icon}
-                  </span>
-                  <span
-                    className="font-sans font-semibold text-[var(--color-espresso)]"
-                    style={{
-                      fontSize: "0.8rem",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {pillar.label}
+            <AnimatedSection animation="slide-up-fade" delay={0.08}>
+              <div className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+                <div className="flex items-center justify-between gap-4">
+                  <h2 className="font-serif text-h4">2. Cart & Schedule</h2>
+                  <span className="rounded-full bg-[var(--color-terracotta-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta-dark)]">
+                    {selectedItems.length} item{selectedItems.length === 1 ? "" : "s"}
                   </span>
                 </div>
-              ))}
-            </div>
-          </AnimatedSection>
-        </div>
+
+                <div className="mt-5 space-y-3">
+                  {selectedItems.length === 0 && (
+                    <p className="rounded-xl border border-dashed border-[var(--color-sand-dark)] px-4 py-5 text-sm text-[var(--color-warm-gray)]">
+                      Your cart is empty. Start by adding at least one service.
+                    </p>
+                  )}
+                  {selectedItems.map((item) => (
+                    <div
+                      key={`${item.serviceId}-${item.durationMinutes}`}
+                      className="grid grid-cols-[minmax(0,1fr)_10rem_9rem] items-center gap-3 rounded-xl border border-[var(--color-sand)] px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-sans text-sm font-medium text-[var(--color-espresso)]">{item.service.name}</p>
+                        <p className="text-xs text-[var(--color-warm-gray)]">
+                          {item.durationMinutes} min · {item.unitPrice.toLocaleString("vi-VN")} VND
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                          Guests
+                        </span>
+                        <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity - 1)}
+                          className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
+                          aria-label="Decrease quantity"
+                        >
+                          −
+                        </button>
+                        <span className="w-6 text-center text-sm text-[var(--color-espresso)]">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity + 1)}
+                          className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
+                          aria-label="Increase quantity"
+                        >
+                          +
+                        </button>
+                        </div>
+                      </div>
+                      <span className="text-right font-sans text-xs font-semibold text-[var(--color-espresso-mid)]">
+                        {item.lineTotal.toLocaleString("vi-VN")} VND
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 border-t border-[var(--color-sand)] pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--color-warm-gray)]">
+                      Total · {totalDuration} min
+                    </span>
+                    <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalVND.toLocaleString("vi-VN")} VND</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                <div className="space-y-3 rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                    Date *
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {[
+                      { label: "Today", value: todayISO },
+                      { label: "Tomorrow", value: tomorrowISO },
+                      { label: "Weekend", value: weekendISO },
+                    ].map((option) => {
+                      const isActive = form.date === option.value;
+                      return (
+                        <button
+                          key={option.label}
+                          type="button"
+                          onClick={() => setForm((prev) => ({ ...prev, date: option.value }))}
+                          className="rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition"
+                          style={{
+                            borderColor: isActive ? "var(--color-terracotta)" : "var(--color-sand-dark)",
+                            backgroundColor: isActive ? "var(--color-terracotta)" : "transparent",
+                            color: isActive ? "white" : "var(--color-espresso-mid)",
+                          }}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <label className="block">
+                    <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                      Or choose another date
+                    </span>
+                    <input
+                      className="input"
+                      type="date"
+                      min={todayISO}
+                      value={form.date}
+                      onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                      required
+                    />
+                  </label>
+                </div>
+
+                <Field label="Time" required>
+                  <div className="space-y-3">
+                    {TIME_GROUPS.map((group) => (
+                      <div key={group.label}>
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                          {group.label}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {group.slots.map((slot) => {
+                            const isActive = form.time === slot;
+                            return (
+                              <button
+                                key={slot}
+                                type="button"
+                                onClick={() => setForm((prev) => ({ ...prev, time: slot }))}
+                                className="rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.08em] transition"
+                                style={{
+                                  borderColor: isActive ? "var(--color-terracotta)" : "var(--color-sand-dark)",
+                                  backgroundColor: isActive ? "var(--color-terracotta-muted)" : "transparent",
+                                  color: "var(--color-espresso-mid)",
+                                }}
+                              >
+                                {isActive ? "✓ " : ""}
+                                {slot}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Field>
+
+                  <div className="space-y-3">
+                    {!canGoNext && (
+                      <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
+                        Complete cart, date and time to continue.
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setActiveStep("contact")}
+                      className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={!canGoNext}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        ) : (
+          <div className="container-site">
+            <AnimatedSection animation="slide-up-fade">
+              <div className="mx-auto w-full max-w-[44rem] rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+                <StepRow
+                  hasCart={hasCart}
+                  isScheduleReady={isScheduleReady}
+                  isContactReady={isContactReady}
+                  activeStep={activeStep}
+                />
+                <h2 className="font-serif text-h3">3. Guest details</h2>
+                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">
+                  One final step to confirm your booking.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setSummaryOpen((prev) => !prev)}
+                  className="mt-5 flex w-full items-center justify-between rounded-xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] px-4 py-3 text-left text-sm text-[var(--color-espresso-mid)]"
+                  aria-expanded={summaryOpen}
+                  aria-controls="booking-summary-details"
+                >
+                  <span>{selectedItems.length} service item(s) · {totalDuration} min · {totalVND.toLocaleString("vi-VN")} VND</span>
+                  <span className="text-[var(--color-terracotta)]">{summaryOpen ? "▴" : "▾"}</span>
+                </button>
+
+                <div
+                  id="booking-summary-details"
+                  className={`${summaryOpen ? "mt-3" : "hidden"} space-y-2 rounded-xl border border-[var(--color-sand)] px-4 py-3`}
+                >
+                  {selectedItems.map((item) => (
+                    <div key={`${item.serviceId}-${item.durationMinutes}`} className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-[var(--color-espresso-mid)]">
+                        {item.service.name} · {item.durationMinutes} min × {item.quantity}
+                      </span>
+                      <span className="font-semibold text-[var(--color-espresso)]">{item.lineTotal.toLocaleString("vi-VN")} VND</span>
+                    </div>
+                  ))}
+                </div>
+
+                <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+                  <Field label="Full name" required>
+                    <input
+                      className="input"
+                      type="text"
+                      value={form.name}
+                      onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                      autoComplete="name"
+                      required
+                    />
+                  </Field>
+
+                  <Field label="Phone / WhatsApp" required>
+                    <input
+                      className="input"
+                      type="tel"
+                      value={form.phone}
+                      onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
+                      autoComplete="tel"
+                      required
+                    />
+                  </Field>
+
+                  <div className="space-y-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta)]">
+                      Add email or note (optional)
+                    </p>
+                    <Field label="Email">
+                      <input
+                        className="input"
+                        type="email"
+                        value={form.email}
+                        onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                        autoComplete="email"
+                      />
+                    </Field>
+
+                    <Field label="Note">
+                      <textarea
+                        className="input min-h-[96px]"
+                        value={form.note}
+                        onChange={(event) => setForm((prev) => ({ ...prev, note: event.target.value }))}
+                        placeholder="Therapist preference, allergies, special occasion..."
+                      />
+                    </Field>
+                  </div>
+
+                  {!canSubmit && (
+                    <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
+                      Complete name and phone to confirm booking.
+                    </p>
+                  )}
+
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => setActiveStep("build")}
+                      className="btn btn-outline flex-1"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={!canSubmit}
+                    >
+                      Confirm Booking Request
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </AnimatedSection>
+          </div>
+        )}
       </section>
     </main>
   );
 }
 
-/* ── Sub-components ──────────────────────────────────────────────────────── */
-
-function StepIndicator() {
-  const steps = [
-    { num: "①", label: "Select Treatment" },
-    { num: "②", label: "Your Details" },
-    { num: "③", label: "Confirm" },
-  ];
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0",
-        justifyContent: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      {steps.map((step, i) => (
-        <div key={step.label} style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.5rem 1rem",
-              borderRadius: "var(--radius-pill)",
-              backgroundColor:
-                i === 0 ? "var(--color-terracotta-muted)" : "transparent",
-            }}
-          >
-            <span
-              className="font-serif text-[var(--color-terracotta)]"
-              style={{ fontSize: "1rem" }}
-              aria-hidden="true"
-            >
-              {step.num}
-            </span>
-            <span
-              className="font-sans"
-              style={{
-                fontSize: "0.8rem",
-                fontWeight: i === 0 ? 600 : 400,
-                color:
-                  i === 0
-                    ? "var(--color-terracotta)"
-                    : "var(--color-warm-gray)",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {step.label}
-            </span>
-          </div>
-          {i < steps.length - 1 && (
-            <span
-              style={{
-                display: "block",
-                width: "2rem",
-                height: "1px",
-                backgroundColor: "var(--color-sand-dark)",
-                margin: "0 0.25rem",
-              }}
-              aria-hidden="true"
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function FormSection({
-  title,
-  badge,
-  description,
-  children,
-}: {
-  title: string;
-  badge: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ marginBottom: "0" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: "0.75rem",
-          marginBottom: "1.25rem",
-        }}
-      >
-        <span
-          className="font-serif text-[var(--color-terracotta)]"
-          style={{
-            width: "2rem",
-            height: "2rem",
-            borderRadius: "50%",
-            backgroundColor: "var(--color-terracotta-muted)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "0.9rem",
-            fontWeight: 600,
-            flexShrink: 0,
-          }}
-          aria-hidden="true"
-        >
-          {badge}
-        </span>
-        <div>
-          <h2
-            className="font-serif text-[var(--color-espresso)]"
-            style={{ fontSize: "1.25rem", fontWeight: 500, lineHeight: 1.2 }}
-          >
-            {title}
-          </h2>
-          <p
-            className="font-sans text-[var(--color-warm-gray)]"
-            style={{ fontSize: "0.85rem", marginTop: "0.15rem" }}
-          >
-            {description}
-          </p>
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function SectionDivider() {
-  return (
-    <div
-      style={{
-        height: "1px",
-        backgroundColor: "var(--color-sand)",
-        margin: "2rem 0",
-      }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function InputLabel({
-  children,
+function Field({
+  label,
   required,
+  children,
 }: {
-  children: React.ReactNode;
+  label: string;
   required?: boolean;
+  children: React.ReactNode;
 }) {
   return (
-    <label
-      className="font-sans font-medium text-[var(--color-espresso)]"
-      style={{
-        fontSize: "0.82rem",
-        letterSpacing: "0.03em",
-        display: "block",
-        marginBottom: "0.4rem",
-      }}
-    >
+    <label className="block">
+      <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+        {label}
+        {required ? " *" : ""}
+      </span>
       {children}
-      {required && (
-        <span
-          style={{ color: "var(--color-terracotta)", marginLeft: "2px" }}
-          aria-hidden="true"
-        >
-          *
-        </span>
-      )}
     </label>
   );
 }
 
-function ServiceCard({
-  service,
-  isSelected,
-  selectedDuration,
-  onSelect,
-  onSelectDuration,
-}: {
-  service: Service;
-  isSelected: boolean;
-  selectedDuration: number | null;
-  onSelect: () => void;
-  onSelectDuration: (mins: number) => void;
-}) {
-  const formatVND = (vnd: number) =>
-    new Intl.NumberFormat("vi-VN").format(vnd) + " VND";
+function addOrIncreaseItem(prev: CartItem[], serviceId: string, durationMinutes: number): CartItem[] {
+  const existing = prev.find(
+    (item) => item.serviceId === serviceId && item.durationMinutes === durationMinutes,
+  );
 
-  return (
-    <div
-      onClick={onSelect}
-      role="button"
-      aria-pressed={isSelected}
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onSelect()}
-      style={{
-        padding: "1rem 1.25rem",
-        borderRadius: "var(--radius-card-sm)",
-        border: isSelected
-          ? "2px solid var(--color-terracotta)"
-          : "1.5px solid var(--color-sand)",
-        backgroundColor: isSelected
-          ? "rgba(200,116,90,0.06)"
-          : "var(--color-warm-white)",
-        cursor: "pointer",
-        transition: "all 0.2s",
-        position: "relative",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: "200px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              marginBottom: "0.2rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              className="font-serif text-[var(--color-espresso)]"
-              style={{ fontSize: "1.05rem", fontWeight: 500 }}
-            >
-              {service.name}
-            </span>
-            {service.isSignature && (
-              <span
-                className="font-sans"
-                style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  backgroundColor: "var(--color-terracotta)",
-                  color: "white",
-                  padding: "0.15rem 0.5rem",
-                  borderRadius: "var(--radius-pill)",
-                }}
-              >
-                Signature
-              </span>
-            )}
-          </div>
-          <p
-            className="font-sans text-[var(--color-warm-gray)]"
-            style={{ fontSize: "0.82rem", marginBottom: "0" }}
-          >
-            {service.tagline}
-          </p>
-        </div>
+  if (!existing) {
+    return [...prev, { serviceId, durationMinutes, quantity: 1 }];
+  }
 
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <p
-            className="font-serif text-[var(--color-terracotta)]"
-            style={{ fontSize: "1.1rem", fontWeight: 600 }}
-          >
-            {service.priceVND ? formatVND(service.priceVND) : `$${service.price}`}
-          </p>
-          <p
-            className="font-sans text-[var(--color-warm-gray)]"
-            style={{ fontSize: "0.75rem" }}
-          >
-            from {service.duration[0]} min
-          </p>
-        </div>
-      </div>
-
-      {/* Duration selector — shown when selected */}
-      {isSelected && service.duration.length > 1 && (
-        <div
-          style={{
-            marginTop: "0.9rem",
-            paddingTop: "0.9rem",
-            borderTop: "1px solid var(--color-sand)",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            flexWrap: "wrap",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span
-            className="font-sans text-[var(--color-espresso-mid)]"
-            style={{ fontSize: "0.78rem", fontWeight: 500 }}
-          >
-            Duration:
-          </span>
-          {service.duration.map((mins) => (
-            <button
-              key={mins}
-              type="button"
-              onClick={() => onSelectDuration(mins)}
-              style={{
-                padding: "0.3rem 0.8rem",
-                borderRadius: "var(--radius-pill)",
-                fontSize: "0.78rem",
-                fontFamily: "var(--font-sans)",
-                fontWeight: 500,
-                border:
-                  selectedDuration === mins
-                    ? "1.5px solid var(--color-terracotta)"
-                    : "1.5px solid var(--color-sand-dark)",
-                backgroundColor:
-                  selectedDuration === mins
-                    ? "var(--color-terracotta)"
-                    : "transparent",
-                color:
-                  selectedDuration === mins
-                    ? "white"
-                    : "var(--color-espresso-mid)",
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-            >
-              {mins} min
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+  return prev.map((item) =>
+    item.serviceId === serviceId && item.durationMinutes === durationMinutes
+      ? { ...item, quantity: item.quantity + 1 }
+      : item,
   );
 }
 
-function BookingSummaryCard({
-  service,
-  form,
+function StepRow({
+  hasCart,
+  isScheduleReady,
+  isContactReady,
+  activeStep,
 }: {
-  service: Service | null;
-  form: BookingFormState;
+  hasCart: boolean;
+  isScheduleReady: boolean;
+  isContactReady: boolean;
+  activeStep: "build" | "contact";
 }) {
-  return (
-    <div
-      className="card"
-      style={{
-        padding: "1.5rem",
-        backgroundColor: "var(--color-warm-white)",
-      }}
-    >
-      <h3
-        className="font-serif text-[var(--color-espresso)]"
-        style={{ fontSize: "1.1rem", fontWeight: 500, marginBottom: "1rem" }}
-      >
-        Your Booking
-      </h3>
-      <SummaryRows service={service} form={form} />
-      <p
-        className="font-sans text-[var(--color-warm-gray)]"
-        style={{
-          fontSize: "0.72rem",
-          marginTop: "1rem",
-          lineHeight: 1.6,
-          borderTop: "1px solid var(--color-sand)",
-          paddingTop: "0.75rem",
-        }}
-      >
-        You&apos;ll receive a confirmation via WhatsApp or Email within 15
-        minutes.
-      </p>
-    </div>
-  );
-}
-
-function BookingSummaryInline({
-  service,
-  form,
-}: {
-  service: Service | null;
-  form: BookingFormState;
-}) {
-  return (
-    <div
-      style={{
-        padding: "1.25rem",
-        borderRadius: "var(--radius-card-sm)",
-        backgroundColor: "var(--color-section-warm)",
-        border: "1px solid var(--color-sand)",
-      }}
-    >
-      <h3
-        className="font-serif text-[var(--color-espresso)]"
-        style={{ fontSize: "1rem", fontWeight: 500, marginBottom: "0.75rem" }}
-      >
-        Booking Summary
-      </h3>
-      <SummaryRows service={service} form={form} />
-      <p
-        className="font-sans text-[var(--color-warm-gray)]"
-        style={{ fontSize: "0.72rem", marginTop: "0.75rem", lineHeight: 1.5 }}
-      >
-        Confirmation via WhatsApp or Email within 15 minutes.
-      </p>
-    </div>
-  );
-}
-
-function SummaryRows({
-  service,
-  form,
-}: {
-  service: Service | null;
-  form: BookingFormState;
-}) {
-  const formatVND = (vnd: number) =>
-    new Intl.NumberFormat("vi-VN").format(vnd) + " VND";
-
-  const rows: { label: string; value: string }[] = [
-    {
-      label: "Treatment",
-      value: service ? service.name : "Not selected",
-    },
-    {
-      label: "Duration",
-      value:
-        form.durationMinutes !== null ? `${form.durationMinutes} min` : "—",
-    },
-    {
-      label: "Date",
-      value: form.date
-        ? new Date(form.date + "T00:00:00").toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })
-        : "Not selected",
-    },
-    {
-      label: "Time",
-      value: form.time
-        ? TIME_SLOTS.find((s) => s.value === form.time)?.label ?? form.time
-        : "Not selected",
-    },
-    {
-      label: "Price",
-      value: service
-        ? service.priceVND
-          ? formatVND(service.priceVND)
-          : `$${service.price}`
-        : "—",
-    },
+  const steps = [
+    { label: "Service", done: hasCart },
+    { label: "Schedule", done: isScheduleReady },
+    { label: "Contact", done: isContactReady },
   ];
 
   return (
-    <div className="space-y-2">
-      {rows.map((row) => (
-        <div
-          key={row.label}
+    <div className="mb-5 flex flex-wrap items-center gap-2" aria-label="Booking progress">
+      {steps.map((step) => (
+        <span
+          key={step.label}
+          className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]"
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: "0.5rem",
+            borderColor: step.done ? "var(--color-terracotta)" : "var(--color-sand-dark)",
+            color: step.done ? "var(--color-terracotta-dark)" : "var(--color-warm-gray)",
+            backgroundColor:
+              step.done ||
+              (activeStep === "build" && step.label !== "Contact") ||
+              (activeStep === "contact" && step.label === "Contact")
+                ? "var(--color-terracotta-muted)"
+                : "transparent",
           }}
         >
-          <span
-            className="font-sans text-[var(--color-warm-gray)]"
-            style={{ fontSize: "0.8rem" }}
-          >
-            {row.label}
-          </span>
-          <span
-            className="font-sans font-medium text-[var(--color-espresso)]"
-            style={{ fontSize: "0.82rem", textAlign: "right" }}
-          >
-            {row.value}
-          </span>
-        </div>
+          {step.done ? "✓ " : ""}{step.label}
+        </span>
       ))}
     </div>
   );
 }
 
-function SubmitButton() {
-  return (
-    <button type="submit" className="btn btn-primary btn-lg" style={{ width: "100%" }}>
-      Complete Booking
-    </button>
-  );
+function getInitialAddSlug() {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("add");
 }
 
-/* ── Success Page ────────────────────────────────────────────────────────── */
-
-function SuccessPage({
-  service,
-  form,
-}: {
-  service: Service | null;
-  form: BookingFormState;
-}) {
-  return (
-    <main>
-      <section
-        style={{
-          background:
-            "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
-          minHeight: "70vh",
-          display: "flex",
-          alignItems: "center",
-          padding: "clamp(4rem, 8vw, 6rem) 1.25rem",
-        }}
-        aria-label="Booking confirmed"
-      >
-        <div className="container-content text-center" style={{ width: "100%" }}>
-          <AnimatedSection animation="scale-fade" delay={0.05}>
-            <div
-              style={{
-                width: "5rem",
-                height: "5rem",
-                borderRadius: "50%",
-                backgroundColor: "var(--color-terracotta-muted)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.5rem",
-              }}
-              aria-hidden="true"
-            >
-              <LotusMarkSmall size={36} color="var(--color-terracotta)" />
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection animation="slide-up-fade" delay={0.15}>
-            <h1
-              className="font-serif text-[var(--color-espresso)]"
-              style={{
-                fontSize: "clamp(2rem, 4vw, 3.5rem)",
-                fontWeight: 700,
-                marginBottom: "0.75rem",
-              }}
-            >
-              Booking Received!
-            </h1>
-            <p
-              className="prose-spa mx-auto"
-              style={{ maxWidth: "44ch", marginBottom: "2rem" }}
-            >
-              {service ? (
-                <>
-                  Your{" "}
-                  <strong style={{ color: "var(--color-terracotta)" }}>
-                    {service.name}
-                  </strong>{" "}
-                  is reserved. We&apos;ll confirm via{" "}
-                  {form.phone ? "WhatsApp" : "email"} within 15 minutes.
-                </>
-              ) : (
-                "Your booking has been received. We'll confirm shortly."
-              )}
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection animation="fade" delay={0.25}>
-            <div
-              style={{
-                display: "inline-flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-                textAlign: "left",
-                padding: "1.5rem 2rem",
-                borderRadius: "var(--radius-card)",
-                backgroundColor: "var(--color-warm-white)",
-                boxShadow: "var(--shadow-card)",
-                marginBottom: "2rem",
-                minWidth: "260px",
-              }}
-            >
-              {service && (
-                <Row label="Treatment" value={service.name} />
-              )}
-              {form.date && (
-                <Row
-                  label="Date"
-                  value={new Date(form.date + "T00:00:00").toLocaleDateString(
-                    "en-GB",
-                    { day: "numeric", month: "long", year: "numeric" }
-                  )}
-                />
-              )}
-              {form.time && (
-                <Row
-                  label="Time"
-                  value={
-                    TIME_SLOTS.find((s) => s.value === form.time)?.label ??
-                    form.time
-                  }
-                />
-              )}
-              {form.name && <Row label="Guest" value={form.name} />}
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection animation="fade" delay={0.3}>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Link href="/" className="btn btn-primary">
-                Return Home
-              </Link>
-              <Link href="/services" className="btn btn-outline">
-                Explore Services
-              </Link>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-    </main>
-  );
+function getLocalDateISO(addDays: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + addDays);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: "1.5rem" }}>
-      <span
-        className="font-sans text-[var(--color-warm-gray)]"
-        style={{ fontSize: "0.8rem" }}
-      >
-        {label}
-      </span>
-      <span
-        className="font-sans font-medium text-[var(--color-espresso)]"
-        style={{ fontSize: "0.82rem" }}
-      >
-        {value}
-      </span>
-    </div>
-  );
+function getNextWeekendISO() {
+  const date = new Date();
+  while (date.getDay() !== 6 && date.getDay() !== 0) {
+    date.setDate(date.getDate() + 1);
+  }
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }

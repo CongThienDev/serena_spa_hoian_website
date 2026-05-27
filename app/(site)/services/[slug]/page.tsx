@@ -297,7 +297,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             <AnimatedSection animation="slide-up-fade" delay={0.48}>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/booking"
+                  href={`/booking?add=${service.slug}`}
                   className="btn btn-primary btn-lg flex items-center gap-2"
                 >
                   <svg
@@ -741,7 +741,7 @@ export default async function ServiceDetailPage({ params }: Props) {
 
           <AnimatedSection animation="slide-up-fade" delay={0.34}>
             <div className="flex flex-wrap gap-4 justify-center mt-2">
-              <Link href="/booking" className="btn btn-primary btn-lg">
+              <Link href={`/booking?add=${service.slug}`} className="btn btn-primary btn-lg">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="none"
