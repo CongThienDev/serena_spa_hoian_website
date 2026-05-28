@@ -11,15 +11,7 @@ import {
   withLocalePath,
 } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * Desktop navigation with hover mega-menu dropdowns.
- * Per WIREFRAMES/interactions/service-hover.md:
- * - Rounded reveal animation
- * - 280ms ease-out dropdown
- * - Active state: terracotta underline
- */
 export default function MainNav() {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
@@ -78,11 +70,7 @@ function NavMenuItem({
   const hasChildren = item.children && item.children.length > 0;
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
+    <div className="relative" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <Link
         href={withLocalePath(locale, item.href)}
         className={cn(
@@ -92,8 +80,7 @@ function NavMenuItem({
           "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-px",
           "after:bg-[var(--color-terracotta)] after:scale-x-0 after:transition-transform",
           "after:duration-200 after:origin-left",
-          (isActive || isOpen) &&
-            "text-[var(--color-terracotta)] after:scale-x-100"
+          (isActive || isOpen) && "text-[var(--color-terracotta)] after:scale-x-100"
         )}
         aria-expanded={hasChildren ? isOpen : undefined}
         aria-haspopup={hasChildren ? "menu" : undefined}
@@ -101,10 +88,7 @@ function NavMenuItem({
         {item.label}
         {hasChildren && (
           <svg
-            className={cn(
-              "w-3.5 h-3.5 transition-transform duration-200",
-              isOpen && "rotate-180"
-            )}
+            className={cn("w-3.5 h-3.5 transition-transform duration-200", isOpen && "rotate-180")}
             fill="none"
             stroke="currentColor"
             strokeWidth={2}
@@ -116,30 +100,24 @@ function NavMenuItem({
         )}
       </Link>
 
-      {/* Mega menu dropdown */}
       {hasChildren && (
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              role="menu"
-              aria-label={`${item.label} submenu`}
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className={cn(
-                "absolute left-0 top-full mt-2 min-w-[220px]",
-                "bg-[var(--color-warm-white)] rounded-2xl",
-                "border border-[var(--color-sand)] shadow-[var(--shadow-float)]",
-                "py-2 overflow-hidden"
-              )}
-            >
-              {item.children?.map((child) => (
-                <DropdownItem key={child.href} item={child} locale={locale} />
-              ))}
-            </motion.div>
+        <div
+          role="menu"
+          aria-label={`${item.label} submenu`}
+          className={cn(
+            "absolute left-0 top-full mt-2 min-w-[220px]",
+            "bg-[var(--color-warm-white)] rounded-2xl",
+            "border border-[var(--color-sand)] shadow-[var(--shadow-float)]",
+            "py-2 overflow-hidden transition-all duration-200",
+            isOpen
+              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+              : "opacity-0 translate-y-2 scale-[0.98] pointer-events-none"
           )}
-        </AnimatePresence>
+        >
+          {item.children?.map((child) => (
+            <DropdownItem key={child.href} item={child} locale={locale} />
+          ))}
+        </div>
       )}
     </div>
   );

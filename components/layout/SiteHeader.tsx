@@ -23,10 +23,18 @@ export default function SiteHeader() {
   const t = getDictionary(locale);
 
   useEffect(() => {
+    let ticking = false;
     function onScroll() {
-      setScrolled(window.scrollY > 60);
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const next = window.scrollY > 60;
+        setScrolled((prev) => (prev === next ? prev : next));
+        ticking = false;
+      });
     }
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 

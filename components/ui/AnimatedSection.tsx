@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type AnimationType = "fade" | "slide-up" | "slide-up-fade" | "scale-fade";
@@ -16,29 +15,9 @@ type AnimatedSectionProps = {
   as?: keyof React.JSX.IntrinsicElements;
 };
 
-const variants: Record<AnimationType, Variants> = {
-  "fade": {
-    hidden:  { opacity: 0 },
-    visible: { opacity: 1 },
-  },
-  "slide-up": {
-    hidden:  { y: 32 },
-    visible: { y: 0 },
-  },
-  "slide-up-fade": {
-    hidden:  { opacity: 0, y: 28 },
-    visible: { opacity: 1, y: 0 },
-  },
-  "scale-fade": {
-    hidden:  { opacity: 0, scale: 0.97 },
-    visible: { opacity: 1, scale: 1 },
-  },
-};
-
 /**
- * Wraps any content with a Framer Motion entrance animation.
- * Per MOTION.md: slow, calm, luxury reveals.
- * Respects prefers-reduced-motion via Framer Motion's built-in behaviour.
+ * Lightweight reveal animation using IntersectionObserver + CSS transitions.
+ * Keeps the same API while avoiding heavy animation runtime.
  */
 export default function AnimatedSection({
   children,
@@ -50,27 +29,54 @@ export default function AnimatedSection({
   as: Tag = "div",
 }: AnimatedSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, {
-    once,
-    margin: "-80px 0px",
-  });
+  const [isInView, setIsInView] = useState(false);
 
-  const MotionTag = motion[Tag as keyof typeof motion] as typeof motion.div;
+  useEffect(() => {
+    if (!ref.current) return;
+    const element = ref.current;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setIsInView(false);
+        }
+      },
+      { rootMargin: "-80px 0px" }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [once]);
+
+  const animationClass =
+    animation === "fade"
+      ? "reveal-fade"
+      : animation === "slide-up"
+        ? "reveal-slide-up"
+        : animation === "scale-fade"
+          ? "reveal-scale-fade"
+          : "reveal-slide-up-fade";
+
+  const StyleTag = Tag as keyof React.JSX.IntrinsicElements;
 
   return (
-    <MotionTag
+    <StyleTag
       ref={ref}
-      className={cn(className)}
-      variants={variants[animation]}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      transition={{
-        duration,
-        delay,
-        ease: [0.25, 0.46, 0.45, 0.94], // --ease-luxury
+      className={cn(
+        "reveal-base",
+        animationClass,
+        isInView && "reveal-visible",
+        className
+      )}
+      style={{
+        transitionDuration: `${duration}s`,
+        transitionDelay: `${delay}s`,
       }}
     >
       {children}
-    </MotionTag>
+    </StyleTag>
   );
 }

@@ -146,6 +146,7 @@ export default function HeroSection({ locale = "en" }: { locale?: Locale }) {
             fill
             className="object-cover object-center"
             priority
+            fetchPriority="high"
             sizes="(max-width: 1024px) 100vw, 55vw"
           />
 
