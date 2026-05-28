@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { absoluteUrl } from "@/lib/utils";
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
+import { SITE } from "@/data/site";
 
 const ROUTES = [
   "",
@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return SUPPORTED_LOCALES.flatMap((locale) =>
     ROUTES.map((route) => ({
-      url: absoluteUrl(`/${locale}${route}`),
+      url: `${SITE.url}/${locale}${route}`,
       lastModified: now,
       changeFrequency: route === "" ? "daily" : "weekly",
       priority: route === "" ? 1 : 0.8,
