@@ -41,6 +41,7 @@ export default async function LocalizedBlogDetailPage({ params }: Props) {
   const post = getPostBySlug(slug, locale);
   if (!post) notFound();
   const isHotStoneArticle = post.slug === "benefits-hot-stone-massage";
+  const isJapandiArticle = post.slug === "japandi-wellness-design-serenity";
   const hotStoneCustomIntroTop =
     locale === "vi"
       ? "Liệu pháp chăm sóc sức khỏe Serena với đá muối Himalaya là một liệu pháp đặc trưng được thiết kế để khôi phục sự cân bằng và trẻ hóa cơ thể. Những viên đá muối Himalaya ấm áp được nhẹ nhàng đặt và lướt trên cơ thể để giải phóng căng thẳng cơ sâu, thải độc và cải thiện tuần hoàn máu."
@@ -49,6 +50,28 @@ export default async function LocalizedBlogDetailPage({ params }: Props) {
     locale === "vi"
       ? "Các khoáng chất tự nhiên từ muối Himalaya giúp thanh lọc da, làm dịu hệ thần kinh và thúc đẩy sức khỏe thể chất và tinh thần tổng thể. Liệu pháp này lý tưởng cho những khách hàng tìm kiếm sự thư giãn sâu, giảm căng thẳng và chữa lành toàn diện."
       : "The natural minerals from Himalayan salt help purify the skin, calm the nervous system, and promote overall physical and mental well-being. This treatment is ideal for guests seeking deep relaxation, stress relief, and holistic healing.";
+  const japandiIntro =
+    locale === "vi"
+      ? "Văn hóa Serena Spa nổi bật nhờ sự kết hợp giữa chữa lành thân - tâm - trí, kết nối sâu với thiên nhiên và trải nghiệm thư giãn như một retreat, thay vì chỉ dừng ở các liệu trình làm đẹp."
+      : "Serena Spa’s culture stands out through its combination of healing the body, mind, and spirit, its close connection to nature, and a retreat-like relaxation experience rather than simply offering beauty treatments.";
+  const japandiHighlights =
+    locale === "vi"
+      ? [
+          "Đặt \"an yên nội tại\" vào trung tâm của trải nghiệm",
+          "Kết nối với thiên nhiên và giá trị văn hóa bản địa",
+          "Mang đến trải nghiệm wellness đa giác quan",
+          "Ưu tiên các liệu pháp trị liệu tự nhiên",
+          "Dịch vụ nhẹ nhàng, cá nhân hóa",
+          "Nuôi dưỡng văn hóa \"wellness lifestyle\"",
+        ]
+      : [
+          "Placing \"inner peace\" at the center of the experience",
+          "Connecting with nature and local cultural values",
+          "Providing multi-sensory wellness experiences",
+          "Prioritizing natural therapeutic treatments",
+          "Offering gentle, personalized service",
+          "Promoting a \"wellness lifestyle\" culture",
+        ];
 
   return (
     <main>
@@ -72,9 +95,18 @@ export default async function LocalizedBlogDetailPage({ params }: Props) {
                 <br />
                 {hotStoneCustomIntroBottom}
               </>
+            ) : isJapandiArticle ? (
+              japandiIntro
             ) : post.excerpt}
           </p>
-          {!isHotStoneArticle && (
+          {isJapandiArticle && (
+            <ul className="prose-spa mt-4 pl-5 list-disc">
+              {japandiHighlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+          {!isHotStoneArticle && !isJapandiArticle && (
             <p className="prose-spa mt-4">
               {locale === "vi"
                 ? "Serena Spa chia sẻ nội dung này để giúp khách hiểu rõ lợi ích liệu trình, chuẩn bị tốt hơn trước buổi trị liệu và duy trì lối sống wellness sau chuyến đi Hội An."

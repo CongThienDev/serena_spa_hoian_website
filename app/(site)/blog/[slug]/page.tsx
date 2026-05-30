@@ -33,10 +33,21 @@ export default async function BlogDetailPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
   const isHotStoneArticle = post.slug === "benefits-hot-stone-massage";
+  const isJapandiArticle = post.slug === "japandi-wellness-design-serenity";
   const hotStoneCustomIntroTop =
     "Serena Healthy Treatment with Himalayan Salt Stone is a signature wellness therapy designed to restore balance and rejuvenate the body. Warm Himalayan salt stones are gently placed and glided over the body to release deep muscle tension, detoxify, and improve blood circulation.";
   const hotStoneCustomIntroBottom =
     "The natural minerals from Himalayan salt help purify the skin, calm the nervous system, and promote overall physical and mental well-being. This treatment is ideal for guests seeking deep relaxation, stress relief, and holistic healing.";
+  const japandiIntro =
+    "Serena Spa’s culture stands out through its combination of healing the body, mind, and spirit, its close connection to nature, and a retreat-like relaxation experience rather than simply offering beauty treatments.";
+  const japandiHighlights = [
+    "Placing \"inner peace\" at the center of the experience",
+    "Connecting with nature and local cultural values",
+    "Providing multi-sensory wellness experiences",
+    "Prioritizing natural therapeutic treatments",
+    "Offering gentle, personalized service",
+    "Promoting a \"wellness lifestyle\" culture",
+  ];
 
   return (
     <main>
@@ -60,9 +71,18 @@ export default async function BlogDetailPage({ params }: Props) {
                 <br />
                 {hotStoneCustomIntroBottom}
               </>
+            ) : isJapandiArticle ? (
+              japandiIntro
             ) : post.excerpt}
           </p>
-          {!isHotStoneArticle && (
+          {isJapandiArticle && (
+            <ul className="prose-spa mt-4 pl-5 list-disc">
+              {japandiHighlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+          {!isHotStoneArticle && !isJapandiArticle && (
             <p className="prose-spa mt-4">
               Serena Spa shares this journal to help guests understand treatment benefits, prepare for sessions, and create a more mindful wellness lifestyle before and after visiting Hội An.
             </p>

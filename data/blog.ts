@@ -88,9 +88,9 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     id: "b-05",
     slug: "japandi-wellness-design-serenity",
-    title: "Why Japandi Wellness Design Creates Deeper Healing",
+    title: "The Serena Spa Culture: Healing Body, Mind, Spirit",
     excerpt:
-      "The fusion of Japanese minimalism and Scandinavian warmth creates spaces where healing happens naturally. Discover the design philosophy behind Serena Spa.",
+      "Serena Spa’s culture stands out through its combination of healing the body, mind, and spirit, its close connection to nature, and a retreat-like relaxation experience rather than simply offering beauty treatments.",
     coverImage: "/images/blog/japandi-wellness.jpg",
     category: "Spa Culture",
     tags: ["japandi", "wellness design", "spa design", "serenity"],
@@ -137,7 +137,7 @@ const BLOG_POSTS_VI: Record<string, LocalizedPostOverride> = {
   "b-05": {
     title: "Vì Sao Phong Cách Japandi Giúp Chữa Lành Sâu Hơn",
     excerpt:
-      "Sự giao thoa giữa tối giản Nhật Bản và ấm áp Bắc Âu tạo nên không gian giúp quá trình phục hồi diễn ra tự nhiên hơn.",
+      "Văn hóa Serena Spa nổi bật nhờ sự kết hợp giữa chữa lành thân - tâm - trí, kết nối sâu với thiên nhiên và trải nghiệm thư giãn như một retreat, thay vì chỉ dừng ở các liệu trình làm đẹp.",
     category: "Văn hoá spa",
   },
 };
