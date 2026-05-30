@@ -43,7 +43,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     id: "b-02",
     slug: "benefits-hot-stone-massage",
-    title: "5 Profound Benefits of Hot Stone Massage You Should Know",
+    title: "5 Profound Benefits of Himalayan Salt Stone Massage You Should Know",
     excerpt:
       "Ancient volcanic stone meets modern wellness science. Discover how hot stone therapy reaches deeper than traditional massage and why it's become our guests' favourite treatment.",
     coverImage: "/images/blog/hot-stone-benefits.jpg",
@@ -111,7 +111,7 @@ const BLOG_POSTS_VI: Record<string, LocalizedPostOverride> = {
       "Khám phá các liệu trình spa và massage nổi bật tại Hội An, từ truyền thống đến cao cấp, trong cẩm nang đầy đủ của Serena Spa.",
   },
   "b-02": {
-    title: "5 Lợi Ích Sâu Sắc Của Massage Đá Nóng Bạn Nên Biết",
+    title: "5 lợi ích tuyệt vời của massage đá muối Himalaya mà bạn nên biết",
     excerpt:
       "Đá núi lửa cổ xưa kết hợp khoa học wellness hiện đại. Tìm hiểu vì sao liệu pháp đá nóng đi sâu hơn massage thông thường và luôn được khách yêu thích.",
     category: "Hướng dẫn liệu trình",

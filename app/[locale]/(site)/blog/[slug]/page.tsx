@@ -40,6 +40,15 @@ export default async function LocalizedBlogDetailPage({ params }: Props) {
   const locale = normalizeLocale(localeInput);
   const post = getPostBySlug(slug, locale);
   if (!post) notFound();
+  const isHotStoneArticle = post.slug === "benefits-hot-stone-massage";
+  const hotStoneCustomIntroTop =
+    locale === "vi"
+      ? "Liệu pháp chăm sóc sức khỏe Serena với đá muối Himalaya là một liệu pháp đặc trưng được thiết kế để khôi phục sự cân bằng và trẻ hóa cơ thể. Những viên đá muối Himalaya ấm áp được nhẹ nhàng đặt và lướt trên cơ thể để giải phóng căng thẳng cơ sâu, thải độc và cải thiện tuần hoàn máu."
+      : "Serena Healthy Treatment with Himalayan Salt Stone is a signature wellness therapy designed to restore balance and rejuvenate the body. Warm Himalayan salt stones are gently placed and glided over the body to release deep muscle tension, detoxify, and improve blood circulation.";
+  const hotStoneCustomIntroBottom =
+    locale === "vi"
+      ? "Các khoáng chất tự nhiên từ muối Himalaya giúp thanh lọc da, làm dịu hệ thần kinh và thúc đẩy sức khỏe thể chất và tinh thần tổng thể. Liệu pháp này lý tưởng cho những khách hàng tìm kiếm sự thư giãn sâu, giảm căng thẳng và chữa lành toàn diện."
+      : "The natural minerals from Himalayan salt help purify the skin, calm the nervous system, and promote overall physical and mental well-being. This treatment is ideal for guests seeking deep relaxation, stress relief, and holistic healing.";
 
   return (
     <main>
@@ -55,12 +64,23 @@ export default async function LocalizedBlogDetailPage({ params }: Props) {
             })} · {post.readingTime} {locale === "vi" ? "phút đọc" : "min read"}
           </p>
 
-          <p className="prose-spa mt-8">{post.excerpt}</p>
-          <p className="prose-spa mt-4">
-            {locale === "vi"
-              ? "Serena Spa chia sẻ nội dung này để giúp khách hiểu rõ lợi ích liệu trình, chuẩn bị tốt hơn trước buổi trị liệu và duy trì lối sống wellness sau chuyến đi Hội An."
-              : "Serena Spa shares this journal to help guests understand treatment benefits, prepare for sessions, and create a more mindful wellness lifestyle before and after visiting Hội An."}
+          <p className="prose-spa mt-8">
+            {isHotStoneArticle ? (
+              <>
+                {hotStoneCustomIntroTop}
+                <br />
+                <br />
+                {hotStoneCustomIntroBottom}
+              </>
+            ) : post.excerpt}
           </p>
+          {!isHotStoneArticle && (
+            <p className="prose-spa mt-4">
+              {locale === "vi"
+                ? "Serena Spa chia sẻ nội dung này để giúp khách hiểu rõ lợi ích liệu trình, chuẩn bị tốt hơn trước buổi trị liệu và duy trì lối sống wellness sau chuyến đi Hội An."
+                : "Serena Spa shares this journal to help guests understand treatment benefits, prepare for sessions, and create a more mindful wellness lifestyle before and after visiting Hội An."}
+            </p>
+          )}
 
           <div className="mt-10 flex gap-3">
             <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-sm">

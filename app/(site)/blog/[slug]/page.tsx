@@ -32,6 +32,11 @@ export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();
+  const isHotStoneArticle = post.slug === "benefits-hot-stone-massage";
+  const hotStoneCustomIntroTop =
+    "Serena Healthy Treatment with Himalayan Salt Stone is a signature wellness therapy designed to restore balance and rejuvenate the body. Warm Himalayan salt stones are gently placed and glided over the body to release deep muscle tension, detoxify, and improve blood circulation.";
+  const hotStoneCustomIntroBottom =
+    "The natural minerals from Himalayan salt help purify the skin, calm the nervous system, and promote overall physical and mental well-being. This treatment is ideal for guests seeking deep relaxation, stress relief, and holistic healing.";
 
   return (
     <main>
@@ -47,10 +52,21 @@ export default async function BlogDetailPage({ params }: Props) {
             })} · {post.readingTime} min read
           </p>
 
-          <p className="prose-spa mt-8">{post.excerpt}</p>
-          <p className="prose-spa mt-4">
-            Serena Spa shares this journal to help guests understand treatment benefits, prepare for sessions, and create a more mindful wellness lifestyle before and after visiting Hội An.
+          <p className="prose-spa mt-8">
+            {isHotStoneArticle ? (
+              <>
+                {hotStoneCustomIntroTop}
+                <br />
+                <br />
+                {hotStoneCustomIntroBottom}
+              </>
+            ) : post.excerpt}
           </p>
+          {!isHotStoneArticle && (
+            <p className="prose-spa mt-4">
+              Serena Spa shares this journal to help guests understand treatment benefits, prepare for sessions, and create a more mindful wellness lifestyle before and after visiting Hội An.
+            </p>
+          )}
 
           <div className="mt-10 flex gap-3">
             <Link href="/booking" className="btn btn-primary btn-sm">Book a Treatment</Link>
