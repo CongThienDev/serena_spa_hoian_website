@@ -264,7 +264,7 @@ const FILTER_LABELS: Record<FilterCategory, string> = {
   all: "All",
   treatment: "Treatment Rooms",
   lobby: "Lobby & Reception",
-  corridors: "Corridors & Spaces",
+  corridors: "Private Space & Locker",
 };
 
 export default function GalleryPage() {
@@ -393,32 +393,14 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* ── Masonry Gallery ─────────────────────────────────────────────── */}
+      {/* ── Grid Gallery ────────────────────────────────────────────────── */}
       <section
         className="section-cream pb-0"
         style={{ paddingTop: "2rem" }}
         aria-label="Spa gallery images"
       >
-        <div
-          className="container-site"
-          style={{
-            columns: "1",
-            columnGap: "1rem",
-          }}
-        >
-          <style>{`
-            @media (min-width: 768px) {
-              .masonry-grid { columns: 2; }
-            }
-            @media (min-width: 1024px) {
-              .masonry-grid { columns: 3; }
-            }
-          `}</style>
-
-          <div
-            className="masonry-grid"
-            style={{ columns: 1, columnGap: "1rem" }}
-          >
+        <div className="container-site">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredImages.map((image, index) => (
               <GalleryItem
                 key={image.src}
@@ -469,7 +451,7 @@ export default function GalleryPage() {
   );
 }
 
-/* ── Gallery Item — single masonry card ──────────────────────────────────── */
+/* ── Gallery Item — single grid card ─────────────────────────────────────── */
 
 type GalleryItemProps = {
   image: GalleryImage;
@@ -480,25 +462,18 @@ function GalleryItem({ image, index }: GalleryItemProps) {
   const delay = Math.min(index * 0.03, 0.5);
 
   return (
-    <div
-      style={{
-        breakInside: "avoid",
-        marginBottom: "1rem",
-        display: "block",
-      }}
-    >
+    <div className="h-full">
       <AnimatedSection animation="fade" delay={delay}>
         <div
-          className="group relative overflow-hidden"
-          style={{ borderRadius: "var(--radius-card)" }}
+          className="group relative overflow-hidden h-full"
+          style={{ borderRadius: "var(--radius-card)", aspectRatio: "4 / 3" }}
         >
           <Image
             src={image.src}
             alt={image.alt}
-            width={image.width}
-            height={image.height}
-            className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            fill
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
 
           {/* Hover overlay */}
