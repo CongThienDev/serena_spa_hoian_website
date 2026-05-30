@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { getFeaturedPosts } from "@/data/blog";
@@ -21,17 +22,13 @@ function BlogCard({ post, locale }: { post: ReturnType<typeof getFeaturedPosts>[
       >
         {/* Cover image */}
         <div className="relative overflow-hidden flex-shrink-0" style={{ aspectRatio: "16/9" }}>
-          <div
-            className="w-full h-full"
-            style={{ backgroundColor: "var(--color-section-warm)" }}
-          >
-            {/* Placeholder shown when blog images aren't available yet */}
-            <div className="w-full h-full flex items-center justify-center">
-              <svg className="w-12 h-12 opacity-20" viewBox="0 0 64 64" fill="var(--color-terracotta)" aria-hidden="true">
-                <path d="M32 4 C25 14, 16 18, 16 28 C16 40, 24 48, 32 52 C40 48, 48 40, 48 28 C48 18, 39 14, 32 4Z" />
-              </svg>
-            </div>
-          </div>
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
         </div>
 
         {/* Content */}

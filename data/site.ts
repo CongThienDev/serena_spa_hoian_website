@@ -5,22 +5,22 @@
  */
 
 export const SITE = {
-  name: "Serena Spa Hội An",
+  name: "Serena Retreat",
   tagline: "A Place to Glow",
   description:
     "Premium wellness spa offering signature massages, holistic treatments, and luxury healing experiences in the heart of Hội An.",
-  url: "https://serenaspahoian.com",
+  url: "https://serenaretreat.com",
 } as const;
 
 export const CONTACT = {
-  phone: "+84 XXX XXX XXX",          // TODO: real phone
-  phoneFormatted: "(+84) XXX XXX XXX",
-  whatsapp: "+84XXXXXXXXX",           // TODO: real WhatsApp
-  zalo: "+84XXXXXXXXX",               // TODO: real Zalo
-  email: "info@serenaspahoian.com",
-  address: "XXX Nguyễn Phúc Chu, Hội An, Quảng Nam, Vietnam",
-  addressShort: "Nguyễn Phúc Chu, Hội An",
-  googleMapsUrl: "https://maps.google.com/?q=Serena+Spa+Hoi+An",
+  phone: "+84935011151",
+  phoneFormatted: "+84 935 011 151",
+  whatsapp: "84935011151",
+  zalo: "84935011151",
+  email: "info@serenaretreat.com",
+  address: "127 Nguyen Duy Hieu - Hoi An Dong - Da Nang",
+  addressShort: "127 Nguyen Duy Hieu, Hoi An Dong",
+  googleMapsUrl: "https://maps.google.com/?q=127+Nguyen+Duy+Hieu+Hoi+An+Dong+Da+Nang",
   googleMapsEmbed: "", // TODO: embed URL from Google Maps
 } as const;
 

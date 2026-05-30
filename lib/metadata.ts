@@ -90,13 +90,13 @@ export function getLocalBusinessSchema() {
     description:
       "Premium wellness spa offering signature massages, holistic treatments, and luxury healing experiences in Hội An, Vietnam.",
     url: absoluteUrl("/"),
-    telephone: "+84-xxx-xxx-xxx", // TODO: fill in real number
-    email: "info@serenaspahoian.com",
+    telephone: "+84-935-011-151",
+    email: "info@serenaretreat.com",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "XXX Nguyễn Phúc Chu",
-      addressLocality: "Hội An",
-      addressRegion: "Quảng Nam",
+      streetAddress: "127 Nguyen Duy Hieu",
+      addressLocality: "Hoi An Dong",
+      addressRegion: "Da Nang",
       postalCode: "560000",
       addressCountry: "VN",
     },

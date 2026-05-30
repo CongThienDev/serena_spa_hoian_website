@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { CONTACT } from "@/data/site";
 import { getDictionary } from "@/data/i18n";
@@ -64,8 +65,15 @@ export default function MobileNav() {
         )}
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--color-sand)]">
-          <Link href={withLocalePath(locale, "/")} onClick={close} className="font-serif text-xl text-[var(--color-espresso)]">
-            Serena Spa
+          <Link href={withLocalePath(locale, "/")} onClick={close} className="inline-flex">
+            <Image
+              src="/images/logo/Serena-logo.webp"
+              alt="Serena Retreat"
+              width={48}
+              height={48}
+              unoptimized
+              className="h-12 w-12 object-contain"
+            />
           </Link>
           <button onClick={close} className="w-11 h-11 flex items-center justify-center text-[var(--color-espresso-mid)]" aria-label={t.mobileNav.closeMenu}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden="true">

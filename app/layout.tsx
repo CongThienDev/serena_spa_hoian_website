@@ -28,7 +28,7 @@ const inter = Inter({
 ─────────────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://serenaspahoian.com"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://serenaretreat.com"
   ),
   title: {
     default: "Serena Spa Hội An — Premium Wellness & Massage",

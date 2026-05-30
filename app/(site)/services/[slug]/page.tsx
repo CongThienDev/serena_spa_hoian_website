@@ -39,16 +39,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `https://serenaspahoian.com/services/${slug}`,
+      canonical: `https://serenaretreat.com/services/${slug}`,
     },
     openGraph: {
       title,
       description,
-      url: `https://serenaspahoian.com/services/${slug}`,
+      url: `https://serenaretreat.com/services/${slug}`,
       type: "website",
       images: [
         {
-          url: `https://serenaspahoian.com${service.image}`,
+          url: `https://serenaretreat.com${service.image}`,
           width: 1200,
           height: 630,
           alt: title,
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [`https://serenaspahoian.com${service.image}`],
+      images: [`https://serenaretreat.com${service.image}`],
     },
   };
 }
@@ -766,7 +766,7 @@ export default async function ServiceDetailPage({
                 {vi ? "Đặt lịch ngay" : "Book Now"}
               </Link>
               <a
-                href="https://wa.me/84xxxxxxxxx"
+                href="https://wa.me/84935011151"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline-white btn-lg"

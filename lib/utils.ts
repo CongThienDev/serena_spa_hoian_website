@@ -68,6 +68,6 @@ export function truncate(text: string, maxLength: number): string {
  */
 export function absoluteUrl(path: string): string {
   const base =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://serenaspahoian.com";
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://serenaretreat.com";
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

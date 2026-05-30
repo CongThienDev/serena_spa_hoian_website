@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { generatePageMetadata } from "@/lib/metadata";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
@@ -30,7 +31,17 @@ export default function BlogPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {BLOG_POSTS.map((post, i) => (
               <AnimatedSection key={post.id} animation="slide-up-fade" delay={i * 0.04}>
-                <Link href={`/blog/${post.slug}`} className="card p-6 block h-full">
+                <Link href={`/blog/${post.slug}`} className="card block h-full overflow-hidden">
+                  <div className="relative" style={{ aspectRatio: "16/9" }}>
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
                   <p className="eyebrow text-[0.65rem]">{post.category}</p>
                   <h2 className="font-serif text-h4 mt-3">{post.title}</h2>
                   <p className="text-sm text-[var(--color-warm-gray)] mt-3">{post.excerpt}</p>
@@ -41,6 +52,7 @@ export default function BlogPage() {
                       year: "numeric",
                     })} · {post.readingTime} min read
                   </p>
+                  </div>
                 </Link>
               </AnimatedSection>
             ))}

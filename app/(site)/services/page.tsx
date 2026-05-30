@@ -385,7 +385,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                 </Link>
 
                 <a
-                  href="https://wa.me/84xxxxxxxxx"
+                  href="https://wa.me/84935011151"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline btn-lg"

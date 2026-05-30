@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import TopBar from "./TopBar";
 import MainNav from "./MainNav";
 import MobileNav from "./MobileNav";
-import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import { getDictionary } from "@/data/i18n";
 import { localeFromPathname, withLocalePath } from "@/lib/i18n";
 
@@ -54,28 +54,18 @@ export default function SiteHeader() {
           {/* ── Logo ─────────────────────────────────────────────────────── */}
           <Link
             href={withLocalePath(locale, "/")}
-            className="flex items-center gap-2.5 shrink-0 group"
-            aria-label="Serena Spa Hội An — Home"
+            className="flex items-center shrink-0"
+            aria-label="Serena Retreat — Home"
           >
-            {/* Lotus mark */}
-            <LotusMarkSmall
-              size={26}
-              color="var(--color-terracotta)"
-              className="transition-transform duration-300 group-hover:scale-110"
+            <Image
+              src="/images/logo/Serena-logo.webp"
+              alt="Serena Retreat"
+              width={48}
+              height={48}
+              priority
+              unoptimized
+              className="h-12 w-12 object-contain"
             />
-
-            {/* Wordmark */}
-            <div className="flex flex-col leading-none gap-0.5">
-              <span
-                className="font-serif text-lg md:text-[22px] tracking-[0.2em] text-[var(--color-espresso)] uppercase"
-                style={{ fontWeight: 500 }}
-              >
-                Serena Spa
-              </span>
-              <span className="font-sans text-[9px] font-semibold tracking-[0.28em] text-[var(--color-terracotta)] uppercase">
-                Hội An · Vietnam
-              </span>
-            </div>
           </Link>
 
           {/* ── Desktop nav ──────────────────────────────────────────────── */}

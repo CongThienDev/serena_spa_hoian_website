@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { generateLocalizedRouteMetadata } from "@/lib/route-metadata";
@@ -37,7 +38,17 @@ export default async function LocalizedBlogPage({ params }: { params: Promise<{ 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post, i) => (
               <AnimatedSection key={post.id} animation="slide-up-fade" delay={i * 0.04}>
-                <Link href={withLocalePath(locale, `/blog/${post.slug}`)} className="card p-6 block h-full">
+                <Link href={withLocalePath(locale, `/blog/${post.slug}`)} className="card block h-full overflow-hidden">
+                  <div className="relative" style={{ aspectRatio: "16/9" }}>
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
                   <p className="eyebrow text-[0.65rem]">{post.category}</p>
                   <h2 className="font-serif text-h4 mt-3">{post.title}</h2>
                   <p className="text-sm text-[var(--color-warm-gray)] mt-3">{post.excerpt}</p>
@@ -48,6 +59,7 @@ export default async function LocalizedBlogPage({ params }: { params: Promise<{ 
                       year: "numeric",
                     })} · {post.readingTime} {locale === "vi" ? "phút đọc" : "min read"}
                   </p>
+                  </div>
                 </Link>
               </AnimatedSection>
             ))}

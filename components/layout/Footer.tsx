@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { SITE, CONTACT, HOURS, SOCIAL } from "@/data/site";
 import { getDictionary } from "@/data/i18n";
 import { getNavItems } from "@/data/navigation";
@@ -34,15 +35,17 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link
               href={withLocalePath(locale, "/")}
-              className="inline-flex flex-col leading-none mb-5"
-              aria-label="Serena Spa — Home"
+              className="inline-flex mb-5"
+              aria-label="Serena Retreat — Home"
             >
-              <span className="font-serif text-2xl font-light tracking-widest text-[var(--color-cream)] uppercase">
-                Serena
-              </span>
-              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[var(--color-terracotta-light)] uppercase">
-                Spa · Hội An
-              </span>
+              <Image
+                src="/images/logo/Serena-logo.webp"
+                alt="Serena Retreat"
+                width={48}
+                height={48}
+                unoptimized
+                className="h-12 w-12 object-contain"
+              />
             </Link>
 
             <p className="text-sm leading-relaxed text-[var(--color-warm-gray-light)] max-w-[280px]">
