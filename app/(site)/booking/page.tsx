@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
@@ -24,10 +24,22 @@ type ContactForm = {
   note: string;
 };
 
+type CouponCode = "SAVE20" | "EXTRA30";
+
+type AppliedCoupon = {
+  code: CouponCode;
+  discountVND: number;
+  extraMinutes: number;
+  message: string;
+};
+
 const TIME_GROUPS = [
   { label: "Morning", slots: ["09:00", "10:00", "11:00"] },
   { label: "Afternoon", slots: ["14:00", "15:00", "16:00", "17:00", "18:00"] },
 ] as const;
+
+const GRAND_OPENING_START = "2026-06-15";
+const GRAND_OPENING_END = "2026-08-15";
 
 export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const vi = locale === "vi";
@@ -54,6 +66,9 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const [activeStep, setActiveStep] = useState<"build" | "contact">("build");
   const [recentAddKey, setRecentAddKey] = useState<string | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
   const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
@@ -80,6 +95,24 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     (sum, item) => sum + item.durationMinutes * item.quantity,
     0,
   );
+  const hasNinetyMinuteBenefit = selectedItems.some((item) => item.durationMinutes >= 90);
+  const hasPackageBenefit = selectedItems.some((item) => isPackageService(item.service.categoryId));
+  const hasAnyBenefitEligible = hasNinetyMinuteBenefit || hasPackageBenefit;
+  const benefitText = vi
+    ? [
+        hasNinetyMinuteBenefit ? "Free Pick Up (dịch vụ từ 90 phút)" : null,
+        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / khách (dịch vụ package)" : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : [
+        hasNinetyMinuteBenefit ? "Free Pick Up (services from 90 minutes)" : null,
+        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / guest (package services)" : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+  const totalAfterCoupon = Math.max(0, totalVND - (appliedCoupon?.discountVND ?? 0));
   const hasCart = selectedItems.length > 0;
   const isScheduleReady = Boolean(form.date && form.time);
   const isContactReady = Boolean(form.name.trim() && form.phone.trim() && form.email.trim());
@@ -94,6 +127,17 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const todayISO = getLocalDateISO(0);
   const tomorrowISO = getLocalDateISO(1);
   const weekendISO = getNextWeekendISO();
+
+  useEffect(() => {
+    if (!appliedCoupon) return;
+    setAppliedCoupon(null);
+    setCouponError(
+      vi
+        ? "Giỏ hàng/ngày/giờ đã thay đổi. Vui lòng áp dụng coupon lại."
+        : "Cart/date/time changed. Please apply your coupon again.",
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, form.date, form.time]);
 
   function handleAddCurrentService(duration: number) {
     if (!activeService) return;
@@ -115,6 +159,88 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
           : item,
       ),
     );
+  }
+
+  function handleApplyCoupon() {
+    const normalized = couponInput.trim().toUpperCase();
+    if (!normalized) {
+      setCouponError(vi ? "Vui lòng nhập mã coupon." : "Please enter a coupon code.");
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (normalized !== "SAVE20" && normalized !== "EXTRA30") {
+      setCouponError(vi ? "Mã coupon không hợp lệ." : "Invalid coupon code.");
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (!hasCart) {
+      setCouponError(vi ? "Hãy thêm dịch vụ vào giỏ trước khi áp mã." : "Add services to cart before applying a coupon.");
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (!form.date || !isWithinCampaignDate(form.date)) {
+      setCouponError(
+        vi
+          ? `Coupon chỉ áp dụng từ ${GRAND_OPENING_START} đến ${GRAND_OPENING_END}.`
+          : `Coupon is valid only from ${GRAND_OPENING_START} to ${GRAND_OPENING_END}.`,
+      );
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (normalized === "SAVE20") {
+      if (!form.time) {
+        setCouponError(vi ? "Vui lòng chọn giờ để áp mã SAVE20." : "Please select a time to apply SAVE20.");
+        setAppliedCoupon(null);
+        return;
+      }
+      if (!isSave20Hour(form.time)) {
+        setCouponError(vi ? "SAVE20 chỉ áp dụng từ 10:00 đến 19:00." : "SAVE20 works only from 10:00 to 19:00.");
+        setAppliedCoupon(null);
+        return;
+      }
+
+      const discountVND = Math.round(totalVND * 0.2);
+      setAppliedCoupon({
+        code: "SAVE20",
+        discountVND,
+        extraMinutes: 0,
+        message: vi
+          ? `You got giảm 20%: -${discountVND.toLocaleString("vi-VN")} VND`
+          : `You got 20% OFF: -${discountVND.toLocaleString("vi-VN")} VND`,
+      });
+      setCouponError(null);
+      return;
+    }
+
+    const eligibleSixtySessions = selectedItems.reduce((sum, item) => {
+      if (item.durationMinutes === 60) return sum + item.quantity;
+      return sum;
+    }, 0);
+
+    if (eligibleSixtySessions <= 0) {
+      setCouponError(
+        vi
+          ? "EXTRA30 cần ít nhất 1 dịch vụ 60 phút trong giỏ."
+          : "EXTRA30 requires at least one 60-minute service in your cart.",
+      );
+      setAppliedCoupon(null);
+      return;
+    }
+
+    const extraMinutes = eligibleSixtySessions * 30;
+    setAppliedCoupon({
+      code: "EXTRA30",
+      discountVND: 0,
+      extraMinutes,
+      message: vi
+        ? `You got +${extraMinutes} phút trị liệu miễn phí`
+        : `You got +${extraMinutes} extra treatment minutes`,
+    });
+    setCouponError(null);
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -326,11 +452,70 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         <span className="text-sm text-[var(--color-warm-gray)]">
                           {vi ? "Tổng" : "Total"} · {totalDuration} {vi ? "phút" : "min"}
                         </span>
-                        <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalVND.toLocaleString("vi-VN")} VND</span>
+                        <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
                       </div>
+                      {appliedCoupon?.discountVND ? (
+                        <p className="mt-1 text-right text-xs text-[var(--color-warm-gray)]">
+                          {vi ? "Trước ưu đãi" : "Before discount"}: {totalVND.toLocaleString("vi-VN")} VND
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="mt-6 space-y-4">
+                      <div className="rounded-2xl border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--color-warm-gray)]">
+                          {vi ? "Bạn có mã không?" : "you have a code?"}
+                        </p>
+                        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                          <input
+                            className="input h-9 px-3 py-2 text-sm"
+                            type="text"
+                            value={couponInput}
+                            onChange={(event) => {
+                              setCouponInput(event.target.value.toUpperCase());
+                              setCouponError(null);
+                            }}
+                            placeholder={vi ? "Nhập mã coupon" : "Enter coupon code"}
+                          />
+                          <button type="button" onClick={handleApplyCoupon} className="btn btn-outline h-9 px-3 py-2 text-xs whitespace-nowrap">
+                            {vi ? "Áp dụng mã" : "Apply code"}
+                          </button>
+                        </div>
+                        {couponError ? (
+                          <p className="mt-2 text-xs text-[var(--color-terracotta-dark)]">{couponError}</p>
+                        ) : null}
+                        {appliedCoupon ? (
+                          <div className="mt-3 rounded-xl border border-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)] px-3 py-2 text-sm text-[var(--color-espresso)] animate-fade-in">
+                            <strong>{appliedCoupon.message}</strong>
+                            {appliedCoupon.code === "EXTRA30" ? (
+                              <p className="mt-1 text-xs text-[var(--color-espresso-mid)]">
+                                {vi
+                                  ? "Áp dụng cho các session 60 phút trong giỏ hiện tại."
+                                  : "Applied to 60-minute sessions in your current cart."}
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {hasAnyBenefitEligible ? (
+                        <div className="rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                            {vi ? "Service Benefits" : "Service Benefits"}
+                          </p>
+                          <p className="mt-1 text-sm text-[var(--color-espresso-mid)]">{benefitText}</p>
+                          <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
+                            {vi
+                              ? appliedCoupon
+                                ? "Benefit này không cộng dồn với coupon, nên sẽ không áp dụng khi đã dùng coupon."
+                                : "Benefit này không cộng dồn với các ưu đãi khác."
+                              : appliedCoupon
+                                ? "These benefits cannot stack with coupons, so they are disabled while a coupon is applied."
+                                : "These benefits cannot be combined with other promotions."}
+                          </p>
+                        </div>
+                      ) : null}
+
                       <div className="space-y-3 rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
                           {vi ? "Ngày *" : "Date *"}
@@ -460,7 +645,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   aria-expanded={summaryOpen}
                   aria-controls="booking-summary-details"
                 >
-                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration} {vi ? "phút" : "min"} · {totalVND.toLocaleString("vi-VN")} VND</span>
+                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration + (appliedCoupon?.extraMinutes ?? 0)} {vi ? "phút" : "min"} · {totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
                   <span className="text-[var(--color-terracotta)]">{summaryOpen ? "▴" : "▾"}</span>
                 </button>
 
@@ -764,6 +949,21 @@ function StepRow({
 function getInitialAddSlug() {
   if (typeof window === "undefined") return null;
   return new URLSearchParams(window.location.search).get("add");
+}
+
+function isWithinCampaignDate(dateISO: string) {
+  return dateISO >= GRAND_OPENING_START && dateISO <= GRAND_OPENING_END;
+}
+
+function isSave20Hour(time: string) {
+  const [hourStr] = time.split(":");
+  const hour = Number(hourStr);
+  if (Number.isNaN(hour)) return false;
+  return hour >= 10 && hour <= 19;
+}
+
+function isPackageService(categoryId: string) {
+  return categoryId === "couple";
 }
 
 function getLocalDateISO(addDays: number) {
