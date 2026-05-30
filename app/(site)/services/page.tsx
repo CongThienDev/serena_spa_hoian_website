@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import OrnamentDivider from "@/components/ui/OrnamentDivider";
@@ -22,7 +21,6 @@ type FilterId = "all" | string;
 
 export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
   const vi = locale === "vi";
-  const searchParams = useSearchParams();
   const ALL_FILTER = { id: "all", label: vi ? "Tất cả dịch vụ" : "All Services" } as const;
   const SERVICE_CATEGORIES = getServiceCategories(locale);
   const localizedServices = getAllServicesLocalized(locale);
@@ -49,7 +47,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
   const showGrouped = activeFilter === "all";
 
   useEffect(() => {
-    const categoryParam = searchParams.get("category");
+    const categoryParam = new URLSearchParams(window.location.search).get("category");
     if (!categoryParam || activeFilter !== "all") return;
     if (lastAutoScrolledCategory.current === categoryParam) return;
 
@@ -63,7 +61,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
         lastAutoScrolledCategory.current = categoryParam;
       }
     });
-  }, [searchParams, activeFilter, SERVICE_CATEGORIES]);
+  }, [activeFilter, SERVICE_CATEGORIES]);
 
   return (
     <>

@@ -12,7 +12,6 @@ type AnimatedSectionProps = {
   duration?: number;
   className?: string;
   once?: boolean;
-  as?: keyof React.JSX.IntrinsicElements;
 };
 
 /**
@@ -26,7 +25,6 @@ export default function AnimatedSection({
   duration = 0.6,
   className,
   once = true,
-  as: Tag = "div",
 }: AnimatedSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
@@ -37,6 +35,7 @@ export default function AnimatedSection({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        if (!entry) return;
         if (entry.isIntersecting) {
           setIsInView(true);
           if (once) observer.disconnect();
@@ -60,10 +59,8 @@ export default function AnimatedSection({
           ? "reveal-scale-fade"
           : "reveal-slide-up-fade";
 
-  const StyleTag = Tag as keyof React.JSX.IntrinsicElements;
-
   return (
-    <StyleTag
+    <div
       ref={ref}
       className={cn(
         "reveal-base",
@@ -77,6 +74,6 @@ export default function AnimatedSection({
       }}
     >
       {children}
-    </StyleTag>
+    </div>
   );
 }
