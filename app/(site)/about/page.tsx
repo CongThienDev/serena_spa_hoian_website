@@ -38,11 +38,15 @@ export default function AboutPage({ locale = "en" }: { locale?: Locale }) {
             <SectionHeading
               eyebrow={vi ? "Về Serena" : "About Serena"}
               title={vi ? "Nơi bạn toả sáng" : "A Place to Glow"}
-              subtitle={vi ? "Serena Spa là chốn an yên giữa lòng Hội An, nơi các nghi thức tinh tế và đôi tay trị liệu tận tâm giúp bạn trở về cân bằng." : "Serena Spa was created as a calm sanctuary in the heart of Hội An, where thoughtful rituals, refined spaces, and caring hands help you return to balance."}
+              subtitle={vi
+                ? "SERENA SPA ra đời với mong muốn tạo nên một không gian nơi vẻ đẹp không chỉ được chăm sóc bên ngoài mà còn được chữa lành từ bên trong. Với sự tận tâm trong từng trải nghiệm, Serena Spa luôn đặt cảm giác thư giãn, an yên và sự hài lòng của khách hàng lên hàng đầu."
+                : "SERENA SPA was created as a sanctuary where beauty is not only cared for on the outside, but also healed from within. With dedication in every experience, Serena Spa always places relaxation, serenity, and customer satisfaction at the heart of every treatment."}
               titleAs="h1"
             />
             <p className="prose-spa mt-5">
-              {vi ? "Chúng tôi kết hợp tinh hoa trị liệu Việt Nam với tiêu chuẩn wellness hiện đại để tạo nên trải nghiệm phục hồi sâu và đáng nhớ." : "We blend Vietnamese healing traditions with modern wellness standards to create treatments that are both deeply restorative and beautifully memorable."}
+              {vi
+                ? "Mỗi liệu trình tại Serena không chỉ là chăm sóc da hay thư giãn cơ thể, mà còn là khoảng thời gian để tái tạo năng lượng và tìm lại sự cân bằng sau những áp lực thường nhật. Lấy cảm hứng từ vẻ đẹp tinh khiết của hoa sen và thiên nhiên chữa lành, Serena Spa theo đuổi phong cách nhẹ nhàng, tinh tế và bền vững, nơi vẻ đẹp được nuôi dưỡng từ bên trong để tự nhiên tỏa sáng."
+                : "Each therapy at Serena is more than skincare or body relaxation - it is a moment to restore energy, regain balance, and escape from daily pressures. Inspired by the pure beauty of the lotus flower and the healing power of nature, Serena Spa embraces a gentle, refined, and sustainable approach, where true beauty is nurtured from within and naturally shines outward."}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href={withLocalePath(locale, "/services")} className="btn btn-primary btn-sm">{vi ? "Khám phá dịch vụ" : "Explore Services"}</Link>
