@@ -20,6 +20,7 @@ type ContactForm = {
   name: string;
   phone: string;
   email: string;
+  pickupLocation: string;
   note: string;
 };
 
@@ -44,6 +45,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     name: "",
     phone: "",
     email: "",
+    pickupLocation: "",
     note: "",
   });
   const [isSuccess, setIsSuccess] = useState(false);
@@ -78,9 +80,10 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   );
   const hasCart = selectedItems.length > 0;
   const isScheduleReady = Boolean(form.date && form.time);
-  const isContactReady = Boolean(form.name.trim() && form.phone.trim());
+  const isContactReady = Boolean(form.name.trim() && form.phone.trim() && form.email.trim());
   const canGoNext = hasCart && isScheduleReady;
   const canSubmit = hasCart && isScheduleReady && isContactReady;
+  const isCartStepLocked = selectedItems.length === 0;
   const todayISO = getLocalDateISO(0);
   const tomorrowISO = getLocalDateISO(1);
   const weekendISO = getNextWeekendISO();
@@ -257,144 +260,159 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   </span>
                 </div>
 
-                <div className="mt-5 space-y-3">
-                  {selectedItems.length === 0 && (
-                    <p className="rounded-xl border border-dashed border-[var(--color-sand-dark)] px-4 py-5 text-sm text-[var(--color-warm-gray)]">
-                      {vi ? "Giỏ hàng đang trống. Hãy thêm ít nhất một dịch vụ để bắt đầu." : "Your cart is empty. Start by adding at least one service."}
-                    </p>
-                  )}
-                  {selectedItems.map((item) => (
-                    <div
-                      key={`${item.serviceId}-${item.durationMinutes}`}
-                      className="grid grid-cols-[minmax(0,1fr)_10rem_9rem] items-center gap-3 rounded-xl border border-[var(--color-sand)] px-4 py-3"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-sans text-sm font-medium text-[var(--color-espresso)]">{item.service.name}</p>
-                        <p className="text-xs text-[var(--color-warm-gray)]">
-                          {item.durationMinutes} {vi ? "phút" : "min"} · {item.unitPrice.toLocaleString("vi-VN")} VND
+                <div className="relative mt-5">
+                  <div
+                    className={`transition-all duration-300 ${isCartStepLocked ? "pointer-events-none select-none opacity-45 blur-[2px]" : "opacity-100 blur-0"}`}
+                    aria-hidden={isCartStepLocked}
+                  >
+                    <div className="space-y-3">
+                      {selectedItems.length === 0 && (
+                        <p className="rounded-xl border border-dashed border-[var(--color-sand-dark)] px-4 py-5 text-sm text-[var(--color-warm-gray)]">
+                          {vi ? "Giỏ hàng đang trống. Hãy thêm ít nhất một dịch vụ để bắt đầu." : "Your cart is empty. Start by adding at least one service."}
                         </p>
-                      </div>
-                      <div className="flex flex-col items-center justify-center gap-1">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                          {vi ? "Khách" : "Guests"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity - 1)}
-                          className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
-                          aria-label={vi ? "Giảm số lượng" : "Decrease quantity"}
+                      )}
+                      {selectedItems.map((item) => (
+                        <div
+                          key={`${item.serviceId}-${item.durationMinutes}`}
+                          className="grid grid-cols-[minmax(0,1fr)_10rem_9rem] items-center gap-3 rounded-xl border border-[var(--color-sand)] px-4 py-3"
                         >
-                          −
-                        </button>
-                        <span className="w-6 text-center text-sm text-[var(--color-espresso)]">{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity + 1)}
-                          className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
-                          aria-label={vi ? "Tăng số lượng" : "Increase quantity"}
-                        >
-                          +
-                        </button>
+                          <div className="min-w-0">
+                            <p className="font-sans text-sm font-medium text-[var(--color-espresso)]">{item.service.name}</p>
+                            <p className="text-xs text-[var(--color-warm-gray)]">
+                              {item.durationMinutes} {vi ? "phút" : "min"} · {item.unitPrice.toLocaleString("vi-VN")} VND
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-center justify-center gap-1">
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                              {vi ? "Khách" : "Guests"}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity - 1)}
+                                className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
+                                aria-label={vi ? "Giảm số lượng" : "Decrease quantity"}
+                              >
+                                −
+                              </button>
+                              <span className="w-6 text-center text-sm text-[var(--color-espresso)]">{item.quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.serviceId, item.durationMinutes, item.quantity + 1)}
+                                className="h-8 w-8 rounded-full border border-[var(--color-sand-dark)] text-[var(--color-espresso)]"
+                                aria-label={vi ? "Tăng số lượng" : "Increase quantity"}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <span className="text-right font-sans text-xs font-semibold text-[var(--color-espresso-mid)]">
+                            {item.lineTotal.toLocaleString("vi-VN")} VND
+                          </span>
                         </div>
-                      </div>
-                      <span className="text-right font-sans text-xs font-semibold text-[var(--color-espresso-mid)]">
-                        {item.lineTotal.toLocaleString("vi-VN")} VND
-                      </span>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                <div className="mt-5 border-t border-[var(--color-sand)] pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-[var(--color-warm-gray)]">
-                      {vi ? "Tổng" : "Total"} · {totalDuration} {vi ? "phút" : "min"}
-                    </span>
-                    <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalVND.toLocaleString("vi-VN")} VND</span>
-                  </div>
-                </div>
+                    <div className="mt-5 border-t border-[var(--color-sand)] pt-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[var(--color-warm-gray)]">
+                          {vi ? "Tổng" : "Total"} · {totalDuration} {vi ? "phút" : "min"}
+                        </span>
+                        <span className="font-serif text-xl text-[var(--color-terracotta)]">{totalVND.toLocaleString("vi-VN")} VND</span>
+                      </div>
+                    </div>
 
-                <div className="mt-6 space-y-4">
-                <div className="space-y-3 rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                    {vi ? "Ngày *" : "Date *"}
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {[
-                      { label: vi ? "Hôm nay" : "Today", value: todayISO },
-                      { label: vi ? "Ngày mai" : "Tomorrow", value: tomorrowISO },
-                      { label: vi ? "Cuối tuần" : "Weekend", value: weekendISO },
-                    ].map((option) => {
-                      const isActive = form.date === option.value;
-                      return (
-                        <button
-                          key={option.label}
-                          type="button"
-                          onClick={() => setForm((prev) => ({ ...prev, date: option.value }))}
-                          className="rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition"
-                          style={{
-                            borderColor: isActive ? "var(--color-terracotta)" : "var(--color-sand-dark)",
-                            backgroundColor: isActive ? "var(--color-terracotta)" : "transparent",
-                            color: isActive ? "white" : "var(--color-espresso-mid)",
-                          }}
-                        >
-                          {option.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <label className="block">
-                    <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                      {vi ? "Hoặc chọn ngày khác" : "Or choose another date"}
-                    </span>
-                    <input
-                      className="input"
-                      type="date"
-                      min={todayISO}
-                      value={form.date}
-                      onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                      required
-                    />
-                  </label>
-                </div>
-
-                <Field label={vi ? "Giờ" : "Time"} required>
-                  <div className="space-y-3">
-                    {TIME_GROUPS.map((group) => (
-                      <div key={group.label}>
-                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                          {vi
-                            ? group.label === "Morning"
-                              ? "Buổi sáng"
-                              : "Buổi chiều"
-                            : group.label}
+                    <div className="mt-6 space-y-4">
+                      <div className="space-y-3 rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                          {vi ? "Ngày *" : "Date *"}
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {group.slots.map((slot) => {
-                            const isActive = form.time === slot;
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          {[
+                            { label: vi ? "Hôm nay" : "Today", value: todayISO },
+                            { label: vi ? "Ngày mai" : "Tomorrow", value: tomorrowISO },
+                            { label: vi ? "Cuối tuần" : "Weekend", value: weekendISO },
+                          ].map((option) => {
+                            const isActive = form.date === option.value;
                             return (
                               <button
-                                key={slot}
+                                key={option.label}
                                 type="button"
-                                onClick={() => setForm((prev) => ({ ...prev, time: slot }))}
-                                className="rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.08em] transition"
+                                onClick={() => setForm((prev) => ({ ...prev, date: option.value }))}
+                                className="rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition"
                                 style={{
                                   borderColor: isActive ? "var(--color-terracotta)" : "var(--color-sand-dark)",
-                                  backgroundColor: isActive ? "var(--color-terracotta-muted)" : "transparent",
-                                  color: "var(--color-espresso-mid)",
+                                  backgroundColor: isActive ? "var(--color-terracotta)" : "transparent",
+                                  color: isActive ? "white" : "var(--color-espresso-mid)",
                                 }}
                               >
-                                {isActive ? "✓ " : ""}
-                                {slot}
+                                {option.label}
                               </button>
                             );
                           })}
                         </div>
+
+                        <label className="block">
+                          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                            {vi ? "Hoặc chọn ngày khác" : "Or choose another date"}
+                          </span>
+                          <input
+                            className="input"
+                            type="date"
+                            min={todayISO}
+                            value={form.date}
+                            onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                            required
+                          />
+                        </label>
                       </div>
-                    ))}
+
+                      <Field label={vi ? "Giờ" : "Time"} required>
+                        <div className="space-y-3">
+                          {TIME_GROUPS.map((group) => (
+                            <div key={group.label}>
+                              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
+                                {vi
+                                  ? group.label === "Morning"
+                                    ? "Buổi sáng"
+                                    : "Buổi chiều"
+                                  : group.label}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {group.slots.map((slot) => {
+                                  const isActive = form.time === slot;
+                                  return (
+                                    <button
+                                      key={slot}
+                                      type="button"
+                                      onClick={() => setForm((prev) => ({ ...prev, time: slot }))}
+                                      className="rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.08em] transition"
+                                      style={{
+                                        borderColor: isActive ? "var(--color-terracotta)" : "var(--color-sand-dark)",
+                                        backgroundColor: isActive ? "var(--color-terracotta-muted)" : "transparent",
+                                        color: "var(--color-espresso-mid)",
+                                      }}
+                                    >
+                                      {isActive ? "✓ " : ""}
+                                      {slot}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </Field>
+                    </div>
                   </div>
-                </Field>
+                  {isCartStepLocked && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="rounded-xl border border-[var(--color-sand-dark)] bg-[var(--color-warm-white)]/95 px-4 py-3 text-center text-sm text-[var(--color-espresso-mid)] shadow-sm backdrop-blur-sm">
+                        {vi ? "Chọn dịch vụ và thời lượng ở bước 1 để mở bước này." : "Choose a service duration in Step 1 to unlock this section."}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                   <div className="space-y-3">
                     {!canGoNext && (
@@ -412,7 +430,6 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     </button>
                   </div>
                 </div>
-              </div>
             </AnimatedSection>
           </div>
         ) : (
@@ -427,9 +444,6 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   locale={locale}
                 />
                 <h2 className="font-serif text-h3">{vi ? "3. Thông tin khách hàng" : "3. Guest details"}</h2>
-                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">
-                  {vi ? "Thêm một bước cuối để xác nhận yêu cầu đặt lịch." : "One final step to confirm your booking."}
-                </p>
 
                 <button
                   type="button"
@@ -456,56 +470,119 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   ))}
                 </div>
 
-                <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-                  <Field label={vi ? "Họ và tên" : "Full name"} required>
-                    <input
-                      className="input"
-                      type="text"
-                      value={form.name}
-                      onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-                      autoComplete="name"
-                      required
-                    />
-                  </Field>
+                <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+                  <div className="rounded-2xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] p-4 md:p-5">
+                    <div className="mb-5 flex items-start gap-3">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-terracotta)] text-sm font-semibold text-[var(--color-terracotta)]">
+                        1
+                      </span>
+                      <div>
+                        <h3 className="text-xl font-semibold text-[var(--color-espresso)]">{vi ? "Thông tin của bạn" : "Your Information"}</h3>
+                        <p className="text-sm text-[var(--color-warm-gray)]">
+                          {vi ? "Chúng tôi cần các thông tin này để xác nhận đặt lịch." : "We need these details to confirm your booking."}
+                        </p>
+                      </div>
+                    </div>
 
-                  <Field label={vi ? "Điện thoại / WhatsApp" : "Phone / WhatsApp"} required>
-                    <input
-                      className="input"
-                      type="tel"
-                      value={form.phone}
-                      onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
-                      autoComplete="tel"
-                      required
-                    />
-                  </Field>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
+                          {vi ? "Họ và tên" : "Full name"} <span className="text-[var(--color-terracotta)]">*</span>
+                        </label>
+                        <input
+                          className="input"
+                          type="text"
+                          value={form.name}
+                          onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                          autoComplete="name"
+                          placeholder={vi ? "Nguyễn Văn A" : "Alex John"}
+                          required
+                        />
+                      </div>
 
-                  <div className="space-y-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta)]">
-                      {vi ? "Thêm email hoặc ghi chú (không bắt buộc)" : "Add email or note (optional)"}
-                    </p>
-                    <Field label={vi ? "Email" : "Email"}>
-                      <input
-                        className="input"
-                        type="email"
-                        value={form.email}
-                        onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                        autoComplete="email"
-                      />
-                    </Field>
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
+                          {vi ? "Email" : "Email address"} <span className="text-[var(--color-terracotta)]">*</span>
+                        </label>
+                        <input
+                          className="input"
+                          type="email"
+                          value={form.email}
+                          onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                          autoComplete="email"
+                          placeholder="you@example.com"
+                          required
+                        />
+                        <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
+                          {vi ? "Thông tin xác nhận đặt lịch sẽ được gửi về email này." : "Booking confirmation will be sent here"}
+                        </p>
+                      </div>
 
-                    <Field label={vi ? "Ghi chú" : "Note"}>
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
+                          {vi ? "Số điện thoại" : "Phone number"} <span className="text-[var(--color-terracotta)]">*</span>
+                        </label>
+                        <input
+                          className="input"
+                          type="tel"
+                          value={form.phone}
+                          onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
+                          autoComplete="tel"
+                          placeholder="+84 900 000 000"
+                          required
+                        />
+                        <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
+                          {vi ? "Hướng dẫn viên sẽ gọi xác nhận điểm đón vào tối hôm trước." : "Our guide will call to confirm pickup time the evening before"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
+                          {vi ? "Điểm đón" : "Pickup location"} <span className="font-normal text-[var(--color-warm-gray)]">({vi ? "tùy chọn" : "optional"})</span>
+                        </label>
+                        <input
+                          className="input"
+                          type="text"
+                          value={form.pickupLocation}
+                          onChange={(event) => setForm((prev) => ({ ...prev, pickupLocation: event.target.value }))}
+                          placeholder={vi ? "Tên khách sạn hoặc địa chỉ" : "Hotel name or street address"}
+                        />
+                        <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
+                          {vi ? "Có thể để trống nếu bạn gặp chúng tôi tại spa." : "Leave blank to meet us at the office"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
+                        {vi ? "Yêu cầu đặc biệt" : "Special requests"} <span className="font-normal text-[var(--color-warm-gray)]">({vi ? "tùy chọn" : "optional"})</span>
+                      </label>
                       <textarea
-                        className="input min-h-[96px]"
+                        className="input min-h-[110px]"
                         value={form.note}
                         onChange={(event) => setForm((prev) => ({ ...prev, note: event.target.value }))}
-                        placeholder={vi ? "Kỹ thuật viên mong muốn, dị ứng, dịp đặc biệt..." : "Therapist preference, allergies, special occasion..."}
+                        placeholder={
+                          vi
+                            ? "Yêu cầu ăn kiêng, dị ứng, hỗ trợ đặc biệt, dịp kỷ niệm..."
+                            : "Dietary requirements, allergies, accessibility needs, special occasions..."
+                        }
                       />
-                    </Field>
+                      <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
+                        {vi ? "Chúng tôi sẽ cố gắng hỗ trợ các yêu cầu của bạn trong khả năng tốt nhất." : "We'll accommodate your requests wherever possible"}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-[var(--color-sand)] bg-[var(--color-warm-white)] px-4 py-3 text-[15px] leading-relaxed text-[var(--color-espresso-mid)]">
+                      <strong className="text-[var(--color-espresso)]">{vi ? "Vui lòng giữ máy điện thoại" : "Please keep your phone available"}</strong>{" "}
+                      {vi
+                        ? "để hướng dẫn viên có thể gọi xác nhận điểm đón và thời gian vào tối hôm trước. Hãy sẵn sàng liên lạc từ 18:00 trở đi."
+                        : "our guide will call the evening before your tour to confirm the exact meeting point and pickup time. Stay reachable from 6 PM onwards that day."}
+                    </div>
                   </div>
 
                   {!canSubmit && (
                     <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
-                      {vi ? "Vui lòng nhập họ tên và số điện thoại để xác nhận đặt lịch." : "Complete name and phone to confirm booking."}
+                      {vi ? "Vui lòng nhập họ tên, email và số điện thoại để xác nhận đặt lịch." : "Complete name, email and phone to confirm booking."}
                     </p>
                   )}
 
