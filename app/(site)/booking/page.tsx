@@ -49,6 +49,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     note: "",
   });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [activeStep, setActiveStep] = useState<"build" | "contact">("build");
   const [recentAddKey, setRecentAddKey] = useState<string | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(false);
@@ -82,8 +84,13 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const isScheduleReady = Boolean(form.date && form.time);
   const isContactReady = Boolean(form.name.trim() && form.phone.trim() && form.email.trim());
   const canGoNext = hasCart && isScheduleReady;
-  const canSubmit = hasCart && isScheduleReady && isContactReady;
+  const canSubmit = hasCart && isScheduleReady && isContactReady && acceptedPolicy;
   const isCartStepLocked = selectedItems.length === 0;
+  const showValidation = attemptedSubmit && !canSubmit;
+  const nameMissing = showValidation && !form.name.trim();
+  const emailMissing = showValidation && !form.email.trim();
+  const phoneMissing = showValidation && !form.phone.trim();
+  const policyMissing = showValidation && !acceptedPolicy;
   const todayISO = getLocalDateISO(0);
   const tomorrowISO = getLocalDateISO(1);
   const weekendISO = getNextWeekendISO();
@@ -112,6 +119,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setAttemptedSubmit(true);
     if (!canSubmit) return;
     setIsSuccess(true);
   }
@@ -490,7 +498,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           {vi ? "Họ và tên" : "Full name"} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
-                          className="input"
+                          className={`input ${nameMissing ? "border-[var(--color-terracotta)]" : ""}`}
                           type="text"
                           value={form.name}
                           onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
@@ -498,6 +506,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           placeholder={vi ? "Nguyễn Văn A" : "Alex John"}
                           required
                         />
+                        {nameMissing && (
+                          <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
+                            {vi ? "Vui lòng nhập họ và tên." : "Please enter your full name."}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -505,7 +518,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           {vi ? "Email" : "Email address"} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
-                          className="input"
+                          className={`input ${emailMissing ? "border-[var(--color-terracotta)]" : ""}`}
                           type="email"
                           value={form.email}
                           onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
@@ -513,6 +526,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           placeholder="you@example.com"
                           required
                         />
+                        {emailMissing && (
+                          <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
+                            {vi ? "Vui lòng nhập email." : "Please enter your email address."}
+                          </p>
+                        )}
                         <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
                           {vi ? "Thông tin xác nhận đặt lịch sẽ được gửi về email này." : "Booking confirmation will be sent here"}
                         </p>
@@ -523,7 +541,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           {vi ? "Số điện thoại" : "Phone number"} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
-                          className="input"
+                          className={`input ${phoneMissing ? "border-[var(--color-terracotta)]" : ""}`}
                           type="tel"
                           value={form.phone}
                           onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
@@ -531,6 +549,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           placeholder="+84 900 000 000"
                           required
                         />
+                        {phoneMissing && (
+                          <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
+                            {vi ? "Vui lòng nhập số điện thoại." : "Please enter your phone number."}
+                          </p>
+                        )}
                         <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
                           {vi ? "Hướng dẫn viên sẽ gọi xác nhận điểm đón vào tối hôm trước." : "Our guide will call to confirm pickup time the evening before"}
                         </p>
@@ -580,9 +603,55 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     </div>
                   </div>
 
-                  {!canSubmit && (
-                    <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
-                      {vi ? "Vui lòng nhập họ tên, email và số điện thoại để xác nhận đặt lịch." : "Complete name, email and phone to confirm booking."}
+                  {showValidation && (
+                    <p className="px-1 text-xs text-[var(--color-warm-gray)]">
+                      {vi
+                        ? "Vui lòng nhập đủ thông tin bắt buộc và xác nhận chính sách để đặt lịch."
+                        : "Complete required details and accept policy terms to confirm booking."}
+                    </p>
+                  )}
+
+                  <details className="rounded-xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] px-4 py-3">
+                    <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-sand-dark)] bg-[var(--color-warm-white)] px-3 py-2 text-sm font-semibold text-[var(--color-espresso)] transition hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta-dark)]">
+                      <span>
+                        {vi
+                          ? "CHINH SACH DOI HEN VA HUY BO | THONG TIN DAT DICH VU"
+                          : "CANCELLATION POLICY | BOOKING INFORMATION"}
+                      </span>
+                      <span className="text-[var(--color-terracotta)]">▾</span>
+                    </summary>
+                    <div className="mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-espresso-mid)]">
+                      <p>
+                        {vi
+                          ? "Viec den muon co the anh huong lich tri lieu tiep theo va co the lam thay doi hoac rut ngan thoi gian tri lieu cua quy khach. Vui long thong bao it nhat truoc 4 gio de tranh phi huy 100%."
+                          : "Late arrival may affect following guests and your treatment may be shortened. Please inform us at least 4 hours in advance to avoid a 100% cancellation fee."}
+                      </p>
+                      <ul className="space-y-1 text-sm">
+                        <li>{vi ? "Dat lich som de co lua chon tot nhat." : "Plan in advance to make your best choice."}</li>
+                        <li>{vi ? "Vui long den truoc 15 phut so voi lich hen." : "Please arrive 15 minutes before your appointment."}</li>
+                        <li>{vi ? "Vui long cho chung toi biet tinh trang suc khoe." : "Please let us know your health condition."}</li>
+                        <li>{vi ? "Vui long de tu trang tai phong, khong mang den spa." : "Please leave belongings in your room and do not bring them to the spa."}</li>
+                      </ul>
+                    </div>
+                  </details>
+
+                  <label className={`flex items-start gap-2 rounded-lg border bg-[var(--color-warm-white)] px-3 py-2 text-sm text-[var(--color-espresso-mid)] ${policyMissing ? "border-[var(--color-terracotta)]" : "border-[var(--color-sand)]"}`}>
+                    <input
+                      type="checkbox"
+                      checked={acceptedPolicy}
+                      onChange={(event) => setAcceptedPolicy(event.target.checked)}
+                      className="mt-1 h-4 w-4 accent-[var(--color-terracotta)]"
+                      required
+                    />
+                    <span>
+                      {vi
+                        ? "Toi da doc va dong y voi chinh sach doi hen, huy bo va thong tin dat dich vu."
+                        : "I have read and agree to the cancellation policy and booking information."}
+                    </span>
+                  </label>
+                  {policyMissing && (
+                    <p className="mt-1 px-1 text-xs text-[var(--color-terracotta-dark)]">
+                      {vi ? "Vui lòng xác nhận bạn đã đọc chính sách." : "Please confirm you have read the policy."}
                     </p>
                   )}
 
