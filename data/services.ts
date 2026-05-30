@@ -204,6 +204,66 @@ export const SERVICES: Service[] = [
       "Book a romantic couple massage in Hội An at Serena Spa. Private suite, dual treatments, and champagne toast from $80. Perfect for anniversaries.",
   },
   {
+    id: "serena-glow-balance-couples",
+    slug: "serena-glow-balance-couples",
+    categoryId: "couple",
+    name: "SERENA GLOW & BALANCE / COUPLES",
+    tagline: "Glow Skin - Light Body - Peaceful Mind",
+    description:
+      "A luxurious 150-minute couples treatment designed to revitalize the body, brighten the skin, and harmonize mind and body together. All prices are listed in (.000) VND and include 5% service charge and VAT.",
+    duration: [150],
+    price: 100,
+    priceVND: 2450000,
+    image: "/images/serena_image/z7863130225920_fcbb5881c13f6f51fd437554d30283e4.jpg",
+    benefits: [
+      "Revitalizes body energy and overall balance",
+      "Brightens and refreshes skin tone",
+      "Relieves muscle tension and stress",
+      "Supports holistic physical and mental wellness",
+    ],
+    includes: [
+      "30 minutes exfoliating scrub or nourishing body wrap to remove dead skin cells, detoxify, and prepare the skin for deeper treatments",
+      "60 minutes Swedish body massage to relax muscles, improve circulation, and release tension",
+      "60 minutes rejuvenating facial treatment to hydrate, brighten, and refresh the complexion",
+    ],
+    isSignature: true,
+    isFeatured: true,
+    seoTitle: "Serena Glow & Balance Couples Package | Serena Spa Hội An",
+    seoDescription:
+      "Discover the 150-minute Serena Glow & Balance couples package with scrub or body wrap, Swedish massage, and rejuvenating facial at Serena Spa Hội An.",
+  },
+  {
+    id: "serena-signature-3-days-long-stay-couple",
+    slug: "serena-signature-3-days-long-stay-couple",
+    categoryId: "couple",
+    name: "SERENA SIGNATURE 3 DAYS",
+    tagline: "3-Day Serenity Experience",
+    description:
+      "A 3-day signature wellness package designed for long-stay guests seeking relaxation, rejuvenation, and shared experiences. Perfect for couples or any guests staying 3-4 nights in Hoi An.",
+    duration: [90],
+    price: 220,
+    priceVND: 5400000,
+    image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
+    benefits: [
+      "Sustained relaxation and rejuvenation across 3 consecutive days",
+      "Shared wellness journey for couples and long-stay guests",
+      "Flexible treatment selection from spa services each day",
+      "Healthy post-treatment nourishment and special take-home gift",
+    ],
+    includes: [
+      "3 days of wellness treatments, 90 minutes each day, selectable from any spa service",
+      "For 2 guests per day / per stay, allowing couples to enjoy treatments together",
+      "Healthy juice and Yogurt Granola provided after each treatment daily",
+      "Applicable to all guests staying 3-4 nights in Hoi An",
+      "Special gift included to take home for each guest using this package",
+    ],
+    isSignature: true,
+    isFeatured: true,
+    seoTitle: "Serena Signature 3-Day Long-Stay Couple Package | Serena Spa Hội An",
+    seoDescription:
+      "Explore Serena Spa's 3-day signature package for long-stay couples in Hoi An, including daily 90-minute treatments, healthy refreshments, and special gifts.",
+  },
+  {
     id: "body-scrub-ritual",
     slug: "body-scrub-ritual",
     categoryId: "body",
@@ -224,6 +284,14 @@ export const SERVICES: Service[] = [
     isFeatured: false,
   },
 ];
+
+const HIDDEN_SERVICE_SLUGS = new Set<string>([
+  "couple-ritual",
+]);
+
+function isVisibleService(service: Service): boolean {
+  return !HIDDEN_SERVICE_SLUGS.has(service.slug);
+}
 
 const CATEGORY_LABELS_VI: Record<string, { label: string; description: string }> = {
   massage: {
@@ -338,6 +406,42 @@ const SERVICES_VI: Record<string, LocalizedServiceOverride> = {
       "Trái cây theo mùa",
     ],
   },
+  "serena-glow-balance-couples": {
+    name: "SERENA GLOW & BALANCE / COUPLES",
+    tagline: "GÓI SÁNG DA - NHẸ THÂN - TÂM AN",
+    description:
+      "Liệu trình chăm sóc cá nhân sang trọng 150 phút dành cho cặp đôi, được thiết kế để phục hồi sức sống cho cơ thể, làm sáng da và hài hòa tâm trí và cơ thể. Tất cả giá đều được tính bằng (.000) Việt Nam đồng, bao gồm 5% phí phục vụ và VAT.",
+    benefits: [
+      "Phục hồi năng lượng và cân bằng cơ thể",
+      "Làm sáng và làm tươi mới làn da",
+      "Giải phóng căng cơ, giảm áp lực tinh thần",
+      "Hỗ trợ thư giãn sâu và chữa lành toàn diện",
+    ],
+    includes: [
+      "30 phút tẩy tế bào chết hoặc đắp mặt nạ dưỡng thể để loại bỏ tế bào chết, thải độc và chuẩn bị da cho các liệu trình sâu hơn",
+      "60 phút massage Thụy Điển toàn thân để thư giãn cơ bắp, cải thiện tuần hoàn và giải tỏa căng thẳng",
+      "60 phút chăm sóc da mặt trẻ hóa để cấp ẩm, làm sáng và làm tươi mới làn da",
+    ],
+  },
+  "serena-signature-3-days-long-stay-couple": {
+    name: "SERENA SIGNATURE 3 DAYS",
+    tagline: "GÓI TRẢI NGHIỆM AN YÊN 3 NGÀY",
+    description:
+      "Gói chăm sóc sức khỏe đặc biệt 3 ngày được thiết kế dành cho khách lưu trú dài ngày tìm kiếm sự thư giãn, trẻ hóa và những trải nghiệm cùng nhau. Hoàn hảo cho các cặp đôi hoặc bất kỳ khách nào lưu trú từ 3-4 đêm tại Hội An.",
+    benefits: [
+      "Thư giãn sâu và phục hồi đều đặn trong 3 ngày liên tiếp",
+      "Trải nghiệm chăm sóc sức khỏe đồng hành dành cho cặp đôi",
+      "Linh hoạt lựa chọn dịch vụ spa mỗi ngày theo nhu cầu",
+      "Bổ sung dinh dưỡng sau trị liệu và quà tặng mang về",
+    ],
+    includes: [
+      "3 ngày trị liệu chăm sóc sức khỏe, mỗi ngày 90 phút, có thể lựa chọn bất kỳ dịch vụ spa nào",
+      "Dành cho 2 khách mỗi ngày/mỗi lần lưu trú, cho phép các cặp đôi cùng nhau tận hưởng các liệu trình",
+      "Nước ép trái cây tốt cho sức khỏe và sữa chua granola được cung cấp sau mỗi liệu trình hàng ngày",
+      "Áp dụng cho tất cả khách lưu trú từ 3-4 đêm tại Hội An",
+      "Quà tặng đặc biệt được tặng kèm cho mỗi khách sử dụng gói dịch vụ này",
+    ],
+  },
   "body-scrub-ritual": {
     name: "Body Scrub Ritual",
     tagline: "Làm mới. Rạng rỡ. Tỏa sáng.",
@@ -376,39 +480,38 @@ export function getServiceCategories(locale: "vi" | "en" = "en"): ServiceCategor
 ─────────────────────────────────────────────────────────────────────────── */
 
 export function getServiceBySlug(slug: string): Service | undefined {
-  return SERVICES.find((s) => s.slug === slug);
+  return SERVICES.find((s) => s.slug === slug && isVisibleService(s));
 }
 
 export function getServiceBySlugLocalized(
   slug: string,
   locale: "vi" | "en" = "en",
 ): Service | undefined {
-  const service = SERVICES.find((s) => s.slug === slug);
+  const service = SERVICES.find((s) => s.slug === slug && isVisibleService(s));
   return service ? localizeService(service, locale) : undefined;
 }
 
 export function getServicesByCategory(categoryId: string): Service[] {
-  return SERVICES.filter((s) => s.categoryId === categoryId);
+  return SERVICES.filter((s) => s.categoryId === categoryId && isVisibleService(s));
 }
 
 export function getServicesByCategoryLocalized(
   categoryId: string,
   locale: "vi" | "en" = "en",
 ): Service[] {
-  return SERVICES.filter((s) => s.categoryId === categoryId).map((service) =>
-    localizeService(service, locale),
-  );
+  return SERVICES.filter((s) => s.categoryId === categoryId && isVisibleService(s))
+    .map((service) => localizeService(service, locale));
 }
 
 export function getFeaturedServices(limit = 4): Service[] {
-  return SERVICES.filter((s) => s.isFeatured).slice(0, limit);
+  return SERVICES.filter((s) => s.isFeatured && isVisibleService(s)).slice(0, limit);
 }
 
 export function getFeaturedServicesLocalized(
   limit = 4,
   locale: "vi" | "en" = "en",
 ): Service[] {
-  return SERVICES.filter((s) => s.isFeatured)
+  return SERVICES.filter((s) => s.isFeatured && isVisibleService(s))
     .slice(0, limit)
     .map((service) => localizeService(service, locale));
 }
@@ -416,9 +519,9 @@ export function getFeaturedServicesLocalized(
 export function getAllServicesLocalized(
   locale: "vi" | "en" = "en",
 ): Service[] {
-  return SERVICES.map((service) => localizeService(service, locale));
+  return SERVICES.filter(isVisibleService).map((service) => localizeService(service, locale));
 }
 
 export function getSignatureServices(): Service[] {
-  return SERVICES.filter((s) => s.isSignature);
+  return SERVICES.filter((s) => s.isSignature && isVisibleService(s));
 }

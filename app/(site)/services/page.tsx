@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import OrnamentDivider from "@/components/ui/OrnamentDivider";
@@ -21,10 +22,12 @@ type FilterId = "all" | string;
 
 export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
   const vi = locale === "vi";
+  const searchParams = useSearchParams();
   const ALL_FILTER = { id: "all", label: vi ? "Tất cả dịch vụ" : "All Services" } as const;
   const SERVICE_CATEGORIES = getServiceCategories(locale);
   const localizedServices = getAllServicesLocalized(locale);
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
+  const lastAutoScrolledCategory = useRef<string | null>(null);
 
   const filteredServices =
     activeFilter === "all"
@@ -44,6 +47,23 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
   }
 
   const showGrouped = activeFilter === "all";
+
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (!categoryParam || activeFilter !== "all") return;
+    if (lastAutoScrolledCategory.current === categoryParam) return;
+
+    const validCategory = SERVICE_CATEGORIES.some((cat) => cat.id === categoryParam);
+    if (!validCategory) return;
+
+    requestAnimationFrame(() => {
+      const target = document.getElementById(`category-${categoryParam}`);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        lastAutoScrolledCategory.current = categoryParam;
+      }
+    });
+  }, [searchParams, activeFilter, SERVICE_CATEGORIES]);
 
   return (
     <>
@@ -228,7 +248,11 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
               {SERVICE_CATEGORIES.filter(
                 (cat) => groupedByCategory[cat.id]?.length,
               ).map((category, catIdx) => (
-                <div key={category.id}>
+                <div
+                  key={category.id}
+                  id={`category-${category.id}`}
+                  style={{ scrollMarginTop: "7rem" }}
+                >
                   {/* Category label heading */}
                   <AnimatedSection animation="fade" delay={catIdx * 0.05}>
                     <div className="flex items-center gap-3 mb-6">
