@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { CONTACT } from "@/data/site";
 import { getDictionary } from "@/data/i18n";
 import { localeFromPathname, withLocalePath } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
 
 type ContactAction = {
   id: string;
@@ -18,7 +17,6 @@ type ContactAction = {
 };
 
 export default function FloatingContactWidget() {
-  const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const t = getDictionary(locale);
@@ -41,7 +39,13 @@ export default function FloatingContactWidget() {
       color: "bg-[#0068FF]",
       hoverColor: "hover:bg-[#0057d9]",
       icon: (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.123a.315.315 0 01-.308.252h-1.08a.314.314 0 01-.307-.38l.19-.877h-3.744l-.432 1.018a.315.315 0 01-.29.191H8.44a.315.315 0 01-.29-.437l3.85-8.9a.315.315 0 01.29-.191h4.963c.149 0 .273.105.309.25v.001zm-3.45.876l-1.497 3.483h2.386l.548-2.547-.008-.007-1.429-.929z" /></svg>
+        <Image
+          src="/images/contact-logo/Icon_of_Zalo.svg.png"
+          alt="Zalo"
+          width={28}
+          height={28}
+          className="h-7 w-7 object-contain"
+        />
       ),
     },
     {
@@ -59,23 +63,7 @@ export default function FloatingContactWidget() {
   return (
     <>
       <div className="hidden md:flex fixed right-5 bottom-10 flex-col items-center gap-2 z-float" role="complementary" aria-label="Quick contact">
-        <button
-          onClick={() => setIsExpanded((v) => !v)}
-          className={cn(
-            "w-12 h-12 rounded-full bg-[var(--color-terracotta)] text-white",
-            "shadow-[var(--shadow-float)] hover:bg-[var(--color-terracotta-dark)]",
-            "transition-all duration-200 flex items-center justify-center",
-            isExpanded && "rotate-45"
-          )}
-          aria-label={isExpanded ? "Close contact options" : "Open contact options"}
-          aria-expanded={isExpanded}
-        >
-          <svg className="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-
-        <div className={cn("flex flex-col items-center gap-2 absolute bottom-14 transition-all duration-200", isExpanded ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-3 pointer-events-none")}>
+        <div className="flex flex-col items-center gap-3">
           {actions.map((action) => (
             <a
               key={action.id}
@@ -83,14 +71,20 @@ export default function FloatingContactWidget() {
               target={action.id !== "phone" ? "_blank" : undefined}
               rel={action.id !== "phone" ? "noopener noreferrer" : undefined}
               aria-label={action.label}
-              className={cn(
-                "group relative w-11 h-11 rounded-full text-white flex items-center justify-center",
-                "shadow-[var(--shadow-float)] transition-all duration-200",
-                "hover:-translate-y-0.5 hover:shadow-lg",
-                action.color,
-                action.hoverColor
-              )}
+              className={`group relative flex h-11 w-11 items-center justify-center rounded-full text-white shadow-[var(--shadow-float)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${action.color} ${action.hoverColor}`}
             >
+              <span
+                className="pointer-events-none absolute inset-[-4px] rounded-full border-2 border-current opacity-0 group-hover:animate-ping group-hover:opacity-35"
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute inset-[-10px] rounded-full border-2 border-current opacity-0 group-hover:animate-ping group-hover:opacity-20 [animation-delay:180ms]"
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute inset-[-16px] rounded-full border-2 border-current opacity-0 group-hover:animate-ping group-hover:opacity-10 [animation-delay:360ms]"
+                aria-hidden="true"
+              />
               {action.icon}
               <span className="absolute right-full mr-3 px-2.5 py-1 rounded-lg bg-[var(--color-espresso)] text-white text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                 {action.label}
