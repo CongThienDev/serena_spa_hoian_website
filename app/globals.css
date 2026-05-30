@@ -398,6 +398,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   transition-timing-function: var(--ease-luxury);
   will-change: opacity, transform;
 }
+.reveal-reduced {
+  will-change: opacity;
+}
 .reveal-fade {
   opacity: 0;
 }
@@ -414,6 +417,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .reveal-visible {
   opacity: 1;
+  transform: none;
+}
+.reveal-reduced.reveal-slide-up,
+.reveal-reduced.reveal-slide-up-fade,
+.reveal-reduced.reveal-scale-fade {
   transform: none;
 }
 
