@@ -143,7 +143,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
               >
                 {vi
                   ? "Mỗi liệu trình là một nghi thức. Mỗi nghi thức là hành trình trở về cân bằng của chính bạn."
-                  : "Every treatment is a ritual. Every ritual, a return to yourself. Explore our full collection of massages, facials, body rituals, and couple experiences."}
+                  : "Every treatment is a ritual. Every ritual, a return to yourself. Explore relaxation therapies, body and facial care, signature rituals, spa packages, nail care, and hair care."}
               </p>
             </AnimatedSection>
           </div>

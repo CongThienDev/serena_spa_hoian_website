@@ -13,7 +13,7 @@ const faq = [
   ["Do I need to book in advance?", "Advance booking is recommended, especially for peak evening hours. Same-day bookings are welcome when slots are available."],
   ["How early should I arrive?", "Please arrive 10-15 minutes before your appointment to enjoy a calm check-in ritual."],
   ["Can I request a specific therapist?", "Yes. You can mention your preferred therapist during booking and we will do our best to arrange."],
-  ["Do you offer couple rooms?", "Yes, we have private couple treatment rooms and curated couple wellness packages."],
+  ["Do you offer couple rooms?", "Yes, we have private couple treatment rooms and curated SPA packages for two guests."],
 ];
 
 export default function FaqPage({ locale = "en" }: { locale?: Locale }) {
@@ -23,7 +23,7 @@ export default function FaqPage({ locale = "en" }: { locale?: Locale }) {
         ["Tôi có cần đặt lịch trước không?", "Nên đặt trước, đặc biệt vào khung giờ cao điểm buổi tối. Serena vẫn hỗ trợ đặt trong ngày nếu còn chỗ."],
         ["Tôi nên đến sớm bao lâu?", "Vui lòng đến sớm 10-15 phút để check-in và thư giãn trước khi bắt đầu liệu trình."],
         ["Tôi có thể chọn kỹ thuật viên không?", "Có. Bạn có thể ghi chú kỹ thuật viên mong muốn khi đặt lịch, Serena sẽ hỗ trợ sắp xếp tối đa."],
-        ["Serena có phòng trị liệu đôi không?", "Có. Serena có phòng trị liệu riêng cho cặp đôi và các gói wellness dành cho hai người."],
+        ["Serena có phòng trị liệu đôi không?", "Có. Serena có phòng trị liệu riêng cho cặp đôi và các gói Spa dành cho hai khách."],
       ]
     : faq;
   return (

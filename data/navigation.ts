@@ -17,19 +17,23 @@ export function getNavItems(locale: Locale): NavItem[] {
       href: "/services",
       children: [
         { label: t.nav.servicesAll, href: "/services" },
-        { label: t.nav.servicesMassage, href: "/services?category=massage" },
-        { label: t.nav.servicesFacial, href: "/services?category=facial" },
-        { label: t.nav.servicesBody, href: "/services?category=body" },
-        { label: t.nav.servicesCouple, href: "/services?category=couple" }
+        { label: t.nav.servicesRelaxation, href: "/services?category=relaxation" },
+        { label: t.nav.servicesBodyTreatment, href: "/services?category=body-treatment" },
+        { label: t.nav.servicesFaceTreatment, href: "/services?category=face-treatment" },
+        { label: t.nav.servicesBodyCareTreatment, href: "/services?category=body-care-treatment" },
+        { label: t.nav.servicesSignature, href: "/services?category=serena-signature" },
+        { label: t.nav.servicesPackage, href: "/services?category=spa-package" },
+        { label: t.nav.servicesNailCare, href: "/services?category=nail-care" },
+        { label: t.nav.servicesHairCare, href: "/services?category=hair-care" }
       ]
     },
     {
       label: t.nav.wellness,
       href: "/wellness",
       children: [
-        { label: t.nav.wellnessPrograms, href: "/wellness" },
-        { label: t.nav.wellnessPackages, href: "/wellness#packages" },
-        { label: t.nav.wellnessRetreats, href: "/wellness#retreats" }
+        { label: t.nav.wellnessOverview, href: "/wellness" },
+        { label: t.nav.wellnessPhilosophy, href: "/wellness#philosophy" },
+        { label: t.nav.wellnessMethod, href: "/wellness#method" }
       ]
     },
     { label: t.nav.gallery, href: "/gallery" },

@@ -1,0 +1,50 @@
+[
+  {
+    "locale": "en",
+    "customer": {
+      "name": "Tran Y",
+      "phone": "001010010101",
+      "email": "thiennle744@gmail.com",
+      "pickupLocation": "BS",
+      "note": "Frêe pickup pls"
+    },
+    "schedule": {
+      "date": "2026-06-01",
+      "time": "09:00"
+    },
+    "items": [
+      {
+        "serviceId": "serena-signature-3-days-long-stay-couple",
+        "serviceName": "Serena Signature 3 Days for Long-Stay Guest / Couple",
+        "durationMinutes": 90,
+        "quantity": 1,
+        "unitPriceVND": 4950000,
+        "lineTotalVND": 4950000
+      },
+      {
+        "serviceId": "foot-reflexology",
+        "serviceName": "Foot Reflexology",
+        "durationMinutes": 30,
+        "quantity": 1,
+        "unitPriceVND": 250000,
+        "lineTotalVND": 250000
+      },
+      {
+        "serviceId": "mineral-mud-wrap-green-tea-wrap",
+        "serviceName": "Mineral Mud Wrap / Green Tea Wrap",
+        "durationMinutes": 30,
+        "quantity": 1,
+        "unitPriceVND": 400000,
+        "lineTotalVND": 400000
+      }
+    ],
+    "totals": {
+      "totalVND": 5600000,
+      "totalAfterCouponVND": 5600000,
+      "totalDurationMinutes": 150
+    },
+    "coupon": null,
+    "id": "bk_1780250764653_4mwi4m",
+    "createdAt": "2026-05-31T18:06:04.653Z"
+  }
+]

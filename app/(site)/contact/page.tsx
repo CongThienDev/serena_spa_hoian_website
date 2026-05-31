@@ -21,10 +21,14 @@ type FormFields = {
 const TREATMENT_INTERESTS = [
   { value: "", labelEn: "Select a topic...", labelVi: "Chọn chủ đề..." },
   { value: "general", labelEn: "General Inquiry", labelVi: "Tư vấn chung" },
-  { value: "massage", labelEn: "Massage Therapy", labelVi: "Massage trị liệu" },
-  { value: "facial", labelEn: "Facial Treatments", labelVi: "Chăm sóc da mặt" },
-  { value: "body", labelEn: "Body Treatments", labelVi: "Chăm sóc cơ thể" },
-  { value: "couple", labelEn: "Couple Packages", labelVi: "Gói cặp đôi" },
+  { value: "relaxation", labelEn: "Relaxation", labelVi: "Thư giãn" },
+  { value: "body-treatment", labelEn: "Body Treatment", labelVi: "Trị liệu cơ thể" },
+  { value: "face-treatment", labelEn: "SPA - Face Treatment", labelVi: "SPA - Chăm sóc da mặt" },
+  { value: "body-care-treatment", labelEn: "SPA - Body Care Treatment", labelVi: "SPA - Chăm sóc cơ thể" },
+  { value: "serena-signature", labelEn: "Serena Signature", labelVi: "Serena đặc biệt" },
+  { value: "spa-package", labelEn: "SPA Package", labelVi: "Gói Spa" },
+  { value: "nail-care", labelEn: "Nail Care", labelVi: "Chăm sóc móng" },
+  { value: "hair-care", labelEn: "Hair Care", labelVi: "Chăm sóc tóc" },
   { value: "occasion", labelEn: "Special Occasion", labelVi: "Dịp đặc biệt" },
 ];
 

@@ -61,6 +61,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     note: "",
   });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [activeStep, setActiveStep] = useState<"build" | "contact">("build");
@@ -243,11 +245,69 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     setCouponError(null);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAttemptedSubmit(true);
     if (!canSubmit) return;
-    setIsSuccess(true);
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        locale,
+        customer: {
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          pickupLocation: form.pickupLocation.trim(),
+          note: form.note.trim(),
+        },
+        schedule: {
+          date: form.date,
+          time: form.time,
+        },
+        items: selectedItems.map((item) => ({
+          serviceId: item.service.id,
+          serviceName: item.service.name,
+          durationMinutes: item.durationMinutes,
+          quantity: item.quantity,
+          unitPriceVND: item.unitPrice,
+          lineTotalVND: item.lineTotal,
+        })),
+        totals: {
+          totalVND,
+          totalAfterCouponVND: totalAfterCoupon,
+          totalDurationMinutes: totalDuration + (appliedCoupon?.extraMinutes ?? 0),
+        },
+        coupon: appliedCoupon
+          ? {
+              code: appliedCoupon.code,
+              discountVND: appliedCoupon.discountVND,
+              extraMinutes: appliedCoupon.extraMinutes,
+            }
+          : null,
+      };
+
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to submit booking");
+      }
+
+      setIsSuccess(true);
+    } catch {
+      setSubmitError(
+        vi
+          ? "Không thể gửi booking lúc này. Vui lòng thử lại sau."
+          : "Unable to submit booking right now. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (isSuccess) {
@@ -798,6 +858,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         : "Complete required details and accept policy terms to confirm booking."}
                     </p>
                   )}
+                  {submitError && (
+                    <p className="px-1 text-xs text-[var(--color-terracotta-dark)]">
+                      {submitError}
+                    </p>
+                  )}
 
                   <details className="rounded-xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] px-4 py-3">
                     <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-sand-dark)] bg-[var(--color-warm-white)] px-3 py-2 text-sm font-semibold text-[var(--color-espresso)] transition hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta-dark)]">
@@ -854,9 +919,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     <button
                       type="submit"
                       className="btn btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-60"
-                      disabled={!canSubmit}
+                      disabled={!canSubmit || isSubmitting}
                     >
-                      {vi ? "Xác nhận yêu cầu đặt lịch" : "Confirm Booking Request"}
+                      {isSubmitting
+                        ? (vi ? "Đang gửi..." : "Submitting...")
+                        : (vi ? "Xác nhận yêu cầu đặt lịch" : "Confirm Booking Request")}
                     </button>
                   </div>
                 </form>
@@ -966,7 +1033,7 @@ function isSave20Hour(time: string) {
 }
 
 function isPackageService(categoryId: string) {
-  return categoryId === "couple";
+  return categoryId === "spa-package";
 }
 
 function getLocalDateISO(addDays: number) {

@@ -12,7 +12,7 @@ import {
   type Service,
 } from "@/data/services";
 
-type FilterId = "all" | "massage" | "facial" | "body" | "couple";
+type FilterId = "all" | string;
 
 export default function LocalizedServicesClient({ locale }: { locale: Locale }) {
   const vi = locale === "vi";
