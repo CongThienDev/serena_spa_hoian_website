@@ -40,10 +40,7 @@ export default function ServiceCard({ service, className, locale = "en" }: Servi
         style={{ borderRadius: "var(--radius-card)" }}
       >
         {/* Image wrapper — portrait 3:4 */}
-        <div
-          className="relative overflow-hidden flex-shrink-0"
-          style={{ aspectRatio: "3/4", maxHeight: "280px" }}
-        >
+        <div className="relative w-full overflow-hidden flex-shrink-0 aspect-[4/3] sm:aspect-[3/4] sm:max-h-[280px]">
           <Image
             src={service.image}
             alt={`${service.name} treatment room at Serena Spa Hội An`}
