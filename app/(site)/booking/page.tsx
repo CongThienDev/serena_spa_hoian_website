@@ -312,7 +312,10 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
         </div>
       </section>
 
-      <section className="section-cream section-padding" aria-label="Booking workspace">
+      <section
+        className="section-cream section-padding pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-24"
+        aria-label="Booking workspace"
+      >
         {activeStep === "build" ? (
           <div className="container-site mx-auto grid w-full max-w-[72rem] gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
             <AnimatedSection animation="slide-up-fade">
@@ -336,7 +339,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         setActiveServiceId(service.id);
                         setRecentAddKey(null);
                       }}
-                      className="flex items-center justify-between rounded-xl border px-4 py-3 text-left transition"
+                      className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition"
                       style={{
                         borderColor:
                           activeServiceId === service.id ? "var(--color-terracotta)" : "var(--color-sand)",
@@ -344,8 +347,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           activeServiceId === service.id ? "var(--color-terracotta-muted)" : "transparent",
                       }}
                     >
-                      <span className="font-sans text-sm text-[var(--color-espresso)]">{service.name}</span>
-                      <span className="font-sans text-xs text-[var(--color-warm-gray)]">
+                      <span className="min-w-0 flex-1 font-sans text-sm text-[var(--color-espresso)]">{service.name}</span>
+                      <span className="shrink-0 font-sans text-xs text-[var(--color-warm-gray)]">
                         {vi ? "Từ" : "From"} {service.priceVND?.toLocaleString("vi-VN") ?? `${service.price} USD`}
                       </span>
                     </button>
@@ -408,7 +411,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       {selectedItems.map((item) => (
                         <div
                           key={`${item.serviceId}-${item.durationMinutes}`}
-                          className="grid grid-cols-[minmax(0,1fr)_10rem_9rem] items-center gap-3 rounded-xl border border-[var(--color-sand)] px-4 py-3"
+                          className="grid gap-3 rounded-xl border border-[var(--color-sand)] px-4 py-3 sm:grid-cols-[minmax(0,1fr)_8.5rem_7.5rem] sm:items-center"
                         >
                           <div className="min-w-0">
                             <p className="font-sans text-sm font-medium text-[var(--color-espresso)]">{item.service.name}</p>
@@ -416,7 +419,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                               {item.durationMinutes} {vi ? "phút" : "min"} · {item.unitPrice.toLocaleString("vi-VN")} VND
                             </p>
                           </div>
-                          <div className="flex flex-col items-center justify-center gap-1">
+                          <div className="flex flex-col items-start justify-center gap-1 sm:items-center">
                             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
                               {vi ? "Khách" : "Guests"}
                             </span>
@@ -440,7 +443,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                               </button>
                             </div>
                           </div>
-                          <span className="text-right font-sans text-xs font-semibold text-[var(--color-espresso-mid)]">
+                          <span className="text-left font-sans text-xs font-semibold text-[var(--color-espresso-mid)] sm:text-right">
                             {item.lineTotal.toLocaleString("vi-VN")} VND
                           </span>
                         </div>

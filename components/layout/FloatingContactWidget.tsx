@@ -102,7 +102,13 @@ export default function FloatingContactWidget() {
           </a>
 
           <a href={`https://zalo.me/${CONTACT.zalo.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center gap-1 py-3 text-[#0068FF] hover:opacity-80 transition-opacity duration-200 min-h-[56px]" aria-label="Zalo">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.123a.315.315 0 01-.308.252h-1.08a.314.314 0 01-.307-.38l.19-.877h-3.744l-.432 1.018a.315.315 0 01-.29.191H8.44a.315.315 0 01-.29-.437l3.85-8.9a.315.315 0 01.29-.191h4.963c.149 0 .273.105.309.25v.001zm-3.45.876l-1.497 3.483h2.386l.548-2.547-.008-.007-1.429-.929z" /></svg>
+            <Image
+              src="/images/contact-logo/Icon_of_Zalo.svg.png"
+              alt="Zalo"
+              width={20}
+              height={20}
+              className="h-5 w-5 object-contain"
+            />
             <span className="text-[10px] font-medium tracking-wide">Zalo</span>
           </a>
 
