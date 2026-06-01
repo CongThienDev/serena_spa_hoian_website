@@ -17,7 +17,7 @@ export const CONTACT = {
   phoneFormatted: "+84 935 011 151",
   whatsapp: "84935011151",
   zalo: "84935011151",
-  email: "info@serenaretreat.com",
+  email: "serenaspahoian@gmail.com",
   address: "127 Nguyen Duy Hieu - Hoi An Dong - Da Nang",
   addressShort: "127 Nguyen Duy Hieu, Hoi An Dong",
   googleMapsUrl: "https://maps.google.com/?q=127+Nguyen+Duy+Hieu+Hoi+An+Dong+Da+Nang",
@@ -25,9 +25,9 @@ export const CONTACT = {
 } as const;
 
 export const HOURS = {
-  weekdays: "09:00 – 21:00",
-  weekends: "09:00 – 21:00",
-  label: "Open daily 9:00 AM – 9:00 PM",
+  weekdays: "09:00 – 22:00",
+  weekends: "09:00 – 22:00",
+  label: "Open daily 9:00 AM – 10:00 PM",
 } as const;
 
 export const SOCIAL = {

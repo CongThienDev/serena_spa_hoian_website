@@ -91,7 +91,7 @@ export function getLocalBusinessSchema() {
       "Premium wellness spa offering signature massages, holistic treatments, and luxury healing experiences in Hội An, Vietnam.",
     url: absoluteUrl("/"),
     telephone: "+84-935-011-151",
-    email: "info@serenaretreat.com",
+    email: "serenaspahoian@gmail.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "127 Nguyen Duy Hieu",
@@ -113,7 +113,7 @@ export function getLocalBusinessSchema() {
           "Friday", "Saturday", "Sunday",
         ],
         opens: "09:00",
-        closes: "21:00",
+        closes: "22:00",
       },
     ],
     priceRange: "$$",

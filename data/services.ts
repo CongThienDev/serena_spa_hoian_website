@@ -110,7 +110,7 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 10,
     priceVND: 250000,
-    image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
+    image: "/images/serena_image/z7863130080318_bd46759e1d082e30adb7e1b0a0e90bd0.jpg",
     isFeatured: true,
   },
   {
@@ -124,7 +124,7 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 13,
     priceVND: 320000,
-    image: "/images/serena_image/z7863130080318_bd46759e1d082e30adb7e1b0a0e90bd0.jpg",
+    image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
     isFeatured: true,
   },
   {
@@ -166,7 +166,7 @@ export const SERVICES: Service[] = [
     duration: [60],
     price: 36,
     priceVND: 900000,
-    image: "/images/serena_image/z7863130080318_bd46759e1d082e30adb7e1b0a0e90bd0.jpg",
+    image: "/images/serena_image/rosa-rafael-Pe9IXUuC6QU-unsplash.jpg",
   },
   {
     id: "mineral-mud-wrap-green-tea-wrap",

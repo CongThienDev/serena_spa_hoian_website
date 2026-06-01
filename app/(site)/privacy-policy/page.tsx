@@ -22,8 +22,8 @@ export default function PrivacyPolicyPage({ locale = "en" }: { locale?: Locale }
           </p>
           <p className="text-[var(--color-warm-gray)] mt-4">
             {vi
-              ? "Với mọi yêu cầu liên quan đến quyền riêng tư, vui lòng liên hệ: info@serenaretreat.com."
-              : "For any privacy-related request, contact us directly at info@serenaretreat.com."}
+              ? "Với mọi yêu cầu liên quan đến quyền riêng tư, vui lòng liên hệ: serenaspahoian@gmail.com."
+              : "For any privacy-related request, contact us directly at serenaspahoian@gmail.com."}
           </p>
         </article>
       </section>
