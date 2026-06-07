@@ -311,6 +311,11 @@ function buildInternalEmail(payload: BookingEmailPayload) {
   const formattedDate = formatDate(payload.schedule.date, "en");
   const pickupLocation = payload.customer.pickupLocation?.trim();
   const note = payload.customer.note?.trim();
+  const couponSummary = payload.coupon
+    ? payload.coupon.code === "SAVE20"
+      ? `${payload.coupon.code} (-${formatCurrency(payload.coupon.discountVND)})`
+      : `${payload.coupon.code} (+${payload.coupon.extraMinutes} min)`
+    : null;
 
   return {
     subject: `New booking from website: ${payload.customer.name} (${payload.id})`,
@@ -334,34 +339,130 @@ function buildInternalEmail(payload: BookingEmailPayload) {
       ...(note ? [`Notes: ${note}`] : []),
     ].join("\n"),
     html: `
-      <div style="font-family:Arial,sans-serif;color:#3d1f0f;line-height:1.6;max-width:720px;margin:0 auto;padding:24px;">
-        <h2 style="margin:0 0 16px;">New booking received from website</h2>
-        <div style="background:#f9f1ea;border:1px solid #ead7ca;border-radius:16px;padding:16px;margin:20px 0;">
-          <p style="margin:0 0 8px;"><strong>Booking ID:</strong> ${escapeHtml(payload.id)}</p>
-          <p style="margin:0 0 8px;"><strong>Created at:</strong> ${escapeHtml(payload.createdAt)}</p>
-          <p style="margin:0 0 8px;"><strong>Guest name:</strong> ${escapeHtml(payload.customer.name)}</p>
-          <p style="margin:0 0 8px;"><strong>Email:</strong> ${escapeHtml(payload.customer.email)}</p>
-          <p style="margin:0 0 8px;"><strong>Phone:</strong> ${escapeHtml(payload.customer.phone)}</p>
-          <p style="margin:0 0 8px;"><strong>Date:</strong> ${escapeHtml(formattedDate)}</p>
-          <p style="margin:0;"><strong>Time:</strong> ${escapeHtml(payload.schedule.time)}</p>
+      <div style="margin:0;padding:0;background:${BRAND.cream};font-family:Arial,Helvetica,sans-serif;color:${BRAND.espresso};">
+        <div style="display:none;max-height:0;overflow:hidden;color:transparent;">
+          New website booking from ${escapeHtml(payload.customer.name)} for ${escapeHtml(formattedDate)} at ${escapeHtml(payload.schedule.time)}.
         </div>
-        <table style="width:100%;border-collapse:collapse;border:1px solid #ead7ca;border-radius:16px;overflow:hidden;">
-          <thead style="background:#f4e6db;">
-            <tr>
-              <th style="padding:12px;text-align:left;">Service</th>
-              <th style="padding:12px;text-align:center;">Duration</th>
-              <th style="padding:12px;text-align:center;">Qty</th>
-              <th style="padding:12px;text-align:right;">Amount</th>
-            </tr>
-          </thead>
-          <tbody>${itemsHtml}</tbody>
-        </table>
-        <div style="margin-top:20px;">
-          <p style="margin:0 0 8px;"><strong>Total duration:</strong> ${payload.totals.totalDurationMinutes} min</p>
-          <p style="margin:0 0 8px;"><strong>Total amount:</strong> ${formatCurrency(payload.totals.totalAfterCouponVND)}</p>
-          ${payload.coupon ? `<p style="margin:0 0 8px;"><strong>Coupon:</strong> ${escapeHtml(payload.coupon.code)}</p>` : ""}
-          ${pickupLocation ? `<p style="margin:0 0 8px;"><strong>Pickup location:</strong> ${escapeHtml(pickupLocation)}</p>` : ""}
-          ${note ? `<p style="margin:0;"><strong>Notes:</strong> ${escapeHtml(note)}</p>` : ""}
+        <div style="max-width:760px;margin:0 auto;padding:30px 18px;">
+          <div style="background:${BRAND.warmWhite};border:1px solid ${BRAND.sand};border-radius:22px;overflow:hidden;box-shadow:0 18px 42px rgba(61,31,15,0.08);">
+            <div style="background:${BRAND.espresso};padding:24px 28px;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 6px;color:${BRAND.brass};font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;">New Website Booking</p>
+                    <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:400;color:${BRAND.warmWhite};">
+                      ${escapeHtml(payload.customer.name)}
+                    </h1>
+                  </td>
+                  <td style="text-align:right;vertical-align:top;">
+                    <span style="display:inline-block;background:${BRAND.terracotta};color:${BRAND.warmWhite};border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">Action Needed</span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="padding:24px 28px 8px;">
+              <div style="background:${BRAND.cream};border:1px solid ${BRAND.sand};border-radius:18px;padding:18px;">
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:7px 0;color:${BRAND.warmGray};font-size:13px;">Booking ID</td>
+                    <td style="padding:7px 0;text-align:right;color:${BRAND.espresso};font-weight:700;">${escapeHtml(payload.id)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:7px 0;color:${BRAND.warmGray};font-size:13px;">Created at</td>
+                    <td style="padding:7px 0;text-align:right;color:${BRAND.espresso};font-weight:700;">${escapeHtml(payload.createdAt)}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div style="padding:16px 28px 8px;">
+              <table style="width:100%;border-collapse:separate;border-spacing:0 12px;">
+                <tr>
+                  <td style="width:50%;vertical-align:top;padding-right:6px;">
+                    <div style="border:1px solid ${BRAND.sand};border-radius:18px;padding:18px;background:${BRAND.warmWhite};">
+                      <p style="margin:0 0 12px;color:${BRAND.warmGray};font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">Guest</p>
+                      <p style="margin:0 0 8px;color:${BRAND.espressoMid};font-size:14px;">
+                        <strong style="color:${BRAND.espresso};">Name:</strong> ${escapeHtml(payload.customer.name)}
+                      </p>
+                      <p style="margin:0 0 8px;color:${BRAND.espressoMid};font-size:14px;">
+                        <strong style="color:${BRAND.espresso};">Phone:</strong> ${escapeHtml(payload.customer.phone)}
+                      </p>
+                      <p style="margin:0;color:${BRAND.espressoMid};font-size:14px;">
+                        <strong style="color:${BRAND.espresso};">Email:</strong>
+                        <a href="mailto:${escapeHtml(payload.customer.email)}" style="color:${BRAND.terracottaDark};text-decoration:none;">${escapeHtml(payload.customer.email)}</a>
+                      </p>
+                    </div>
+                  </td>
+                  <td style="width:50%;vertical-align:top;padding-left:6px;">
+                    <div style="border:1px solid ${BRAND.sand};border-radius:18px;padding:18px;background:${BRAND.warmWhite};">
+                      <p style="margin:0 0 12px;color:${BRAND.warmGray};font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">Schedule</p>
+                      <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:${BRAND.espresso};">${escapeHtml(formattedDate)}</p>
+                      <p style="margin:0;color:${BRAND.terracottaDark};font-size:20px;font-weight:700;">${escapeHtml(payload.schedule.time)}</p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="padding:16px 28px 8px;">
+              <p style="margin:0 0 12px;color:${BRAND.warmGray};font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">Services</p>
+              <table style="width:100%;border-collapse:separate;border-spacing:0;border:1px solid ${BRAND.sand};border-radius:18px;overflow:hidden;background:${BRAND.warmWhite};">
+                <thead style="background:#f4e6db;">
+                  <tr>
+                    <th style="padding:13px 16px;text-align:left;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">Service</th>
+                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">Min</th>
+                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">Qty</th>
+                    <th style="padding:13px 16px;text-align:right;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>${itemsHtml}</tbody>
+              </table>
+            </div>
+
+            <div style="padding:18px 28px 8px;">
+              <div style="background:${BRAND.espresso};border-radius:20px;padding:20px;color:${BRAND.warmWhite};">
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:6px 0;color:${BRAND.sand};">Total duration</td>
+                    <td style="padding:6px 0;text-align:right;font-weight:700;">${payload.totals.totalDurationMinutes} min</td>
+                  </tr>
+                  ${
+                    couponSummary
+                      ? `<tr>
+                          <td style="padding:6px 0;color:${BRAND.sand};">Coupon</td>
+                          <td style="padding:6px 0;text-align:right;font-weight:700;">${escapeHtml(couponSummary)}</td>
+                        </tr>`
+                      : ""
+                  }
+                  <tr>
+                    <td style="padding:10px 0 0;color:${BRAND.sand};font-size:16px;">Total amount</td>
+                    <td style="padding:10px 0 0;text-align:right;font-size:22px;font-weight:700;color:${BRAND.brass};">${formatCurrency(payload.totals.totalAfterCouponVND)}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            ${
+              pickupLocation || note
+                ? `<div style="padding:18px 28px 8px;">
+                    <div style="border-left:4px solid ${BRAND.terracotta};background:${BRAND.cream};border-radius:0 16px 16px 0;padding:16px;color:${BRAND.espressoMid};font-size:14px;line-height:1.65;">
+                      ${pickupLocation ? `<p style="margin:0 0 8px;"><strong>Pickup location:</strong> ${escapeHtml(pickupLocation)}</p>` : ""}
+                      ${note ? `<p style="margin:0;"><strong>Notes:</strong> ${escapeHtml(note)}</p>` : ""}
+                    </div>
+                  </div>`
+                : ""
+            }
+
+            <div style="padding:22px 28px 28px;">
+              <a href="mailto:${escapeHtml(payload.customer.email)}?subject=${encodeURIComponent(`Serena Spa Hoi An booking confirmation ${payload.id}`)}" style="display:inline-block;background:${BRAND.terracotta};color:${BRAND.warmWhite};border-radius:999px;padding:13px 18px;font-weight:700;text-decoration:none;">
+                Reply to guest
+              </a>
+              <p style="margin:16px 0 0;color:${BRAND.warmGray};font-size:13px;line-height:1.6;">
+                Customer confirmation email has been sent automatically from the booking mailbox. Please review details and contact the guest to confirm the appointment.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     `,

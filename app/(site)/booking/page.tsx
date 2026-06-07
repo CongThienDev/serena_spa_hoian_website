@@ -73,6 +73,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const durationSectionRef = useRef<HTMLDivElement | null>(null);
   const cartSectionRef = useRef<HTMLDivElement | null>(null);
+  const contactSectionRef = useRef<HTMLDivElement | null>(null);
+  const successSectionRef = useRef<HTMLElement | null>(null);
 
   const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
@@ -128,6 +130,13 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     });
   }
 
+  function scrollToElement(elementRef: { current: HTMLElement | null }, behavior: ScrollBehavior = "smooth") {
+    if (!elementRef.current) return;
+    window.requestAnimationFrame(() => {
+      elementRef.current?.scrollIntoView({ behavior, block: "start" });
+    });
+  }
+
   useEffect(() => {
     if (!appliedCoupon) return;
     setAppliedCoupon(null);
@@ -139,12 +148,34 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, form.date, form.time]);
 
+  useEffect(() => {
+    if (activeStep !== "contact") return;
+    const timeout = window.setTimeout(() => scrollToElement(contactSectionRef), 80);
+    return () => window.clearTimeout(timeout);
+  }, [activeStep]);
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timeout = window.setTimeout(() => scrollToElement(successSectionRef, "auto"), 80);
+    return () => window.clearTimeout(timeout);
+  }, [isSuccess]);
+
   function handleAddCurrentService(duration: number) {
     if (!activeService) return;
     const feedbackKey = `${activeService.id}-${duration}`;
     setCart((prev) => addOrIncreaseItem(prev, activeService.id, duration));
     setRecentAddKey(feedbackKey);
     window.setTimeout(() => scrollToSection(cartSectionRef), 120);
+  }
+
+  function handleGoToContactStep() {
+    setSummaryOpen(false);
+    setActiveStep("contact");
+  }
+
+  function handleBackToBuildStep() {
+    setActiveStep("build");
+    window.setTimeout(() => scrollToSection(cartSectionRef), 80);
   }
 
   function updateQuantity(serviceId: string, durationMinutes: number, nextQuantity: number) {
@@ -312,7 +343,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   if (isSuccess) {
     return (
       <main className="section-cream">
-        <section className="container-site py-20 text-center">
+        <section ref={successSectionRef} className="container-site py-20 text-center" style={{ scrollMarginTop: "7rem" }}>
           <LotusMarkSmall size={28} color="var(--color-terracotta)" />
           <h1 className="mt-4 font-serif text-h2">{vi ? "Đã nhận yêu cầu đặt lịch" : "Booking Request Received"}</h1>
           <p className="mx-auto mt-3 max-w-xl text-[var(--color-espresso-mid)]">
@@ -699,7 +730,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     )}
                     <button
                       type="button"
-                      onClick={() => setActiveStep("contact")}
+                      onClick={handleGoToContactStep}
                       className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!canGoNext}
                     >
@@ -712,7 +743,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
         ) : (
           <div className="container-site">
             <AnimatedSection animation="slide-up-fade">
-              <div className="mx-auto w-full max-w-[44rem] rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+              <div
+                ref={contactSectionRef}
+                className="mx-auto w-full max-w-[44rem] rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7"
+                style={{ scrollMarginTop: "7rem" }}
+              >
                 <StepRow
                   hasCart={hasCart}
                   isScheduleReady={isScheduleReady}
@@ -932,7 +967,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <button
                       type="button"
-                      onClick={() => setActiveStep("build")}
+                      onClick={handleBackToBuildStep}
                       className="btn btn-outline flex-1"
                     >
                       {vi ? "Quay lại" : "Back"}
