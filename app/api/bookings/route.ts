@@ -43,31 +43,40 @@ type StoredBooking = BookingPayload & {
 
 const BOOKINGS_FILE = path.join(process.cwd(), "data", "bookings.json");
 
-function getBookingDateCode(date = new Date()) {
+function getBookingDateParts(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
   }).formatToParts(date);
   const year = parts.find((part) => part.type === "year")?.value ?? "0000";
   const month = parts.find((part) => part.type === "month")?.value ?? "00";
   const day = parts.find((part) => part.type === "day")?.value ?? "00";
+  const hour = parts.find((part) => part.type === "hour")?.value ?? "00";
+  const minute = parts.find((part) => part.type === "minute")?.value ?? "00";
+  const second = parts.find((part) => part.type === "second")?.value ?? "00";
 
-  return `${year}${month}${day}`;
+  return {
+    dateCode: `${year}${month}${day}`,
+    timeCode: `${hour}${minute}${second}`,
+  };
 }
 
-function createBookingId(bookings: StoredBooking[], date = new Date()) {
-  const dateCode = getBookingDateCode(date);
-  const prefix = `SRN-${dateCode}-`;
-  const nextSequence =
-    bookings.reduce((max, booking) => {
-      if (!booking.id.startsWith(prefix)) return max;
-      const sequence = Number(booking.id.slice(prefix.length));
-      return Number.isFinite(sequence) ? Math.max(max, sequence) : max;
-    }, 0) + 1;
+function createBookingId(date = new Date()) {
+  const { dateCode, timeCode } = getBookingDateParts(date);
+  const millisecondCode = String(date.getMilliseconds()).padStart(3, "0");
+  return `SRN-${dateCode}-${timeCode}-${millisecondCode}`;
+}
 
-  return `${prefix}${String(nextSequence).padStart(3, "0")}`;
+function isReadonlyFilesystemError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const code = "code" in error ? error.code : undefined;
+  return code === "EROFS" || code === "EPERM";
 }
 
 async function readBookings(): Promise<StoredBooking[]> {
@@ -102,14 +111,33 @@ export async function POST(req: Request) {
     const createdAt = new Date();
     const record: StoredBooking = {
       ...payload,
-      id: createBookingId(bookings, createdAt),
+      id: createBookingId(createdAt),
       createdAt: createdAt.toISOString(),
     };
-    bookings.unshift(record);
-    await writeBookings(bookings);
+    const nextBookings = [record, ...bookings];
+    let persistedToFile = false;
 
     try {
-      const emailResult = await sendBookingEmails(record);
+      await writeBookings(nextBookings);
+      persistedToFile = true;
+    } catch (error) {
+      if (isReadonlyFilesystemError(error)) {
+        console.warn(`[booking-storage] Skipped file write for ${record.id}: read-only filesystem`);
+      } else {
+        throw error;
+      }
+    }
+
+    let emailResult:
+      | {
+          skipped: boolean;
+          customerSent: boolean;
+          internalSent: boolean;
+          reason?: string;
+        }
+      | null = null;
+    try {
+      emailResult = await sendBookingEmails(record);
       if (emailResult.skipped) {
         console.warn(`[booking-email] Skipped for ${record.id}: ${emailResult.reason}`);
       } else if (!emailResult.customerSent || !emailResult.internalSent) {
@@ -119,6 +147,16 @@ export async function POST(req: Request) {
       }
     } catch (error) {
       console.error(`[booking-email] Unexpected failure for ${record.id}`, error);
+    }
+
+    if (
+      !persistedToFile &&
+      (!emailResult || emailResult.skipped || (!emailResult.customerSent && !emailResult.internalSent))
+    ) {
+      return NextResponse.json(
+        { ok: false, error: "Booking could not be persisted or emailed" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ ok: true, id: record.id });
