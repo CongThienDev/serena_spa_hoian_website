@@ -97,22 +97,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     (sum, item) => sum + item.durationMinutes * item.quantity,
     0,
   );
-  const hasNinetyMinuteBenefit = selectedItems.some((item) => item.durationMinutes >= 90);
   const hasPackageBenefit = selectedItems.some((item) => isPackageService(item.service.categoryId));
-  const hasAnyBenefitEligible = hasNinetyMinuteBenefit || hasPackageBenefit;
+  const hasAnyBenefitEligible = hasPackageBenefit;
   const benefitText = vi
-    ? [
-        hasNinetyMinuteBenefit ? "Free Pick Up (dịch vụ từ 90 phút)" : null,
-        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / khách (dịch vụ package)" : null,
-      ]
-        .filter(Boolean)
-        .join(" · ")
-    : [
-        hasNinetyMinuteBenefit ? "Free Pick Up (services from 90 minutes)" : null,
-        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / guest (package services)" : null,
-      ]
-        .filter(Boolean)
-        .join(" · ");
+    ? "Free Pick Up (7km) + Healthy juice and Yogurt Granola snack / guest (package services)"
+    : "Free Pick Up (7km) + Healthy juice and Yogurt Granola snack / guest (package services)";
 
   const totalAfterCoupon = Math.max(0, totalVND - (appliedCoupon?.discountVND ?? 0));
   const hasCart = selectedItems.length > 0;
