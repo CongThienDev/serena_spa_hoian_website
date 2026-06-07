@@ -10,31 +10,33 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3",
+    "@sanity/client": "^6",
+    "@sanity/image-url": "^1",
+    "clsx": "^2",
+    "date-fns": "^4",
+    "framer-motion": "^12",
     "next": "16.2.6",
+    "nodemailer": "^8.0.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "framer-motion": "^12",
     "react-hook-form": "^7",
-    "@hookform/resolvers": "^3",
-    "zod": "^3",
-    "clsx": "^2",
-    "tailwind-merge": "^2",
     "resend": "^4",
-    "date-fns": "^4",
-    "@sanity/client": "^6",
-    "@sanity/image-url": "^1"
+    "tailwind-merge": "^2",
+    "zod": "^3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "sharp": "^0.33",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "sharp": "^0.33"
+    "typescript": "^5"
   },
   "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"
 }

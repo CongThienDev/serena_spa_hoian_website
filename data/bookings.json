@@ -3,6 +3,70 @@
     "locale": "en",
     "customer": {
       "name": "Tran Y",
+      "phone": "45678",
+      "email": "thiennle744@gmai.com",
+      "pickupLocation": "",
+      "note": ""
+    },
+    "schedule": {
+      "date": "2026-06-07",
+      "time": "09:00"
+    },
+    "items": [
+      {
+        "serviceId": "back-neck-head-shoulder",
+        "serviceName": "Back Neck Head Shoulder",
+        "durationMinutes": 60,
+        "quantity": 1,
+        "unitPriceVND": 320000,
+        "lineTotalVND": 320000
+      }
+    ],
+    "totals": {
+      "totalVND": 320000,
+      "totalAfterCouponVND": 320000,
+      "totalDurationMinutes": 60
+    },
+    "coupon": null,
+    "id": "bk_1780830134083_9ixlr7",
+    "createdAt": "2026-06-07T11:02:14.083Z"
+  },
+  {
+    "locale": "en",
+    "customer": {
+      "name": "Tran Y",
+      "phone": "087654671",
+      "email": "thiennle744@gmai.com",
+      "pickupLocation": "Nhà của Thiên",
+      "note": ""
+    },
+    "schedule": {
+      "date": "2026-06-07",
+      "time": "09:00"
+    },
+    "items": [
+      {
+        "serviceId": "foot-reflexology",
+        "serviceName": "Foot Reflexology",
+        "durationMinutes": 30,
+        "quantity": 1,
+        "unitPriceVND": 250000,
+        "lineTotalVND": 250000
+      }
+    ],
+    "totals": {
+      "totalVND": 250000,
+      "totalAfterCouponVND": 250000,
+      "totalDurationMinutes": 30
+    },
+    "coupon": null,
+    "id": "bk_1780829771080_2nbsx7",
+    "createdAt": "2026-06-07T10:56:11.080Z"
+  },
+  {
+    "locale": "en",
+    "customer": {
+      "name": "Tran Y",
       "phone": "001010010101",
       "email": "thiennle744@gmail.com",
       "pickupLocation": "BS",

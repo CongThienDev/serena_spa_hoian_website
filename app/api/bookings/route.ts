@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { sendBookingEmails } from "@/lib/booking-email";
 
 type BookingPayload = {
   locale: "vi" | "en";
@@ -79,9 +80,21 @@ export async function POST(req: Request) {
     bookings.unshift(record);
     await writeBookings(bookings);
 
+    try {
+      const emailResult = await sendBookingEmails(record);
+      if (emailResult.skipped) {
+        console.warn(`[booking-email] Skipped for ${record.id}: ${emailResult.reason}`);
+      } else if (!emailResult.customerSent || !emailResult.internalSent) {
+        console.error(
+          `[booking-email] Partial failure for ${record.id}: customerSent=${emailResult.customerSent}, internalSent=${emailResult.internalSent}`,
+        );
+      }
+    } catch (error) {
+      console.error(`[booking-email] Unexpected failure for ${record.id}`, error);
+    }
+
     return NextResponse.json({ ok: true, id: record.id });
   } catch {
     return NextResponse.json({ ok: false, error: "Failed to save booking" }, { status: 500 });
   }
 }
-
