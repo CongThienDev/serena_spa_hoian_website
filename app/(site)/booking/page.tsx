@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
@@ -71,6 +71,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const durationSectionRef = useRef<HTMLDivElement | null>(null);
+  const cartSectionRef = useRef<HTMLDivElement | null>(null);
 
   const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
@@ -119,6 +121,13 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const tomorrowISO = getLocalDateISO(1);
   const weekendISO = getNextWeekendISO();
 
+  function scrollToSection(sectionRef: { current: HTMLDivElement | null }) {
+    if (!sectionRef.current) return;
+    window.requestAnimationFrame(() => {
+      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   useEffect(() => {
     if (!appliedCoupon) return;
     setAppliedCoupon(null);
@@ -135,6 +144,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     const feedbackKey = `${activeService.id}-${duration}`;
     setCart((prev) => addOrIncreaseItem(prev, activeService.id, duration));
     setRecentAddKey(feedbackKey);
+    window.setTimeout(() => scrollToSection(cartSectionRef), 120);
   }
 
   function updateQuantity(serviceId: string, durationMinutes: number, nextQuantity: number) {
@@ -387,6 +397,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       onClick={() => {
                         setActiveServiceId(service.id);
                         setRecentAddKey(null);
+                        window.setTimeout(() => scrollToSection(durationSectionRef), 120);
                       }}
                       className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition"
                       style={{
@@ -405,7 +416,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                 </div>
 
                 {activeService && (
-                  <div className="mt-6 border-t border-[var(--color-sand)] pt-5">
+                  <div
+                    ref={durationSectionRef}
+                    className="mt-6 border-t border-[var(--color-sand)] pt-5"
+                    style={{ scrollMarginTop: "7rem" }}
+                  >
                     <p className="font-serif text-lg text-[var(--color-espresso)]">{activeService.name}</p>
                     <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{activeService.tagline}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -451,7 +466,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
             </AnimatedSection>
 
             <AnimatedSection animation="slide-up-fade" delay={0.08}>
-              <div className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+              <div
+                ref={cartSectionRef}
+                className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7"
+                style={{ scrollMarginTop: "7rem" }}
+              >
                 <div className="flex items-center justify-between gap-4">
                   <h2 className="font-serif text-h4">{vi ? "2. Giỏ hàng & lịch hẹn" : "2. Cart & Schedule"}</h2>
                   <span className="rounded-full bg-[var(--color-terracotta-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta-dark)]">
