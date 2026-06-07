@@ -481,7 +481,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           </div>
                           <div className="flex flex-col items-start justify-center gap-1 sm:items-center">
                             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                              {vi ? "Khách" : "Guests"}
+                              {getQuantityUnitLabel(item.service.id, vi)}
                             </span>
                             <div className="flex items-center gap-2">
                               <button
@@ -1034,6 +1034,14 @@ function isSave20Hour(time: string) {
 
 function isPackageService(categoryId: string) {
   return categoryId === "spa-package";
+}
+
+function getQuantityUnitLabel(serviceId: string, vi: boolean) {
+  if (serviceId === "serena-signature-3-days-long-stay-couple") {
+    return vi ? "Gói" : "Package";
+  }
+
+  return vi ? "Khách" : "Guests";
 }
 
 function getLocalDateISO(addDays: number) {

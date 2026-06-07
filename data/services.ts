@@ -179,7 +179,7 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 16,
     priceVND: 400000,
-    image: "/images/serena_image/z7863130225920_fcbb5881c13f6f51fd437554d30283e4.jpg",
+    image: "/images/serena_image/premium_photo-1661490015867-61413eaef4a5.avif",
   },
   {
     id: "coffee-sea-salt-coconut-scrub",
@@ -192,7 +192,7 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 16,
     priceVND: 400000,
-    image: "/images/serena_image/z7863130225920_fcbb5881c13f6f51fd437554d30283e4.jpg",
+    image: "/images/serena_image/dear-scrub-GEGPGa7lYMc-unsplash.jpg",
   },
   {
     id: "serena-healthy-treatment-himalaya-salt-stone",
