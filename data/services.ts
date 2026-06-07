@@ -205,7 +205,7 @@ export const SERVICES: Service[] = [
     duration: [60, 90],
     price: 28,
     priceVND: 700000,
-    image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
+    image: "/images/serena_image/Himalayan-Salt-Massage-Hero-800x1000.jpg",
     isSignature: true,
     isFeatured: true,
   },
@@ -220,7 +220,7 @@ export const SERVICES: Service[] = [
     duration: [90],
     price: 36,
     priceVND: 900000,
-    image: "/images/serena_image/z7863130373074_bd43471af11ebd6a27da4edc71b541b6.jpg",
+    image: "/images/serena_image/taylor-heery-_TyrA1RUaiI-unsplash.jpg",
   },
   {
     id: "aroma-treatment",
