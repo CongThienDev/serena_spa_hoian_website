@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
@@ -71,6 +71,10 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const durationSectionRef = useRef<HTMLDivElement | null>(null);
+  const cartSectionRef = useRef<HTMLDivElement | null>(null);
+  const contactSectionRef = useRef<HTMLDivElement | null>(null);
+  const successSectionRef = useRef<HTMLElement | null>(null);
 
   const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
@@ -97,22 +101,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     (sum, item) => sum + item.durationMinutes * item.quantity,
     0,
   );
-  const hasNinetyMinuteBenefit = selectedItems.some((item) => item.durationMinutes >= 90);
   const hasPackageBenefit = selectedItems.some((item) => isPackageService(item.service.categoryId));
-  const hasAnyBenefitEligible = hasNinetyMinuteBenefit || hasPackageBenefit;
+  const hasAnyBenefitEligible = hasPackageBenefit;
   const benefitText = vi
-    ? [
-        hasNinetyMinuteBenefit ? "Free Pick Up (dịch vụ từ 90 phút)" : null,
-        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / khách (dịch vụ package)" : null,
-      ]
-        .filter(Boolean)
-        .join(" · ")
-    : [
-        hasNinetyMinuteBenefit ? "Free Pick Up (services from 90 minutes)" : null,
-        hasPackageBenefit ? "Free Pick Up + Healthy juice and Yogurt Granola snack / guest (package services)" : null,
-      ]
-        .filter(Boolean)
-        .join(" · ");
+    ? "Free Pick Up (7km) + Healthy juice and Yogurt Granola snack / guest (package services)"
+    : "Free Pick Up (7km) + Healthy juice and Yogurt Granola snack / guest (package services)";
 
   const totalAfterCoupon = Math.max(0, totalVND - (appliedCoupon?.discountVND ?? 0));
   const hasCart = selectedItems.length > 0;
@@ -130,6 +123,20 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const tomorrowISO = getLocalDateISO(1);
   const weekendISO = getNextWeekendISO();
 
+  function scrollToSection(sectionRef: { current: HTMLDivElement | null }) {
+    if (!sectionRef.current) return;
+    window.requestAnimationFrame(() => {
+      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function scrollToElement(elementRef: { current: HTMLElement | null }, behavior: ScrollBehavior = "smooth") {
+    if (!elementRef.current) return;
+    window.requestAnimationFrame(() => {
+      elementRef.current?.scrollIntoView({ behavior, block: "start" });
+    });
+  }
+
   useEffect(() => {
     if (!appliedCoupon) return;
     setAppliedCoupon(null);
@@ -141,11 +148,34 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, form.date, form.time]);
 
+  useEffect(() => {
+    if (activeStep !== "contact") return;
+    const timeout = window.setTimeout(() => scrollToElement(contactSectionRef), 80);
+    return () => window.clearTimeout(timeout);
+  }, [activeStep]);
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timeout = window.setTimeout(() => scrollToElement(successSectionRef, "auto"), 80);
+    return () => window.clearTimeout(timeout);
+  }, [isSuccess]);
+
   function handleAddCurrentService(duration: number) {
     if (!activeService) return;
     const feedbackKey = `${activeService.id}-${duration}`;
     setCart((prev) => addOrIncreaseItem(prev, activeService.id, duration));
     setRecentAddKey(feedbackKey);
+    window.setTimeout(() => scrollToSection(cartSectionRef), 120);
+  }
+
+  function handleGoToContactStep() {
+    setSummaryOpen(false);
+    setActiveStep("contact");
+  }
+
+  function handleBackToBuildStep() {
+    setActiveStep("build");
+    window.setTimeout(() => scrollToSection(cartSectionRef), 80);
   }
 
   function updateQuantity(serviceId: string, durationMinutes: number, nextQuantity: number) {
@@ -313,7 +343,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   if (isSuccess) {
     return (
       <main className="section-cream">
-        <section className="container-site py-20 text-center">
+        <section ref={successSectionRef} className="container-site py-20 text-center" style={{ scrollMarginTop: "7rem" }}>
           <LotusMarkSmall size={28} color="var(--color-terracotta)" />
           <h1 className="mt-4 font-serif text-h2">{vi ? "Đã nhận yêu cầu đặt lịch" : "Booking Request Received"}</h1>
           <p className="mx-auto mt-3 max-w-xl text-[var(--color-espresso-mid)]">
@@ -398,6 +428,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       onClick={() => {
                         setActiveServiceId(service.id);
                         setRecentAddKey(null);
+                        window.setTimeout(() => scrollToSection(durationSectionRef), 120);
                       }}
                       className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition"
                       style={{
@@ -416,13 +447,30 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                 </div>
 
                 {activeService && (
-                  <div className="mt-6 border-t border-[var(--color-sand)] pt-5">
+                  <div
+                    ref={durationSectionRef}
+                    className="mt-6 border-t border-[var(--color-sand)] pt-5"
+                    style={{ scrollMarginTop: "7rem" }}
+                  >
                     <p className="font-serif text-lg text-[var(--color-espresso)]">{activeService.name}</p>
                     <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{activeService.tagline}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {activeService.duration.map((duration) => {
                         const key = `${activeService.id}-${duration}`;
                         const isAdded = recentAddKey === key;
+                        const isLongStayPackage =
+                          activeService.id === "serena-signature-3-days-long-stay-couple";
+                        const actionLabel = isLongStayPackage
+                          ? vi
+                            ? `Thêm ${duration} phút/liệu trình/ngày`
+                            : `Add ${duration} mins/treatment/day`
+                          : isAdded
+                            ? vi
+                              ? `Đã thêm ${duration} phút`
+                              : `Added ${duration} min`
+                            : vi
+                              ? `Thêm ${duration} phút`
+                              : `Add ${duration} min`;
                         return (
                           <button
                             key={key}
@@ -435,7 +483,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                               color: isAdded ? "white" : undefined,
                             }}
                           >
-                            {isAdded ? (vi ? `Đã thêm ${duration} phút` : `Added ${duration} min`) : (vi ? `Thêm ${duration} phút` : `Add ${duration} min`)}
+                            {actionLabel}
                           </button>
                         );
                       })}
@@ -449,7 +497,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
             </AnimatedSection>
 
             <AnimatedSection animation="slide-up-fade" delay={0.08}>
-              <div className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+              <div
+                ref={cartSectionRef}
+                className="rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7"
+                style={{ scrollMarginTop: "7rem" }}
+              >
                 <div className="flex items-center justify-between gap-4">
                   <h2 className="font-serif text-h4">{vi ? "2. Giỏ hàng & lịch hẹn" : "2. Cart & Schedule"}</h2>
                   <span className="rounded-full bg-[var(--color-terracotta-muted)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-terracotta-dark)]">
@@ -481,7 +533,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           </div>
                           <div className="flex flex-col items-start justify-center gap-1 sm:items-center">
                             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                              {vi ? "Khách" : "Guests"}
+                              {getQuantityUnitLabel(item.service.id, vi)}
                             </span>
                             <div className="flex items-center gap-2">
                               <button
@@ -678,7 +730,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     )}
                     <button
                       type="button"
-                      onClick={() => setActiveStep("contact")}
+                      onClick={handleGoToContactStep}
                       className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!canGoNext}
                     >
@@ -691,7 +743,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
         ) : (
           <div className="container-site">
             <AnimatedSection animation="slide-up-fade">
-              <div className="mx-auto w-full max-w-[44rem] rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7">
+              <div
+                ref={contactSectionRef}
+                className="mx-auto w-full max-w-[44rem] rounded-[var(--radius-card)] border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-5 md:p-7"
+                style={{ scrollMarginTop: "7rem" }}
+              >
                 <StepRow
                   hasCart={hasCart}
                   isScheduleReady={isScheduleReady}
@@ -911,7 +967,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <button
                       type="button"
-                      onClick={() => setActiveStep("build")}
+                      onClick={handleBackToBuildStep}
                       className="btn btn-outline flex-1"
                     >
                       {vi ? "Quay lại" : "Back"}
@@ -1034,6 +1090,14 @@ function isSave20Hour(time: string) {
 
 function isPackageService(categoryId: string) {
   return categoryId === "spa-package";
+}
+
+function getQuantityUnitLabel(serviceId: string, vi: boolean) {
+  if (serviceId === "serena-signature-3-days-long-stay-couple") {
+    return vi ? "Gói" : "Package";
+  }
+
+  return vi ? "Khách" : "Guests";
 }
 
 function getLocalDateISO(addDays: number) {

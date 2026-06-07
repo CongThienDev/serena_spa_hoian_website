@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { sendBookingEmails } from "@/lib/booking-email";
 
 type BookingPayload = {
   locale: "vi" | "en";
@@ -42,6 +43,33 @@ type StoredBooking = BookingPayload & {
 
 const BOOKINGS_FILE = path.join(process.cwd(), "data", "bookings.json");
 
+function getBookingDateCode(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value ?? "0000";
+  const month = parts.find((part) => part.type === "month")?.value ?? "00";
+  const day = parts.find((part) => part.type === "day")?.value ?? "00";
+
+  return `${year}${month}${day}`;
+}
+
+function createBookingId(bookings: StoredBooking[], date = new Date()) {
+  const dateCode = getBookingDateCode(date);
+  const prefix = `SRN-${dateCode}-`;
+  const nextSequence =
+    bookings.reduce((max, booking) => {
+      if (!booking.id.startsWith(prefix)) return max;
+      const sequence = Number(booking.id.slice(prefix.length));
+      return Number.isFinite(sequence) ? Math.max(max, sequence) : max;
+    }, 0) + 1;
+
+  return `${prefix}${String(nextSequence).padStart(3, "0")}`;
+}
+
 async function readBookings(): Promise<StoredBooking[]> {
   try {
     const raw = await fs.readFile(BOOKINGS_FILE, "utf8");
@@ -71,17 +99,30 @@ export async function POST(req: Request) {
     }
 
     const bookings = await readBookings();
+    const createdAt = new Date();
     const record: StoredBooking = {
       ...payload,
-      id: `bk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      createdAt: new Date().toISOString(),
+      id: createBookingId(bookings, createdAt),
+      createdAt: createdAt.toISOString(),
     };
     bookings.unshift(record);
     await writeBookings(bookings);
+
+    try {
+      const emailResult = await sendBookingEmails(record);
+      if (emailResult.skipped) {
+        console.warn(`[booking-email] Skipped for ${record.id}: ${emailResult.reason}`);
+      } else if (!emailResult.customerSent || !emailResult.internalSent) {
+        console.error(
+          `[booking-email] Partial failure for ${record.id}: customerSent=${emailResult.customerSent}, internalSent=${emailResult.internalSent}`,
+        );
+      }
+    } catch (error) {
+      console.error(`[booking-email] Unexpected failure for ${record.id}`, error);
+    }
 
     return NextResponse.json({ ok: true, id: record.id });
   } catch {
     return NextResponse.json({ ok: false, error: "Failed to save booking" }, { status: 500 });
   }
 }
-
