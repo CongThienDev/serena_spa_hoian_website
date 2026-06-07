@@ -423,6 +423,19 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       {activeService.duration.map((duration) => {
                         const key = `${activeService.id}-${duration}`;
                         const isAdded = recentAddKey === key;
+                        const isLongStayPackage =
+                          activeService.id === "serena-signature-3-days-long-stay-couple";
+                        const actionLabel = isLongStayPackage
+                          ? vi
+                            ? `Thêm ${duration} phút/liệu trình/ngày`
+                            : `Add ${duration} mins/treatment/day`
+                          : isAdded
+                            ? vi
+                              ? `Đã thêm ${duration} phút`
+                              : `Added ${duration} min`
+                            : vi
+                              ? `Thêm ${duration} phút`
+                              : `Add ${duration} min`;
                         return (
                           <button
                             key={key}
@@ -435,7 +448,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                               color: isAdded ? "white" : undefined,
                             }}
                           >
-                            {isAdded ? (vi ? `Đã thêm ${duration} phút` : `Added ${duration} min`) : (vi ? `Thêm ${duration} phút` : `Add ${duration} min`)}
+                            {actionLabel}
                           </button>
                         );
                       })}
