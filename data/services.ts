@@ -233,7 +233,7 @@ export const SERVICES: Service[] = [
     duration: [90],
     price: 36,
     priceVND: 900000,
-    image: "/images/serena_image/z7863130203764_6bc950cfa0128b88f9da0f0e14fc8264.jpg",
+    image: "/images/serena_image/premium_photo-1723795304943-9477dd459db6.avif",
   },
   {
     id: "serena-renewal-body-ritual-package",
