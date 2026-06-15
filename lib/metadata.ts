@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl } from "./utils";
-import { type Locale } from "./i18n";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./i18n";
 
 type PageMetadataOptions = {
   title: string;
@@ -10,7 +10,27 @@ type PageMetadataOptions = {
   noIndex?: boolean;
   keywords?: string[];
   locale?: Locale;
+  imageAlt?: string;
 };
+
+export function getLocalizedMetadataUrls(path: string, locale: Locale) {
+  const normalizedPath = path === "/" ? "" : path;
+  const canonical = absoluteUrl(`/${locale}${normalizedPath}`);
+  const languages = Object.fromEntries(
+    SUPPORTED_LOCALES.map((supportedLocale) => [
+      supportedLocale,
+      absoluteUrl(`/${supportedLocale}${normalizedPath}`),
+    ]),
+  ) as Record<Locale, string>;
+
+  return {
+    canonical,
+    languages: {
+      ...languages,
+      "x-default": languages[DEFAULT_LOCALE],
+    },
+  };
+}
 
 /**
  * Generate consistent metadata for each page.
@@ -27,12 +47,10 @@ export function generatePageMetadata({
   ogImage = "/images/branding/og-default.jpg",
   noIndex = false,
   keywords = [],
-  locale = "vi",
+  locale = DEFAULT_LOCALE,
+  imageAlt = title,
 }: PageMetadataOptions): Metadata {
-  const normalizedPath = path === "/" ? "" : path;
-  const url = absoluteUrl(`/${locale}${normalizedPath}`);
-  const viUrl = absoluteUrl(`/vi${normalizedPath}`);
-  const enUrl = absoluteUrl(`/en${normalizedPath}`);
+  const { canonical: url, languages } = getLocalizedMetadataUrls(path, locale);
 
   return {
     title,
@@ -45,11 +63,7 @@ export function generatePageMetadata({
     ],
     alternates: {
       canonical: url,
-      languages: {
-        vi: viUrl,
-        en: enUrl,
-        "x-default": viUrl,
-      },
+      languages,
     },
     openGraph: {
       title,
@@ -62,7 +76,7 @@ export function generatePageMetadata({
           url: absoluteUrl(ogImage),
           width: 1200,
           height: 630,
-          alt: title,
+          alt: imageAlt,
         },
       ],
     },
