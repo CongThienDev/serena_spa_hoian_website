@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     languages: {
       vi: "/vi",
       en: "/en",
-      "x-default": "/vi",
+      "x-default": "/en",
     },
   },
 };

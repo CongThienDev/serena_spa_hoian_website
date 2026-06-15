@@ -12,6 +12,7 @@ import {
   getServicesByCategoryLocalized,
   getServiceCategories,
 } from "@/data/services";
+import { generatePageMetadata } from "@/lib/metadata";
 import { type Locale, withLocalePath } from "@/lib/i18n";
 
 /* ─── Static params ─────────────────────────────────────────────────────── */
@@ -24,44 +25,26 @@ export function generateStaticParams() {
 
 type Props = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const service = getServiceBySlugLocalized(slug, "en");
+export function buildServiceMetadata(slug: string, locale: Locale = "en"): Metadata {
+  const service = getServiceBySlugLocalized(slug, locale);
   if (!service) return {};
 
-  const title =
-    service.seoTitle ?? `${service.name} — Serena Spa Hội An`;
-  const description =
-    service.seoDescription ??
-    `${service.description.slice(0, 155)}…`;
+  const title = service.seoTitle ?? `${service.name} — Serena Spa Hội An`;
+  const description = service.seoDescription ?? `${service.description.slice(0, 155)}…`;
 
-  return {
+  return generatePageMetadata({
     title,
     description,
-    alternates: {
-      canonical: `https://serenaretreat.com/services/${slug}`,
-    },
-    openGraph: {
-      title,
-      description,
-      url: `https://serenaretreat.com/services/${slug}`,
-      type: "website",
-      images: [
-        {
-          url: `https://serenaretreat.com${service.image}`,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [`https://serenaretreat.com${service.image}`],
-    },
-  };
+    path: `/services/${slug}`,
+    locale,
+    ogImage: service.image,
+    imageAlt: title,
+  });
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  return buildServiceMetadata(slug, "en");
 }
 
 /* ─── Page ──────────────────────────────────────────────────────────────── */
