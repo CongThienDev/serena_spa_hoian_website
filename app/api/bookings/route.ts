@@ -30,9 +30,8 @@ type BookingPayload = {
     totalDurationMinutes: number;
   };
   coupon?: {
-    code: "SAVE20" | "EXTRA30";
+    code: "SAVE35" | "BUY2PAY1";
     discountVND: number;
-    extraMinutes: number;
   } | null;
 };
 
@@ -42,6 +41,8 @@ type StoredBooking = BookingPayload & {
 };
 
 const BOOKINGS_FILE = path.join(process.cwd(), "data", "bookings.json");
+const GRAND_OPENING_START = "2026-06-15";
+const GRAND_OPENING_END = "2026-07-15";
 
 function getBookingDateParts(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -94,6 +95,29 @@ async function writeBookings(bookings: StoredBooking[]) {
   await fs.writeFile(BOOKINGS_FILE, JSON.stringify(bookings, null, 2), "utf8");
 }
 
+function isWithinCampaignDate(dateISO: string) {
+  return dateISO >= GRAND_OPENING_START && dateISO <= GRAND_OPENING_END;
+}
+
+function isCouponHour(time: string) {
+  const [hourStr] = time.split(":");
+  const hour = Number(hourStr);
+  if (Number.isNaN(hour)) return false;
+  return hour >= 10 && hour <= 19;
+}
+
+function computeCouponDiscount(items: BookingPayload["items"], code: "SAVE35" | "BUY2PAY1") {
+  if (code === "SAVE35") {
+    const totalVND = items.reduce((sum, item) => sum + item.unitPriceVND * item.quantity, 0);
+    return Math.round(totalVND * 0.35);
+  }
+
+  return items.reduce((sum, item) => {
+    if (item.durationMinutes < 90) return sum;
+    return sum + Math.floor(item.quantity / 2) * item.unitPriceVND;
+  }, 0);
+}
+
 export async function POST(req: Request) {
   try {
     const payload = (await req.json()) as BookingPayload;
@@ -107,10 +131,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Booking cart is empty" }, { status: 400 });
     }
 
+    const totalVND = payload.items.reduce((sum, item) => sum + item.unitPriceVND * item.quantity, 0);
+    const totalDurationMinutes = payload.items.reduce(
+      (sum, item) => sum + item.durationMinutes * item.quantity,
+      0,
+    );
+
+    let coupon: BookingPayload["coupon"] = null;
+    if (payload.coupon) {
+      if (!isWithinCampaignDate(payload.schedule.date)) {
+        return NextResponse.json({ ok: false, error: "Coupon is outside the campaign date range" }, { status: 400 });
+      }
+      if (!isCouponHour(payload.schedule.time)) {
+        return NextResponse.json({ ok: false, error: "Coupon is outside the valid time range" }, { status: 400 });
+      }
+
+      const discountVND = computeCouponDiscount(payload.items, payload.coupon.code);
+      if (discountVND <= 0) {
+        return NextResponse.json({ ok: false, error: "Coupon conditions are not met" }, { status: 400 });
+      }
+
+      coupon = {
+        code: payload.coupon.code,
+        discountVND,
+      };
+    }
+
+    const normalizedPayload: BookingPayload = {
+      ...payload,
+      totals: {
+        totalVND,
+        totalAfterCouponVND: Math.max(0, totalVND - (coupon?.discountVND ?? 0)),
+        totalDurationMinutes,
+      },
+      coupon,
+    };
+
     const bookings = await readBookings();
     const createdAt = new Date();
     const record: StoredBooking = {
-      ...payload,
+      ...normalizedPayload,
       id: createBookingId(createdAt),
       createdAt: createdAt.toISOString(),
     };

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { generatePageMetadata, getLocalBusinessSchema } from "@/lib/metadata";
 import HeroSection from "@/components/sections/HeroSection";
 import FeatureStrip from "@/components/sections/FeatureStrip";
+import PromotionSpotlight from "@/components/sections/PromotionSpotlight";
 import SignatureTreatments from "@/components/sections/SignatureTreatments";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
 import GalleryPreview from "@/components/sections/GalleryPreview";
@@ -33,6 +34,9 @@ export default function HomePage() {
 
       {/* ── Feature strip ─── 4 wellness pillars, rounded top, white bg */}
       <FeatureStrip />
+
+      {/* ── Promotion spotlight ─── grand opening poster + booking CTA */}
+      <PromotionSpotlight />
 
       {/* ── Signature Treatments ─── service cards grid + dark booking card */}
       <SignatureTreatments />

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { generatePageMetadata } from "@/lib/metadata";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import PromotionSpotlight from "@/components/sections/PromotionSpotlight";
 import { type Locale, withLocalePath } from "@/lib/i18n";
 
 export const metadata: Metadata = generatePageMetadata({
@@ -67,6 +68,8 @@ export default function AboutPage({ locale = "en" }: { locale?: Locale }) {
           </AnimatedSection>
         </div>
       </section>
+
+      <PromotionSpotlight locale={locale} />
 
       <section className="section-padding" style={{ backgroundColor: "var(--color-section-warm)" }}>
         <div className="container-site">
