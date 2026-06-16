@@ -24,22 +24,21 @@ type ContactForm = {
   note: string;
 };
 
-type CouponCode = "SAVE20" | "EXTRA30";
+type CouponCode = "SAVE35" | "BUY2PAY1";
 
 type AppliedCoupon = {
   code: CouponCode;
   discountVND: number;
-  extraMinutes: number;
   message: string;
 };
 
 const TIME_GROUPS = [
   { label: "Morning", slots: ["09:00", "10:00", "11:00"] },
-  { label: "Afternoon", slots: ["14:00", "15:00", "16:00", "17:00", "18:00"] },
+  { label: "Afternoon", slots: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00"] },
 ] as const;
 
 const GRAND_OPENING_START = "2026-06-15";
-const GRAND_OPENING_END = "2026-08-15";
+const GRAND_OPENING_END = "2026-07-15";
 
 export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const vi = locale === "vi";
@@ -71,10 +70,12 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [pendingCouponApply, setPendingCouponApply] = useState(false);
   const durationSectionRef = useRef<HTMLDivElement | null>(null);
   const cartSectionRef = useRef<HTMLDivElement | null>(null);
   const contactSectionRef = useRef<HTMLDivElement | null>(null);
   const successSectionRef = useRef<HTMLElement | null>(null);
+  const couponSectionRef = useRef<HTMLDivElement | null>(null);
 
   const activeService = SERVICES.find((service) => service.id === activeServiceId) ?? SERVICES[0];
 
@@ -160,6 +161,15 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     return () => window.clearTimeout(timeout);
   }, [isSuccess]);
 
+  useEffect(() => {
+    if (!pendingCouponApply || !form.date || !form.time) return;
+    const timeout = window.setTimeout(() => {
+      couponSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      handleApplyCoupon(true);
+    }, 120);
+    return () => window.clearTimeout(timeout);
+  }, [pendingCouponApply, form.date, form.time]);
+
   function handleAddCurrentService(duration: number) {
     if (!activeService) return;
     const feedbackKey = `${activeService.id}-${duration}`;
@@ -193,27 +203,46 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
     );
   }
 
-  function handleApplyCoupon() {
+  function handleApplyCoupon(forceRetry = false) {
     const normalized = couponInput.trim().toUpperCase();
     if (!normalized) {
+      setPendingCouponApply(false);
       setCouponError(vi ? "Vui lòng nhập mã coupon." : "Please enter a coupon code.");
       setAppliedCoupon(null);
       return;
     }
 
-    if (normalized !== "SAVE20" && normalized !== "EXTRA30") {
+    if (normalized !== "SAVE35" && normalized !== "BUY2PAY1") {
+      setPendingCouponApply(false);
       setCouponError(vi ? "Mã coupon không hợp lệ." : "Invalid coupon code.");
       setAppliedCoupon(null);
       return;
     }
 
     if (!hasCart) {
+      setPendingCouponApply(false);
       setCouponError(vi ? "Hãy thêm dịch vụ vào giỏ trước khi áp mã." : "Add services to cart before applying a coupon.");
       setAppliedCoupon(null);
       return;
     }
 
-    if (!form.date || !isWithinCampaignDate(form.date)) {
+    if (!form.date || !form.time) {
+      setPendingCouponApply(true);
+      setCouponError(
+        vi
+          ? "Vui lòng chọn ngày và giờ trước khi áp mã coupon."
+          : "Please select your date and time before applying a coupon.",
+      );
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (forceRetry || pendingCouponApply) {
+      setPendingCouponApply(false);
+    }
+
+    if (!isWithinCampaignDate(form.date)) {
+      setPendingCouponApply(false);
       setCouponError(
         vi
           ? `Coupon chỉ áp dụng từ ${GRAND_OPENING_START} đến ${GRAND_OPENING_END}.`
@@ -223,55 +252,64 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
       return;
     }
 
-    if (normalized === "SAVE20") {
-      if (!form.time) {
-        setCouponError(vi ? "Vui lòng chọn giờ để áp mã SAVE20." : "Please select a time to apply SAVE20.");
-        setAppliedCoupon(null);
-        return;
-      }
-      if (!isSave20Hour(form.time)) {
-        setCouponError(vi ? "SAVE20 chỉ áp dụng từ 10:00 đến 19:00." : "SAVE20 works only from 10:00 to 19:00.");
-        setAppliedCoupon(null);
-        return;
-      }
-
-      const discountVND = Math.round(totalVND * 0.2);
-      setAppliedCoupon({
-        code: "SAVE20",
-        discountVND,
-        extraMinutes: 0,
-        message: vi
-          ? `You got giảm 20%: -${discountVND.toLocaleString("vi-VN")} VND`
-          : `You got 20% OFF: -${discountVND.toLocaleString("vi-VN")} VND`,
-      });
-      setCouponError(null);
-      return;
-    }
-
-    const eligibleSixtySessions = selectedItems.reduce((sum, item) => {
-      if (item.durationMinutes === 60) return sum + item.quantity;
-      return sum;
-    }, 0);
-
-    if (eligibleSixtySessions <= 0) {
+    if (!isCouponHour(form.time)) {
+      setPendingCouponApply(false);
       setCouponError(
         vi
-          ? "EXTRA30 cần ít nhất 1 dịch vụ 60 phút trong giỏ."
-          : "EXTRA30 requires at least one 60-minute service in your cart.",
+          ? `${normalized} chỉ áp dụng từ 10:00 đến 19:00.`
+          : `${normalized} works only from 10:00 to 19:00.`,
       );
       setAppliedCoupon(null);
       return;
     }
 
-    const extraMinutes = eligibleSixtySessions * 30;
+    if (normalized === "SAVE35") {
+      const discountVND = Math.round(totalVND * 0.35);
+      setAppliedCoupon({
+        code: "SAVE35",
+        discountVND,
+        message: vi
+          ? `Bạn được giảm 35%: -${discountVND.toLocaleString("vi-VN")} VND`
+          : `You got 35% OFF: -${discountVND.toLocaleString("vi-VN")} VND`,
+      });
+      setPendingCouponApply(false);
+      setCouponError(null);
+      return;
+    }
+
+    const eligibleItems = selectedItems
+      .map((item) => {
+        if (item.durationMinutes < 90) return null;
+        const freeGuests = Math.floor(item.quantity / 2);
+        if (freeGuests <= 0) return null;
+        return {
+          freeGuests,
+          discountVND: freeGuests * item.unitPrice,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    if (eligibleItems.length <= 0) {
+      setPendingCouponApply(false);
+      setCouponError(
+        vi
+          ? "BUY2PAY1 cần ít nhất 2 khách cho một dịch vụ từ 90 phút trở lên."
+          : "BUY2PAY1 requires at least 2 guests on a treatment of 90 minutes or more.",
+      );
+      setAppliedCoupon(null);
+      return;
+    }
+
+    const freeGuests = eligibleItems.reduce((sum, item) => sum + item.freeGuests, 0);
+    const discountVND = eligibleItems.reduce((sum, item) => sum + item.discountVND, 0);
     setAppliedCoupon({
-      code: "EXTRA30",
-      discountVND: 0,
-      extraMinutes,
+      code: "BUY2PAY1",
+      discountVND,
       message: vi
-        ? `You got +${extraMinutes} phút trị liệu miễn phí`
-        : `You got +${extraMinutes} extra treatment minutes`,
+        ? `BUY2PAY1: miễn phí ${freeGuests} khách, giảm ${discountVND.toLocaleString("vi-VN")} VND`
+        : `BUY2PAY1: ${freeGuests} guest free, -${discountVND.toLocaleString("vi-VN")} VND`,
     });
+    setPendingCouponApply(false);
     setCouponError(null);
   }
 
@@ -307,13 +345,12 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
         totals: {
           totalVND,
           totalAfterCouponVND: totalAfterCoupon,
-          totalDurationMinutes: totalDuration + (appliedCoupon?.extraMinutes ?? 0),
+          totalDurationMinutes: totalDuration,
         },
         coupon: appliedCoupon
           ? {
               code: appliedCoupon.code,
               discountVND: appliedCoupon.discountVND,
-              extraMinutes: appliedCoupon.extraMinutes,
             }
           : null,
       };
@@ -577,7 +614,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     </div>
 
                     <div className="mt-6 space-y-4">
-                      <div className="rounded-2xl border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-3">
+                      <div ref={couponSectionRef} className="rounded-2xl border border-[var(--color-sand)] bg-[var(--color-warm-white)] p-3">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--color-warm-gray)]">
                           {vi ? "Bạn có mã không?" : "you have a code?"}
                         </p>
@@ -592,7 +629,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                             }}
                             placeholder={vi ? "Nhập mã coupon" : "Enter coupon code"}
                           />
-                          <button type="button" onClick={handleApplyCoupon} className="btn btn-outline h-9 px-3 py-2 text-xs whitespace-nowrap">
+                          <button type="button" onClick={() => handleApplyCoupon()} className="btn btn-outline h-9 px-3 py-2 text-xs whitespace-nowrap">
                             {vi ? "Áp dụng mã" : "Apply code"}
                           </button>
                         </div>
@@ -602,11 +639,11 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         {appliedCoupon ? (
                           <div className="mt-3 rounded-xl border border-[var(--color-terracotta)] bg-[var(--color-terracotta-muted)] px-3 py-2 text-sm text-[var(--color-espresso)] animate-fade-in">
                             <strong>{appliedCoupon.message}</strong>
-                            {appliedCoupon.code === "EXTRA30" ? (
+                            {appliedCoupon.code === "BUY2PAY1" ? (
                               <p className="mt-1 text-xs text-[var(--color-espresso-mid)]">
                                 {vi
-                                  ? "Áp dụng cho các session 60 phút trong giỏ hiện tại."
-                                  : "Applied to 60-minute sessions in your current cart."}
+                                  ? "Áp dụng cho các dịch vụ từ 90 phút trở lên với mỗi cặp 2 khách miễn phí 1 khách."
+                                  : "Applied to treatments of 90 minutes or more with 1 free guest for every 2 guests."}
                               </p>
                             ) : null}
                           </div>
@@ -722,7 +759,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   )}
                 </div>
 
-                  <div className="space-y-3">
+                  <div className="mt-6 space-y-3 border-t border-[var(--color-sand)] pt-5">
                     {!canGoNext && (
                       <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
                         {vi ? "Vui lòng hoàn tất giỏ hàng, ngày và giờ để tiếp tục." : "Complete cart, date and time to continue."}
@@ -764,7 +801,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   aria-expanded={summaryOpen}
                   aria-controls="booking-summary-details"
                 >
-                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration + (appliedCoupon?.extraMinutes ?? 0)} {vi ? "phút" : "min"} · {totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
+                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration} {vi ? "phút" : "min"} · {totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
                   <span className="text-[var(--color-terracotta)]">{summaryOpen ? "▴" : "▾"}</span>
                 </button>
 
@@ -1081,7 +1118,7 @@ function isWithinCampaignDate(dateISO: string) {
   return dateISO >= GRAND_OPENING_START && dateISO <= GRAND_OPENING_END;
 }
 
-function isSave20Hour(time: string) {
+function isCouponHour(time: string) {
   const [hourStr] = time.split(":");
   const hour = Number(hourStr);
   if (Number.isNaN(hour)) return false;

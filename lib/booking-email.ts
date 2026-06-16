@@ -27,9 +27,8 @@ type BookingEmailPayload = {
     totalDurationMinutes: number;
   };
   coupon?: {
-    code: "SAVE20" | "EXTRA30";
+    code: "SAVE35" | "BUY2PAY1";
     discountVND: number;
-    extraMinutes: number;
   } | null;
   createdAt: string;
 };
@@ -84,6 +83,11 @@ function formatCurrency(amount: number) {
   return `${amount.toLocaleString("vi-VN")} VND`;
 }
 
+function formatCouponSummary(coupon: BookingEmailPayload["coupon"]) {
+  if (!coupon) return null;
+  return `${coupon.code} (-${formatCurrency(coupon.discountVND)})`;
+}
+
 const BRAND = {
   cream: "#fff5ee",
   warmWhite: "#fffaf7",
@@ -126,11 +130,7 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
   const note = payload.customer.note?.trim();
   const itemsHtml = formatItemsHtml(payload.items);
   const formattedDate = formatDate(payload.schedule.date, payload.locale);
-  const couponSummary = payload.coupon
-    ? payload.coupon.code === "SAVE20"
-      ? `${payload.coupon.code} (-${formatCurrency(payload.coupon.discountVND)})`
-      : `${payload.coupon.code} (+${payload.coupon.extraMinutes} min)`
-    : null;
+  const couponSummary = formatCouponSummary(payload.coupon);
 
   return {
     subject: vi
@@ -311,11 +311,7 @@ function buildInternalEmail(payload: BookingEmailPayload) {
   const formattedDate = formatDate(payload.schedule.date, "en");
   const pickupLocation = payload.customer.pickupLocation?.trim();
   const note = payload.customer.note?.trim();
-  const couponSummary = payload.coupon
-    ? payload.coupon.code === "SAVE20"
-      ? `${payload.coupon.code} (-${formatCurrency(payload.coupon.discountVND)})`
-      : `${payload.coupon.code} (+${payload.coupon.extraMinutes} min)`
-    : null;
+  const couponSummary = formatCouponSummary(payload.coupon);
 
   return {
     subject: `New booking from website: ${payload.customer.name} (${payload.id})`,

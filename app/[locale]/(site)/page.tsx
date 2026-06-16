@@ -1,6 +1,7 @@
 import { generateLocalizedRouteMetadata } from "@/lib/route-metadata";
 import HeroSection from "@/components/sections/HeroSection";
 import FeatureStrip from "@/components/sections/FeatureStrip";
+import PromotionSpotlight from "@/components/sections/PromotionSpotlight";
 import SignatureTreatments from "@/components/sections/SignatureTreatments";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
 import GalleryPreview from "@/components/sections/GalleryPreview";
@@ -30,6 +31,7 @@ export default async function LocalizedHomePage({
     <>
       <HeroSection locale={locale} />
       <FeatureStrip locale={locale} />
+      <PromotionSpotlight locale={locale} />
       <SignatureTreatments locale={locale} />
       <WhyChooseUs locale={locale} />
       <GalleryPreview locale={locale} />
