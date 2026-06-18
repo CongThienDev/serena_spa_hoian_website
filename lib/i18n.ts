@@ -1,8 +1,18 @@
-export const SUPPORTED_LOCALES = ["vi", "en"] as const;
+export const SUPPORTED_LOCALES = ["vi", "en", "ko"] as const;
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
+
+/**
+ * Pick a value for the active locale from a per-locale map.
+ * Requiring all locales (Record<Locale, T>) means adding a new language
+ * forces a compile error at every call site instead of silently falling
+ * back to English — no untranslated strings slip through.
+ */
+export function localize<T>(locale: Locale, variants: Record<Locale, T>): T {
+  return variants[locale] ?? variants[DEFAULT_LOCALE];
+}
 
 export function isLocale(value: string): value is Locale {
   return SUPPORTED_LOCALES.includes(value as Locale);
@@ -17,6 +27,7 @@ export function detectPreferredLocale(acceptLanguage?: string | null): Locale {
   if (!acceptLanguage) return DEFAULT_LOCALE;
   const normalized = acceptLanguage.toLowerCase();
   if (normalized.includes("vi")) return "vi";
+  if (normalized.includes("ko")) return "ko";
   return "en";
 }
 

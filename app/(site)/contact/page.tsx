@@ -6,7 +6,7 @@ import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import { CONTACT, HOURS, SOCIAL } from "@/data/site";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -19,24 +19,24 @@ type FormFields = {
 };
 
 const TREATMENT_INTERESTS = [
-  { value: "", labelEn: "Select a topic...", labelVi: "Chọn chủ đề..." },
-  { value: "general", labelEn: "General Inquiry", labelVi: "Tư vấn chung" },
-  { value: "relaxation", labelEn: "Relaxation", labelVi: "Thư giãn" },
-  { value: "body-treatment", labelEn: "Body Treatment", labelVi: "Trị liệu cơ thể" },
-  { value: "face-treatment", labelEn: "SPA - Face Treatment", labelVi: "SPA - Chăm sóc da mặt" },
-  { value: "body-care-treatment", labelEn: "SPA - Body Care Treatment", labelVi: "SPA - Chăm sóc cơ thể" },
-  { value: "serena-signature", labelEn: "Serena Signature", labelVi: "Serena đặc biệt" },
-  { value: "spa-package", labelEn: "SPA Package", labelVi: "Gói Spa" },
-  { value: "nail-care", labelEn: "Nail Care", labelVi: "Chăm sóc móng" },
-  { value: "hair-care", labelEn: "Hair Care", labelVi: "Chăm sóc tóc" },
-  { value: "occasion", labelEn: "Special Occasion", labelVi: "Dịp đặc biệt" },
+  { value: "", labelEn: "Select a topic...", labelVi: "Chọn chủ đề...", labelKo: "주제를 선택하세요..." },
+  { value: "general", labelEn: "General Inquiry", labelVi: "Tư vấn chung", labelKo: "일반 문의" },
+  { value: "relaxation", labelEn: "Relaxation", labelVi: "Thư giãn", labelKo: "릴랙세이션" },
+  { value: "body-treatment", labelEn: "Body Treatment", labelVi: "Trị liệu cơ thể", labelKo: "바디 트리트먼트" },
+  { value: "face-treatment", labelEn: "SPA - Face Treatment", labelVi: "SPA - Chăm sóc da mặt", labelKo: "스파 - 페이스 트리트먼트" },
+  { value: "body-care-treatment", labelEn: "SPA - Body Care Treatment", labelVi: "SPA - Chăm sóc cơ thể", labelKo: "스파 - 바디 케어 트리트먼트" },
+  { value: "serena-signature", labelEn: "Serena Signature", labelVi: "Serena đặc biệt", labelKo: "세레나 시그니처" },
+  { value: "spa-package", labelEn: "SPA Package", labelVi: "Gói Spa", labelKo: "스파 패키지" },
+  { value: "nail-care", labelEn: "Nail Care", labelVi: "Chăm sóc móng", labelKo: "네일 케어" },
+  { value: "hair-care", labelEn: "Hair Care", labelVi: "Chăm sóc tóc", labelKo: "헤어 케어" },
+  { value: "occasion", labelEn: "Special Occasion", labelVi: "Dịp đặc biệt", labelKo: "특별한 날" },
 ];
 
 export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
-  const vi = locale === "vi";
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
   const localizedInterests = TREATMENT_INTERESTS.map((item) => ({
     value: item.value,
-    label: vi ? item.labelVi : item.labelEn,
+    label: t({ en: item.labelEn, vi: item.labelVi, ko: item.labelKo }),
   }));
   const [formState, setFormState] = useState<FormState>("idle");
   const [fields, setFields] = useState<FormFields>({
@@ -67,13 +67,13 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
       {/* ── Page Header ─────────────────────────────────────────────────── */}
       <section
         className="section-cream section-padding text-center"
-        aria-label={vi ? "Tiêu đề trang liên hệ" : "Contact page header"}
+        aria-label={t({ en: "Contact page header", vi: "Tiêu đề trang liên hệ", ko: "문의 페이지 헤더" })}
       >
         <div className="container-content">
           <AnimatedSection animation="fade" delay={0.05}>
             <div className="flex items-center justify-center gap-2.5 mb-5">
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
-              <span className="eyebrow">{vi ? "Serena luôn sẵn sàng lắng nghe bạn" : "We'd Love to Hear From You"}</span>
+              <span className="eyebrow">{t({ en: "We'd Love to Hear From You", vi: "Serena luôn sẵn sàng lắng nghe bạn", ko: "여러분의 이야기를 듣고 싶습니다" })}</span>
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
             </div>
           </AnimatedSection>
@@ -89,7 +89,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                 letterSpacing: "-0.01em",
               }}
             >
-              {vi ? "Liên hệ Serena" : "Get in Touch"}
+              {t({ en: "Get in Touch", vi: "Liên hệ Serena", ko: "문의하기" })}
             </h1>
           </AnimatedSection>
 
@@ -110,7 +110,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-cream section-padding"
         style={{ paddingTop: "2rem" }}
-        aria-label={vi ? "Thông tin liên hệ và biểu mẫu" : "Contact information and form"}
+        aria-label={t({ en: "Contact information and form", vi: "Thông tin liên hệ và biểu mẫu", ko: "연락처 정보 및 양식" })}
       >
         <div className="container-site">
           <div
@@ -142,7 +142,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                         fontWeight: 500,
                       }}
                     >
-                      {vi ? "Thông tin của Serena" : "Our Details"}
+                      {t({ en: "Our Details", vi: "Thông tin của Serena", ko: "연락처 정보" })}
                     </h2>
                   </AnimatedSection>
 
@@ -151,10 +151,10 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                     <AnimatedSection animation="slide-up-fade" delay={0.1}>
                       <ContactInfoBlock
                         icon={<LocationIcon />}
-                        label={vi ? "Địa chỉ" : "Visit Us"}
+                        label={t({ en: "Visit Us", vi: "Địa chỉ", ko: "오시는 길" })}
                         value={CONTACT.address}
                         href={CONTACT.googleMapsUrl}
-                        linkLabel={vi ? "Xem chỉ đường" : "Get directions"}
+                        linkLabel={t({ en: "Get directions", vi: "Xem chỉ đường", ko: "길찾기" })}
                       />
                     </AnimatedSection>
 
@@ -162,7 +162,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                     <AnimatedSection animation="slide-up-fade" delay={0.15}>
                       <ContactInfoBlock
                         icon={<PhoneIcon />}
-                        label={vi ? "Điện thoại" : "Call Us"}
+                        label={t({ en: "Call Us", vi: "Điện thoại", ko: "전화" })}
                         value={CONTACT.phoneFormatted}
                         href={`tel:${CONTACT.phone}`}
                       />
@@ -182,7 +182,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                     <AnimatedSection animation="slide-up-fade" delay={0.25}>
                       <ContactInfoBlock
                         icon={<ClockIcon />}
-                        label={vi ? "Giờ mở cửa" : "Opening Hours"}
+                        label={t({ en: "Opening Hours", vi: "Giờ mở cửa", ko: "영업 시간" })}
                         value={HOURS.label}
                         subValue={`Mon – Fri: ${HOURS.weekdays}  ·  Sat – Sun: ${HOURS.weekends}`}
                       />
@@ -193,9 +193,9 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                       <ContactInfoBlock
                         icon={<WhatsAppIcon />}
                         label="WhatsApp"
-                        value={vi ? "Nhắn tin trực tiếp với Serena" : "Message us directly"}
+                        value={t({ en: "Message us directly", vi: "Nhắn tin trực tiếp với Serena", ko: "바로 메시지 보내기" })}
                         href={`https://wa.me/${CONTACT.whatsapp}`}
-                        linkLabel={vi ? "Mở WhatsApp" : "Open WhatsApp"}
+                        linkLabel={t({ en: "Open WhatsApp", vi: "Mở WhatsApp", ko: "WhatsApp 열기" })}
                       />
                     </AnimatedSection>
 
@@ -241,7 +241,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                               marginBottom: "0.35rem",
                             }}
                           >
-                            {vi ? "Theo dõi Serena" : "Follow Us"}
+                            {t({ en: "Follow Us", vi: "Theo dõi Serena", ko: "팔로우하기" })}
                           </p>
                           <div className="flex items-center gap-3">
                             {SOCIAL.instagram && (
@@ -342,7 +342,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-sm"
                       >
-                        {vi ? "Mở Google Maps" : "Open in Google Maps"}
+                        {t({ en: "Open in Google Maps", vi: "Mở Google Maps", ko: "Google 지도에서 열기" })}
                       </a>
                     </div>
                   </AnimatedSection>
@@ -365,25 +365,25 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                             fontWeight: 500,
                           }}
                         >
-                          {vi ? "Gửi tin nhắn cho Serena" : "Send Us a Message"}
+                          {t({ en: "Send Us a Message", vi: "Gửi tin nhắn cho Serena", ko: "메시지 보내기" })}
                         </h2>
                         <p
                           className="font-sans text-[var(--color-warm-gray)] mb-7"
                           style={{ fontSize: "0.9rem" }}
                         >
-                          {vi ? "Serena sẽ phản hồi trong vòng 24 giờ." : "We'll get back to you within 24 hours."}
+                          {t({ en: "We'll get back to you within 24 hours.", vi: "Serena sẽ phản hồi trong vòng 24 giờ.", ko: "24시간 이내에 답변드리겠습니다." })}
                         </p>
 
                         <form onSubmit={handleSubmit} noValidate>
                           <div className="space-y-5">
                             {/* Name */}
-                            <FormField label={vi ? "Họ và tên" : "Full Name"} required>
+                            <FormField label={t({ en: "Full Name", vi: "Họ và tên", ko: "성함" })} required>
                               <input
                                 type="text"
                                 name="name"
                                 value={fields.name}
                                 onChange={handleChange}
-                                placeholder={vi ? "Nhập họ và tên" : "Your full name"}
+                                placeholder={t({ en: "Your full name", vi: "Nhập họ và tên", ko: "성함을 입력하세요" })}
                                 required
                                 className="input"
                                 autoComplete="name"
@@ -391,7 +391,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                             </FormField>
 
                             {/* Email */}
-                            <FormField label={vi ? "Địa chỉ email" : "Email Address"} required>
+                            <FormField label={t({ en: "Email Address", vi: "Địa chỉ email", ko: "이메일 주소" })} required>
                               <input
                                 type="email"
                                 name="email"
@@ -405,7 +405,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                             </FormField>
 
                             {/* Phone */}
-                            <FormField label={vi ? "Số điện thoại" : "Phone Number"} hint={vi ? "Không bắt buộc" : "Optional"}>
+                            <FormField label={t({ en: "Phone Number", vi: "Số điện thoại", ko: "전화번호" })} hint={t({ en: "Optional", vi: "Không bắt buộc", ko: "선택" })}>
                               <input
                                 type="tel"
                                 name="phone"
@@ -418,7 +418,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                             </FormField>
 
                             {/* Treatment Interest */}
-                            <FormField label={vi ? "Tôi quan tâm" : "I'm Interested In"}>
+                            <FormField label={t({ en: "I'm Interested In", vi: "Tôi quan tâm", ko: "관심 분야" })}>
                               <select
                                 name="interest"
                                 value={fields.interest}
@@ -435,12 +435,12 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                             </FormField>
 
                             {/* Message */}
-                            <FormField label={vi ? "Nội dung tin nhắn" : "Your Message"} required>
+                            <FormField label={t({ en: "Your Message", vi: "Nội dung tin nhắn", ko: "메시지 내용" })} required>
                               <textarea
                                 name="message"
                                 value={fields.message}
                                 onChange={handleChange}
-                                placeholder={vi ? "Hãy cho Serena biết bạn cần hỗ trợ gì…" : "Tell us how we can help…"}
+                                placeholder={t({ en: "Tell us how we can help…", vi: "Hãy cho Serena biết bạn cần hỗ trợ gì…", ko: "무엇을 도와드릴지 알려 주세요…" })}
                                 required
                                 rows={4}
                                 className="input"
@@ -476,7 +476,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
                                   Sending…
                                 </>
                               ) : (
-                                (vi ? "Gửi tin nhắn" : "Send Message")
+                                (t({ en: "Send Message", vi: "Gửi tin nhắn", ko: "메시지 보내기" }))
                               )}
                             </button>
                           </div>
@@ -547,7 +547,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
           backgroundColor: "var(--color-espresso)",
           padding: "2.5rem 1.25rem",
         }}
-        aria-label={vi ? "Liên kết đặt lịch nhanh" : "Quick booking link"}
+        aria-label={t({ en: "Quick booking link", vi: "Liên kết đặt lịch nhanh", ko: "빠른 예약 링크" })}
       >
         <div className="container-site">
           <div
@@ -564,10 +564,10 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
               className="font-sans text-[var(--color-sand)]"
               style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}
             >
-              {vi ? "Bạn muốn đặt trực tiếp?" : "Prefer to book directly?"}
+              {t({ en: "Prefer to book directly?", vi: "Bạn muốn đặt trực tiếp?", ko: "바로 예약하시겠어요?" })}
             </p>
             <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-sm">
-              {vi ? "Đặt lịch online" : "Book Online"}
+              {t({ en: "Book Online", vi: "Đặt lịch online", ko: "온라인 예약" })}
             </Link>
           </div>
         </div>
@@ -717,7 +717,7 @@ function FormField({
 }
 
 function SuccessState({ locale }: { locale: Locale }) {
-  const vi = locale === "vi";
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
   return (
     <div
       style={{
@@ -750,20 +750,20 @@ function SuccessState({ locale }: { locale: Locale }) {
         className="font-serif text-[var(--color-espresso)]"
         style={{ fontSize: "1.6rem", fontWeight: 500 }}
       >
-        {vi ? "Đã nhận tin nhắn" : "Message Received"}
+        {t({ en: "Message Received", vi: "Đã nhận tin nhắn", ko: "메시지가 접수되었습니다" })}
       </h3>
       <p
         className="font-sans text-[var(--color-espresso-mid)]"
         style={{ fontSize: "0.95rem", maxWidth: "34ch", lineHeight: 1.7 }}
       >
-        {vi ? "Cảm ơn bạn! Serena sẽ phản hồi trong vòng 24 giờ." : "Thank you! We'll be in touch within 24 hours."}
+        {t({ en: "Thank you! We'll be in touch within 24 hours.", vi: "Cảm ơn bạn! Serena sẽ phản hồi trong vòng 24 giờ.", ko: "감사합니다! 24시간 이내에 연락드리겠습니다." })}
       </p>
       <Link
         href={withLocalePath(locale, "/booking")}
         className="btn btn-outline btn-sm"
         style={{ marginTop: "0.5rem" }}
       >
-        {vi ? "Đặt liệu trình" : "Book a Treatment"}
+        {t({ en: "Book a Treatment", vi: "Đặt liệu trình", ko: "트리트먼트 예약" })}
       </Link>
     </div>
   );

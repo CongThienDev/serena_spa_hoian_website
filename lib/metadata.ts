@@ -70,7 +70,7 @@ export function generatePageMetadata({
       description,
       url,
       type: "website",
-      locale: locale === "vi" ? "vi_VN" : "en_US",
+      locale: locale === "vi" ? "vi_VN" : locale === "ko" ? "ko_KR" : "en_US",
       images: [
         {
           url: absoluteUrl(ogImage),

@@ -27,6 +27,11 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       description:
         "Discover premium wellness treatments, signature massages, and holistic healing at Serena Spa in Hội An. Book your sanctuary experience today.",
     },
+    ko: {
+      title: "세레나 스파 호이안 — 프리미엄 웰니스 & 마사지",
+      description:
+        "호이안 세레나 스파에서 프리미엄 웰니스 트리트먼트, 시그니처 마사지, 전인적 힐링을 만나보세요. 지금 나만의 안식 시간을 예약하세요.",
+    },
   },
   "/about": {
     vi: {
@@ -36,6 +41,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
     en: {
       title: "About Serena Spa Hội An",
       description: "Discover Serena Spa's story, philosophy, and commitment to premium wellness experiences in Hội An.",
+    },
+    ko: {
+      title: "세레나 스파 호이안 소개",
+      description: "호이안 세레나 스파의 이야기와 철학, 프리미엄 웰니스 경험을 향한 약속을 만나보세요.",
     },
   },
   "/blog": {
@@ -47,6 +56,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       title: "Wellness Journal — Serena Spa Hội An",
       description: "Wellness tips, treatment guides, and spa insights from Serena Spa Hội An.",
     },
+    ko: {
+      title: "웰니스 저널 — 세레나 스파 호이안",
+      description: "호이안 세레나 스파의 웰니스 팁과 트리트먼트 가이드, 스파 인사이트를 만나보세요.",
+    },
   },
   "/booking": {
     vi: {
@@ -56,6 +69,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
     en: {
       title: "Booking — Serena Spa Hội An",
       description: "Reserve your treatment quickly at Serena Spa Hội An.",
+    },
+    ko: {
+      title: "예약 — 세레나 스파 호이안",
+      description: "호이안 세레나 스파에서 트리트먼트를 간편하게 예약하세요.",
     },
   },
   "/contact": {
@@ -67,6 +84,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       title: "Contact — Serena Spa Hội An",
       description: "Contact Serena Spa for booking and support.",
     },
+    ko: {
+      title: "문의 — 세레나 스파 호이안",
+      description: "예약과 지원이 필요하시면 세레나 스파로 문의하세요.",
+    },
   },
   "/faq": {
     vi: {
@@ -76,6 +97,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
     en: {
       title: "FAQ — Serena Spa Hội An",
       description: "Frequently asked questions about treatments, booking, and the Serena Spa Hội An experience.",
+    },
+    ko: {
+      title: "자주 묻는 질문 — 세레나 스파 호이안",
+      description: "트리트먼트, 예약, 세레나 스파 호이안 경험에 대한 자주 묻는 질문입니다.",
     },
   },
   "/gallery": {
@@ -87,6 +112,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       title: "Gallery — Serena Spa Hội An",
       description: "Explore Serena Spa spaces through real photos.",
     },
+    ko: {
+      title: "갤러리 — 세레나 스파 호이안",
+      description: "실제 사진으로 세레나 스파의 공간을 둘러보세요.",
+    },
   },
   "/privacy-policy": {
     vi: {
@@ -96,6 +125,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
     en: {
       title: "Privacy Policy — Serena Spa Hội An",
       description: "Learn how Serena Spa Hội An collects, uses, and protects your information.",
+    },
+    ko: {
+      title: "개인정보 처리방침 — 세레나 스파 호이안",
+      description: "세레나 스파 호이안이 고객 정보를 수집·이용·보호하는 방식을 안내합니다.",
     },
   },
   "/services": {
@@ -107,6 +140,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       title: "Services — Serena Spa Hội An",
       description: "Explore massage, facial, and wellness treatments at Serena Spa Hội An.",
     },
+    ko: {
+      title: "서비스 — 세레나 스파 호이안",
+      description: "호이안 세레나 스파의 마사지, 페이셜, 웰니스 트리트먼트를 둘러보세요.",
+    },
   },
   "/terms": {
     vi: {
@@ -116,6 +153,10 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
     en: {
       title: "Terms & Conditions — Serena Spa Hội An",
       description: "Booking terms, cancellation policy, and service conditions at Serena Spa Hội An.",
+    },
+    ko: {
+      title: "이용약관 — 세레나 스파 호이안",
+      description: "세레나 스파 호이안의 예약 약관, 취소 정책, 서비스 조건을 안내합니다.",
     },
   },
   "/wellness": {
@@ -127,6 +168,11 @@ const COPY: Record<RouteKey, Record<Locale, { title: string; description: string
       title: "Wellness Philosophy — Serena Spa Hội An",
       description:
         "Discover the Serena wellness philosophy — where every ritual, space, and moment is designed to restore your body, quiet your mind, and awaken your spirit in Hội An.",
+    },
+    ko: {
+      title: "웰니스 철학 — 세레나 스파 호이안",
+      description:
+        "모든 리추얼과 공간, 순간이 몸을 회복시키고 마음을 가라앉히며 정신을 깨우도록 설계된 세레나의 웰니스 철학을 만나보세요.",
     },
   },
 };

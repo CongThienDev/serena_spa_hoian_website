@@ -3,7 +3,7 @@ import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { generateLocalizedRouteMetadata } from "@/lib/route-metadata";
-import { normalizeLocale, withLocalePath } from "@/lib/i18n";
+import { localize, normalizeLocale, withLocalePath } from "@/lib/i18n";
 import { getAllPosts } from "@/data/blog";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -22,13 +22,13 @@ export default async function LocalizedBlogPage({ params }: { params: Promise<{ 
         <div className="container-site">
           <AnimatedSection animation="slide-up-fade">
             <SectionHeading
-              eyebrow={locale === "vi" ? "Nhật ký Wellness" : "Wellness Journal"}
-              title={locale === "vi" ? "Bài viết mới" : "Latest Articles"}
-              subtitle={
-                locale === "vi"
-                  ? "Các hướng dẫn thực tế và nguồn cảm hứng cho hành trình chăm sóc sức khỏe của bạn."
-                  : "Practical guides and mindful inspiration for your wellness journey."
-              }
+              eyebrow={localize(locale, { en: "Wellness Journal", vi: "Nhật ký Wellness", ko: "웰니스 저널" })}
+              title={localize(locale, { en: "Latest Articles", vi: "Bài viết mới", ko: "최신 글" })}
+              subtitle={localize(locale, {
+                en: "Practical guides and mindful inspiration for your wellness journey.",
+                vi: "Các hướng dẫn thực tế và nguồn cảm hứng cho hành trình chăm sóc sức khỏe của bạn.",
+                ko: "당신의 웰니스 여정을 위한 실용적인 가이드와 마음챙김 영감입니다.",
+              })}
               titleAs="h1"
               align="center"
               className="mb-12"
@@ -53,11 +53,11 @@ export default async function LocalizedBlogPage({ params }: { params: Promise<{ 
                   <h2 className="font-serif text-h4 mt-3">{post.title}</h2>
                   <p className="text-sm text-[var(--color-warm-gray)] mt-3">{post.excerpt}</p>
                   <p className="text-xs text-[var(--color-warm-gray)] mt-4">
-                    {new Date(post.publishedAt).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
+                    {new Date(post.publishedAt).toLocaleDateString(localize(locale, { en: "en-US", vi: "vi-VN", ko: "ko-KR" }), {
                       month: "long",
                       day: "numeric",
                       year: "numeric",
-                    })} · {post.readingTime} {locale === "vi" ? "phút đọc" : "min read"}
+                    })} · {post.readingTime} {localize(locale, { en: "min read", vi: "phút đọc", ko: "분 읽기" })}
                   </p>
                   </div>
                 </Link>

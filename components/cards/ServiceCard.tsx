@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
 import type { Service } from "@/data/services";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 type ServiceCardProps = {
   service: Service;
@@ -18,15 +18,16 @@ type ServiceCardProps = {
 export default function ServiceCard({ service, className, locale = "en" }: ServiceCardProps) {
   const minDuration = service.duration[0] ?? 60;
   const maxDuration = service.duration[service.duration.length - 1] ?? 60;
+  const minsLabel = localize(locale, { en: "mins", vi: "phút", ko: "분" });
   // Reference format: "60 / 90 mins" or "60 mins"
   const durationLabel =
     service.duration.length > 1
-      ? `${minDuration} / ${maxDuration} ${locale === "vi" ? "phút" : "mins"}`
-      : `${minDuration} ${locale === "vi" ? "phút" : "mins"}`;
+      ? `${minDuration} / ${maxDuration} ${minsLabel}`
+      : `${minDuration} ${minsLabel}`;
 
   // Show VND price if available, else USD
   const priceLabel = service.priceVND
-    ? `${locale === "vi" ? "Từ" : "From"} ${service.priceVND.toLocaleString("vi-VN")} VND`
+    ? `${localize(locale, { en: "From", vi: "Từ", ko: "최소" })} ${service.priceVND.toLocaleString("vi-VN")} VND`
     : formatPrice(service.price);
 
   return (
@@ -60,7 +61,7 @@ export default function ServiceCard({ service, className, locale = "en" }: Servi
                 backgroundColor: "var(--color-terracotta)",
               }}
             >
-              {locale === "vi" ? "Đặc trưng" : "Signature"}
+              {localize(locale, { en: "Signature", vi: "Đặc trưng", ko: "시그니처" })}
             </div>
           )}
 
@@ -74,7 +75,7 @@ export default function ServiceCard({ service, className, locale = "en" }: Servi
             <span
               className="font-sans font-semibold text-white tracking-widest uppercase px-5 py-2 rounded-full border border-white/70 text-xs"
             >
-              {locale === "vi" ? "Đặt lịch" : "Book Now"}
+              {localize(locale, { en: "Book Now", vi: "Đặt lịch", ko: "예약하기" })}
             </span>
           </div>
         </div>
