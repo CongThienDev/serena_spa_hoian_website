@@ -14,7 +14,6 @@ import {
   stripLocalePrefix,
   withLocalePath,
 } from "@/lib/i18n";
-import { LOCALE_LABELS } from "./MainNav";
 import { cn } from "@/lib/utils";
 
 export default function MobileNav() {
