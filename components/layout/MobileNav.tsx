@@ -78,11 +78,31 @@ export default function MobileNav() {
               className="h-12 w-12 object-contain"
             />
           </Link>
-          <button onClick={close} className="w-11 h-11 flex items-center justify-center text-[var(--color-espresso-mid)]" aria-label={t.mobileNav.closeMenu}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5">
+              {SUPPORTED_LOCALES.map((loc) => (
+                <Link
+                  key={loc}
+                  href={withLocalePath(loc, stripLocalePrefix(pathname))}
+                  hrefLang={loc}
+                  onClick={close}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors duration-200 uppercase",
+                    loc === locale
+                      ? "border-[var(--color-terracotta)] text-[var(--color-terracotta)]"
+                      : "border-[var(--color-sand-dark)] text-[var(--color-espresso)] hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
+                  )}
+                >
+                  {loc}
+                </Link>
+              ))}
+            </div>
+            <button onClick={close} className="w-11 h-11 flex items-center justify-center text-[var(--color-espresso-mid)]" aria-label={t.mobileNav.closeMenu}>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <ul className="flex-1 px-6 py-6 space-y-1">
@@ -104,30 +124,6 @@ export default function MobileNav() {
           <a href={`tel:${CONTACT.phone}`} className="btn btn-outline w-full justify-center">
             {t.mobileNav.callUs}
           </a>
-
-          <div className="pt-2">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-warm-gray)]">
-              {t.header.switchLanguage}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {SUPPORTED_LOCALES.map((loc) => (
-                <Link
-                  key={loc}
-                  href={withLocalePath(loc, stripLocalePrefix(pathname))}
-                  hrefLang={loc}
-                  onClick={close}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-sm transition-colors duration-200",
-                    loc === locale
-                      ? "border-[var(--color-terracotta)] text-[var(--color-terracotta)] font-medium"
-                      : "border-[var(--color-sand)] text-[var(--color-espresso)] hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
-                  )}
-                >
-                  {LOCALE_LABELS[loc]}
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </nav>
     </>

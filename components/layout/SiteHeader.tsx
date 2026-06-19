@@ -9,7 +9,7 @@ import TopBar from "./TopBar";
 import MainNav from "./MainNav";
 import MobileNav from "./MobileNav";
 import { getDictionary } from "@/data/i18n";
-import { localeFromPathname, withLocalePath } from "@/lib/i18n";
+import { localeFromPathname, withLocalePath, SUPPORTED_LOCALES, stripLocalePrefix, type Locale } from "@/lib/i18n";
 
 /**
  * SiteHeader — sticky, scroll-aware.
@@ -73,12 +73,31 @@ export default function SiteHeader() {
 
           {/* ── Right — CTA + mobile menu ────────────────────────────────── */}
           <div className="flex items-center gap-3">
-            <Link
-              href={withLocalePath(locale, "/booking")}
-              className="btn btn-primary btn-sm hidden md:inline-flex"
-            >
-              {t.header.bookNow}
-            </Link>
+            <div className="hidden lg:block">
+              <Link
+                href={withLocalePath(locale, "/booking")}
+                className="btn btn-primary btn-sm"
+              >
+                {t.header.bookNow}
+              </Link>
+            </div>
+            <div className="flex items-center gap-1.5 lg:hidden">
+              {SUPPORTED_LOCALES.map((loc) => (
+                <Link
+                  key={loc}
+                  href={withLocalePath(loc as Locale, stripLocalePrefix(pathname))}
+                  hrefLang={loc}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-xs font-medium uppercase transition-colors duration-200",
+                    loc === locale
+                      ? "border-[var(--color-terracotta)] text-[var(--color-terracotta)]"
+                      : "border-[var(--color-sand-dark)] text-[var(--color-espresso)] hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
+                  )}
+                >
+                  {loc}
+                </Link>
+              ))}
+            </div>
             <MobileNav />
           </div>
         </div>
