@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { normalizeLocale } from "@/lib/i18n";
 
@@ -123,7 +124,10 @@ export default async function RootLayout({
       className={`${cormorant.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
