@@ -377,7 +377,7 @@ export default function GalleryPage() {
               role="group"
               aria-label="Filter gallery by category"
             >
-              {(Object.keys(FILTER_LABELS) as FilterCategory[]).map(
+              {(Object.keys(FILTER_LABELS[locale]) as FilterCategory[]).map(
                 (category) => (
                   <button
                     key={category}
