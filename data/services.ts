@@ -4,6 +4,8 @@
  * Per CONTENT_CHECKLIST.md suggested categories and treatments.
  */
 
+import { type Locale } from "@/lib/i18n";
+
 export type ServiceCategory = {
   id: string;
   label: string;
@@ -595,17 +597,203 @@ const SERVICES_VI: Record<string, LocalizedServiceOverride> = {
   },
 };
 
-function localizeService(service: Service, locale: "vi" | "en"): Service {
-  if (locale === "en") return service;
-  return { ...service, ...(SERVICES_VI[service.id] ?? {}) };
+const CATEGORY_LABELS_KO: Record<string, { label: string; description: string }> = {
+  relaxation: {
+    label: "릴랙세이션",
+    description: "긴장을 풀고 몸의 균형을 되찾아 주는 릴랙세이션 트리트먼트입니다.",
+  },
+  "body-treatment": {
+    label: "바디 트리트먼트",
+    description: "근육을 회복시키고 깊은 이완을 선사하는 바디 마사지 트리트먼트입니다.",
+  },
+  "face-treatment": {
+    label: "페이스 트리트먼트",
+    description: "피부를 밝히고 수분을 채우며 재생시키는 페이셜 케어 트리트먼트입니다.",
+  },
+  "body-care-treatment": {
+    label: "바디 케어",
+    description: "전신 랩과 스크럽으로 피부를 정화하고 영양을 공급해 재생합니다.",
+  },
+  "serena-signature": {
+    label: "세레나 시그니처",
+    description: "세레나 스파만의 시그니처 트리트먼트입니다.",
+  },
+  "spa-package": {
+    label: "스파 패키지",
+    description: "여러 트리트먼트를 하나의 의식으로 결합한 패키지입니다.",
+  },
+  "nail-care": {
+    label: "네일 케어",
+    description: "기본부터 럭셔리까지 다양한 네일 케어 서비스입니다.",
+  },
+  "hair-care": {
+    label: "헤어 케어",
+    description: "두피를 진정시키고 모발에 활력을 주는 릴랙싱 케어 트리트먼트입니다.",
+  },
+};
+
+// 한국어 임시 번역 — 검토 후 다듬어 주세요 (Korean placeholder translations — please review/refine).
+const SERVICES_KO: Record<string, LocalizedServiceOverride> = {
+  "foot-reflexology": {
+    name: "발 반사 요법",
+    tagline: "릴랙세이션",
+    description:
+      "발바닥의 반사 지점을 자극해 혈액 순환을 촉진하고 몸의 에너지 균형을 맞춰 주는 트리트먼트입니다.",
+  },
+  "back-neck-head-shoulder": {
+    name: "등·목·어깨·머리",
+    tagline: "릴랙세이션",
+    description:
+      "긴장이 쌓이기 쉬운 등·목·어깨·머리를 집중적으로 풀어 주어 장시간 업무, 이동, 잘못된 자세로 인한 통증을 완화합니다.",
+  },
+  "swedish-therapy-treatment": {
+    name: "스웨디시 테라피",
+    tagline: "바디 트리트먼트",
+    description:
+      "부드러운 동작의 전신 릴랙싱 마사지로 근육 긴장을 풀고 혈액 순환을 개선하며 몸과 마음에 편안함을 선사합니다.",
+  },
+  "thai-massage": {
+    name: "타이 마사지",
+    tagline: "바디 트리트먼트",
+    description:
+      "지압과 부드러운 스트레칭을 결합한 60분 타이 마사지로 근육 긴장을 풀고 유연성과 에너지 균형을 높입니다.",
+  },
+  "rejuvenating-face-treatment": {
+    name: "브라이트닝 페이셜 트리트먼트",
+    tagline: "스파 - 페이스 트리트먼트",
+    description:
+      "클렌징, 부드러운 각질 제거, 영양 마스크, 릴랙싱 페이셜 마사지로 피부를 재생하고 밝히며 활력을 되찾아 주는 프리미엄 케어입니다.",
+  },
+  "mineral-mud-wrap-green-tea-wrap": {
+    name: "미네랄 머드 / 녹차 랩",
+    tagline: "전신 랩",
+    description:
+      "미네랄 머드 또는 녹차 추출물로 노폐물을 배출하고 피부에 영양을 공급해 활력을 되찾아 주는 바디 케어 트리트먼트입니다.",
+  },
+  "coffee-sea-salt-coconut-scrub": {
+    name: "커피 / 소금 / 코코넛 스크럽",
+    tagline: "전신 스크럽",
+    description:
+      "전신 각질을 제거해 피부를 깨끗이 하고 혈액 순환을 촉진하며 상쾌한 이완감을 선사하는 스크럽 트리트먼트입니다.",
+  },
+  "serena-healthy-treatment-himalaya-salt-stone": {
+    name: "히말라야 소금돌 세레나 시그니처 트리트먼트",
+    tagline: "세레나 시그니처",
+    description:
+      "따뜻한 히말라야 소금돌을 활용한 독점 웰니스 트리트먼트로 깊은 근육 긴장을 풀고 해독을 돕고 혈액 순환을 촉진합니다.",
+  },
+  "hot-stone-treatment": {
+    name: "핫 스톤 트리트먼트",
+    tagline: "세레나 시그니처",
+    description:
+      "따뜻한 현무암을 주요 지점에 올리고 마사지를 결합해 근육 긴장과 스트레스를 풀고 에너지 균형을 맞추는 깊은 이완 트리트먼트입니다.",
+  },
+  "aroma-treatment": {
+    name: "아로마 트리트먼트",
+    tagline: "세레나 시그니처",
+    description:
+      "에센셜 오일과 은은한 허브를 결합한 90분 트리트먼트로 근육을 이완하고 마음을 진정시키며 해독을 돕습니다.",
+  },
+  "serena-renewal-body-ritual-package": {
+    name: "세레나 리뉴얼 바디 리추얼 패키지",
+    tagline: "스파 패키지",
+    description:
+      "30분 스크럽 또는 영양 랩과 90분 스웨디시 마사지로 구성된 120분 트리트먼트로 에너지를 재충전하고 깊은 이완을 선사합니다.",
+  },
+  "serena-glow-balance-couples": {
+    name: "글로우·밸런스 커플 패키지",
+    tagline: "스파 패키지",
+    description:
+      "2인을 위한 150분 트리트먼트로 스크럽/영양 랩, 전신 스웨디시 마사지, 안티에이징 페이셜로 구성됩니다.",
+  },
+  "serena-grand-harmony-package": {
+    name: "그랜드 하모니 밸런스 패키지",
+    tagline: "스파 패키지",
+    description:
+      "스크럽/영양 랩, 90분 히말라야 소금돌 트리트먼트, 60분 페이셜로 구성된 180분 토탈 회복 트리트먼트입니다.",
+  },
+  "serena-nourish-renew-package": {
+    name: "너리시·리뉴 회복 영양 패키지",
+    tagline: "스파 패키지",
+    description:
+      "스크럽/영양 랩, 90분 허브 마사지, 60분 페이셜에 헬시 주스와 요거트 그래놀라가 포함된 3시간 패키지입니다.",
+  },
+  "serena-signature-3-days-long-stay-couple": {
+    name: "3일 롱스테이 커플 세레나 시그니처 패키지",
+    tagline: "스파 패키지",
+    description:
+      "장기 투숙객을 위한 3일 패키지로 매일 90분 선택 트리트먼트를 2인에게 제공하며 매 세션 후 헬시 스낵이 포함됩니다.",
+  },
+  "basic-manicure-or-pedicure": {
+    name: "베이직 매니큐어 또는 페디큐어",
+    tagline: "네일 케어",
+    description: "기본 손톱 또는 발톱 케어입니다.",
+  },
+  "gel-polish-classic": {
+    name: "젤 폴리시 클래식 (매니큐어 / 페디큐어)",
+    tagline: "네일 케어",
+    description: "손톱 또는 발톱 기본 케어와 젤 컬러입니다.",
+  },
+  "luxury-gel-care-ritual": {
+    name: "럭셔리 젤 케어 리추얼",
+    tagline: "네일 케어",
+    description: "프리미엄 피부 및 네일 케어 리추얼입니다.",
+  },
+  "luxury-nail-art-package": {
+    name: "럭셔리 네일 아트 패키지",
+    tagline: "네일 케어",
+    description: "프리미엄 젤 컬러, 정교한 아트 또는 큐빅, 3D 아크릴 또는 젤 익스텐션입니다.",
+  },
+  "soak-off-gel-removal": {
+    name: "젤 제거 (소크 오프)",
+    tagline: "네일 케어",
+    description: "기존 젤을 부드럽게 제거합니다.",
+  },
+  "serena-an-nhien-scalp-ritual": {
+    name: "세레나 안니엔 스칼프 리추얼",
+    tagline: "헤어 케어",
+    description:
+      "부드러운 마사지와 클렌징을 결합해 스트레스를 줄이고 두피에 영양을 공급하며 모발을 새롭게 하는 45분 트리트먼트입니다.",
+  },
+  "serena-meridian-flow": {
+    name: "세레나 메리디안 플로우",
+    tagline: "헤어 케어",
+    description:
+      "경락을 열어 근육 긴장을 풀고 에너지 순환을 촉진하는 75분 트리트먼트입니다.",
+  },
+  "serena-calm-and-glow": {
+    name: "세레나 캄 & 글로우",
+    tagline: "헤어 케어",
+    description:
+      "마음을 이완하고 피부에 영양을 공급해 내면의 평온함을 선사하는 100분 트리트먼트입니다.",
+  },
+};
+
+const SERVICE_OVERRIDES: Partial<Record<Locale, Record<string, LocalizedServiceOverride>>> = {
+  vi: SERVICES_VI,
+  ko: SERVICES_KO,
+};
+
+const CATEGORY_LABEL_OVERRIDES: Partial<
+  Record<Locale, Record<string, { label: string; description: string }>>
+> = {
+  vi: CATEGORY_LABELS_VI,
+  ko: CATEGORY_LABELS_KO,
+};
+
+function localizeService(service: Service, locale: Locale): Service {
+  const overrides = SERVICE_OVERRIDES[locale];
+  if (!overrides) return service;
+  return { ...service, ...(overrides[service.id] ?? {}) };
 }
 
-export function getServiceCategories(locale: "vi" | "en" = "en"): ServiceCategory[] {
-  if (locale === "en") return SERVICE_CATEGORIES;
+export function getServiceCategories(locale: Locale = "en"): ServiceCategory[] {
+  const labels = CATEGORY_LABEL_OVERRIDES[locale];
+  if (!labels) return SERVICE_CATEGORIES;
   return SERVICE_CATEGORIES.map((cat) => ({
     ...cat,
-    label: CATEGORY_LABELS_VI[cat.id]?.label ?? cat.label,
-    description: CATEGORY_LABELS_VI[cat.id]?.description ?? cat.description,
+    label: labels[cat.id]?.label ?? cat.label,
+    description: labels[cat.id]?.description ?? cat.description,
   }));
 }
 
@@ -618,7 +806,7 @@ export function getServiceBySlug(slug: string): Service | undefined {
 
 export function getServiceBySlugLocalized(
   slug: string,
-  locale: "vi" | "en" = "en",
+  locale: Locale = "en",
 ): Service | undefined {
   const service = SERVICES.find((s) => s.slug === slug && isVisibleService(s));
   return service ? localizeService(service, locale) : undefined;
@@ -630,7 +818,7 @@ export function getServicesByCategory(categoryId: string): Service[] {
 
 export function getServicesByCategoryLocalized(
   categoryId: string,
-  locale: "vi" | "en" = "en",
+  locale: Locale = "en",
 ): Service[] {
   return SERVICES.filter((s) => s.categoryId === categoryId && isVisibleService(s))
     .map((service) => localizeService(service, locale));
@@ -642,7 +830,7 @@ export function getFeaturedServices(limit = 4): Service[] {
 
 export function getFeaturedServicesLocalized(
   limit = 4,
-  locale: "vi" | "en" = "en",
+  locale: Locale = "en",
 ): Service[] {
   return SERVICES.filter((s) => s.isFeatured && isVisibleService(s))
     .slice(0, limit)
@@ -650,7 +838,7 @@ export function getFeaturedServicesLocalized(
 }
 
 export function getAllServicesLocalized(
-  locale: "vi" | "en" = "en",
+  locale: Locale = "en",
 ): Service[] {
   return SERVICES.filter(isVisibleService).map((service) => localizeService(service, locale));
 }

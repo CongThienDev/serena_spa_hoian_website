@@ -13,7 +13,7 @@ import {
   getServiceCategories,
 } from "@/data/services";
 import { generatePageMetadata } from "@/lib/metadata";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 /* ─── Static params ─────────────────────────────────────────────────────── */
 
@@ -53,7 +53,7 @@ export default async function ServiceDetailPage({
   params,
   locale = "en",
 }: Props & { locale?: Locale }) {
-  const vi = locale === "vi";
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
   const { slug } = await params;
   const service = getServiceBySlugLocalized(slug, locale);
   if (!service) notFound();
@@ -87,7 +87,7 @@ export default async function ServiceDetailPage({
                 color: "var(--color-warm-gray)",
               }}
             >
-              {vi ? "Trang chủ" : "Home"}
+              {t({ en: "Home", vi: "Trang chủ", ko: "홈" })}
             </Link>
           </li>
           <li
@@ -105,7 +105,7 @@ export default async function ServiceDetailPage({
                 color: "var(--color-warm-gray)",
               }}
             >
-              {vi ? "Dịch vụ" : "Services"}
+              {t({ en: "Services", vi: "Dịch vụ", ko: "서비스" })}
             </Link>
           </li>
           <li
@@ -162,7 +162,7 @@ export default async function ServiceDetailPage({
                     letterSpacing: "0.22em",
                   }}
                 >
-                  {category?.label ?? (vi ? "Liệu trình" : "Treatment")}
+                  {category?.label ?? t({ en: "Treatment", vi: "Liệu trình", ko: "트리트먼트" })}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -248,7 +248,7 @@ export default async function ServiceDetailPage({
                       backgroundColor: "var(--color-cream)",
                     }}
                   >
-                    {mins} {vi ? "phút" : "mins"}
+                    {mins} {t({ en: "mins", vi: "phút", ko: "분" })}
                   </span>
                 ))}
               </div>
@@ -266,7 +266,7 @@ export default async function ServiceDetailPage({
                       lineHeight: 1.1,
                     }}
                   >
-                    {vi ? "Từ" : "From"} {service.priceVND.toLocaleString("vi-VN")} VND
+                    {t({ en: "From", vi: "Từ", ko: "최소" })} {service.priceVND.toLocaleString("vi-VN")} VND
                   </p>
                   <p
                     className="font-sans mt-1"
@@ -302,13 +302,13 @@ export default async function ServiceDetailPage({
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                     />
                   </svg>
-                  {vi ? "Đặt liệu trình này" : "Book This Treatment"}
+                  {t({ en: "Book This Treatment", vi: "Đặt liệu trình này", ko: "이 트리트먼트 예약" })}
                 </Link>
                 <a
                   href="#details"
                   className="btn btn-outline btn-lg"
                 >
-                  {vi ? "Xem thêm ↓" : "Learn More ↓"}
+                  {t({ en: "Learn More ↓", vi: "Xem thêm ↓", ko: "더 알아보기 ↓" })}
                 </a>
               </div>
             </AnimatedSection>
@@ -359,7 +359,7 @@ export default async function ServiceDetailPage({
                   boxShadow: "0 4px 16px rgba(200,116,90,0.45)",
                 }}
               >
-                {vi ? "Liệu trình đặc trưng" : "Signature Treatment"}
+                {t({ en: "Signature Treatment", vi: "Liệu trình đặc trưng", ko: "시그니처 트리트먼트" })}
               </div>
             )}
           </div>
@@ -404,7 +404,7 @@ export default async function ServiceDetailPage({
                         letterSpacing: "0.22em",
                       }}
                     >
-                      {vi ? "Trải nghiệm" : "The Experience"}
+                      {t({ en: "The Experience", vi: "Trải nghiệm", ko: "경험" })}
                     </span>
                   </div>
                   <OrnamentDivider className="justify-start mb-4" />
@@ -416,7 +416,7 @@ export default async function ServiceDetailPage({
                       lineHeight: 1.12,
                     }}
                   >
-                    {vi ? "Bạn sẽ cảm nhận" : "What You'll Feel"}
+                    {t({ en: "What You'll Feel", vi: "Bạn sẽ cảm nhận", ko: "느끼게 될 것" })}
                   </h2>
                   <p
                     className="font-sans text-[var(--color-espresso-mid)] mt-4"
@@ -426,9 +426,7 @@ export default async function ServiceDetailPage({
                       maxWidth: "36ch",
                     }}
                   >
-                    {vi
-                      ? "Mỗi liệu trình được thiết kế để phục hồi cân bằng ở mọi cấp độ: cơ thể, tâm trí và tinh thần."
-                      : "Each treatment is designed to restore balance on every level — body, mind, and spirit."}
+                    {t({ vi: "Mỗi liệu trình được thiết kế để phục hồi cân bằng ở mọi cấp độ: cơ thể, tâm trí và tinh thần.", en: "Each treatment is designed to restore balance on every level — body, mind, and spirit.", ko: "각 트리트먼트는 신체, 마음, 정신의 모든 수준에서 균형을 회복하도록 설계되었습니다." })}
                   </p>
                 </div>
               </AnimatedSection>
@@ -489,7 +487,7 @@ export default async function ServiceDetailPage({
                       letterSpacing: "0.22em",
                     }}
                   >
-                    {vi ? "Mỗi lần trải nghiệm" : "Every Visit"}
+                    {t({ en: "Every Visit", vi: "Mỗi lần trải nghiệm", ko: "방문할 때마다" })}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -502,7 +500,7 @@ export default async function ServiceDetailPage({
                     lineHeight: 1.12,
                   }}
                 >
-                  {vi ? "Liệu trình bao gồm" : "What's Included"}
+                  {t({ en: "What's Included", vi: "Liệu trình bao gồm", ko: "포함 사항" })}
                 </h2>
               </div>
             </AnimatedSection>
@@ -567,7 +565,7 @@ export default async function ServiceDetailPage({
                       letterSpacing: "0.22em",
                     }}
                   >
-                    {vi ? "Không gian Serena" : "Our Space"}
+                    {t({ en: "Our Space", vi: "Không gian Serena", ko: "세레나의 공간" })}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -579,7 +577,7 @@ export default async function ServiceDetailPage({
                     lineHeight: 1.15,
                   }}
                 >
-                  {vi ? "Bên trong phòng trị liệu" : "Inside the Room"}
+                  {t({ en: "Inside the Room", vi: "Bên trong phòng trị liệu", ko: "트리트먼트 룸 내부" })}
                 </h2>
               </div>
             </AnimatedSection>
@@ -632,7 +630,7 @@ export default async function ServiceDetailPage({
                       letterSpacing: "0.22em",
                     }}
                   >
-                    {vi ? "Tiếp tục hành trình" : "Continue Your Journey"}
+                    {t({ en: "Continue Your Journey", vi: "Tiếp tục hành trình", ko: "여정을 계속하세요" })}
                   </span>
                   <LotusMarkSmall size={14} color="var(--color-terracotta)" />
                 </div>
@@ -645,7 +643,7 @@ export default async function ServiceDetailPage({
                     lineHeight: 1.12,
                   }}
                 >
-                  {vi ? "Có thể bạn cũng thích" : "You May Also Love"}
+                  {t({ en: "You May Also Love", vi: "Có thể bạn cũng thích", ko: "이런 트리트먼트도 좋아하실 거예요" })}
                 </h2>
               </div>
             </AnimatedSection>
@@ -701,7 +699,7 @@ export default async function ServiceDetailPage({
               className="font-sans font-semibold uppercase text-[var(--color-peach-light)]"
               style={{ fontSize: "0.72rem", letterSpacing: "0.22em" }}
             >
-              {vi ? "Không gian chữa lành đang chờ bạn" : "Your Sanctuary Awaits"}
+              {t({ en: "Your Sanctuary Awaits", vi: "Không gian chữa lành đang chờ bạn", ko: "당신을 위한 안식처가 기다립니다" })}
             </span>
           </AnimatedSection>
 
@@ -714,7 +712,7 @@ export default async function ServiceDetailPage({
                 lineHeight: 1.1,
               }}
             >
-              {vi ? "Đặt liệu trình này ngay hôm nay" : "Reserve This Treatment Today"}
+              {t({ en: "Reserve This Treatment Today", vi: "Đặt liệu trình này ngay hôm nay", ko: "오늘 이 트리트먼트를 예약하세요" })}
             </h2>
           </AnimatedSection>
 
@@ -723,9 +721,7 @@ export default async function ServiceDetailPage({
               className="font-sans text-[var(--color-sand)] max-w-md"
               style={{ fontSize: "0.975rem", lineHeight: 1.75 }}
             >
-              {vi
-                ? "Serena hỗ trợ đặt lịch trong ngày. Liên hệ trực tuyến hoặc qua WhatsApp để xác nhận nhanh."
-                : "Same-day bookings warmly welcomed. Connect with us online or via WhatsApp for instant confirmation."}
+              {t({ vi: "Serena hỗ trợ đặt lịch trong ngày. Liên hệ trực tuyến hoặc qua WhatsApp để xác nhận nhanh.", en: "Same-day bookings warmly welcomed. Connect with us online or via WhatsApp for instant confirmation.", ko: "당일 예약도 환영합니다. 온라인 또는 WhatsApp으로 바로 확인하세요." })}
             </p>
           </AnimatedSection>
 
@@ -746,7 +742,7 @@ export default async function ServiceDetailPage({
                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                   />
                 </svg>
-                {vi ? "Đặt lịch ngay" : "Book Now"}
+                {t({ en: "Book Now", vi: "Đặt lịch ngay", ko: "예약하기" })}
               </Link>
               <a
                 href="https://wa.me/84935011151"
@@ -754,7 +750,7 @@ export default async function ServiceDetailPage({
                 rel="noopener noreferrer"
                 className="btn btn-outline-white btn-lg"
               >
-                {vi ? "Nhắn WhatsApp" : "WhatsApp Us"}
+                {t({ en: "WhatsApp Us", vi: "Nhắn WhatsApp", ko: "WhatsApp 문의" })}
               </a>
             </div>
           </AnimatedSection>

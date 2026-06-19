@@ -3,12 +3,12 @@ import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { getFeaturedPosts } from "@/data/blog";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 import { getHomeCopy } from "@/data/content-home";
 
 function BlogCard({ post, locale }: { post: ReturnType<typeof getFeaturedPosts>[number]; locale: Locale }) {
   const copy = getHomeCopy(locale).blog;
-  const date = new Date(post.publishedAt).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
+  const date = new Date(post.publishedAt).toLocaleDateString(localize(locale, { en: "en-US", vi: "vi-VN", ko: "ko-KR" }), {
     month: "long",
     day: "numeric",
     year: "numeric",

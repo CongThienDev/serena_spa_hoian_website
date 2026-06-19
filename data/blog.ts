@@ -4,6 +4,8 @@
  * Per CONTENT_CHECKLIST.md: 10 initial blog topics.
  */
 
+import { type Locale } from "@/lib/i18n";
+
 export type BlogPost = {
   id: string;
   slug: string;
@@ -142,22 +144,71 @@ const BLOG_POSTS_VI: Record<string, LocalizedPostOverride> = {
   },
 };
 
-function localizePost(post: BlogPost, locale: "vi" | "en"): BlogPost {
-  if (locale === "en") return post;
-  return { ...post, ...(BLOG_POSTS_VI[post.id] ?? {}) };
+// 한국어 임시 번역 — 검토 후 다듬어 주세요 (Korean placeholder translations — please review/refine).
+const BLOG_POSTS_KO: Record<string, LocalizedPostOverride> = {
+  "b-01": {
+    title: "호이안 스파 트리트먼트 완벽 가이드",
+    excerpt:
+      "전통 베트남 마사지부터 현대 웰니스 리추얼까지, 호이안이 선사하는 힐링 경험의 모든 것과 세레나 스파가 특별한 이유를 알아보세요.",
+    category: "웰니스 가이드",
+    seoTitle: "호이안 최고의 스파 트리트먼트 — 완벽 웰니스 가이드",
+    seoDescription:
+      "호이안에서 즐길 수 있는 최고의 스파와 마사지 트리트먼트를 전통부터 럭셔리까지 세레나 스파의 완벽 가이드로 만나보세요.",
+  },
+  "b-02": {
+    title: "꼭 알아야 할 히말라야 소금돌 마사지의 5가지 효능",
+    excerpt:
+      "고대 화산석과 현대 웰니스 과학의 만남. 핫 스톤 테라피가 일반 마사지보다 더 깊이 작용하며 손님들이 가장 사랑하는 이유를 알아보세요.",
+    category: "트리트먼트 가이드",
+    seoTitle: "핫 스톤 마사지의 효능 — 기대할 수 있는 것 | 세레나 스파",
+    seoDescription:
+      "깊은 근육 이완부터 정신적 명료함까지, 핫 스톤 마사지의 뛰어난 효능을 호이안 세레나 스파에서 알아보세요.",
+  },
+  "b-03": {
+    title: "호이안 커플 마사지: 완벽한 로맨틱 경험",
+    excerpt:
+      "호이안으로 로맨틱한 여행을 계획 중이신가요? 커플 웰니스 리트리트가 가장 기억에 남는 방법인 이유와 완벽한 둘만의 스파 데이를 계획하는 법을 알아보세요.",
+    category: "경험",
+    seoTitle: "호이안 커플 마사지 — 완벽한 로맨틱 스파 경험",
+    seoDescription:
+      "프라이빗 룸, 커플 트리트먼트, 섬세한 릴랙세이션 리추얼로 호이안에서 완벽한 커플 스파 경험을 계획하세요.",
+  },
+  "b-04": {
+    title: "베트남 마사지의 예술: 전통 기법, 현대적 힐링",
+    excerpt:
+      "베트남은 수 세기에 걸친 민간 의학과 에너지 철학에 뿌리를 둔 가장 풍부한 마사지 전통 중 하나를 지니고 있습니다.",
+    category: "웰니스 지식",
+  },
+  "b-05": {
+    title: "자판디 디자인이 더 깊은 힐링을 선사하는 이유",
+    excerpt:
+      "세레나 스파의 문화는 몸·마음·정신의 힐링, 자연과의 깊은 연결, 단순한 뷰티 트리트먼트를 넘어선 리트리트 같은 이완 경험으로 돋보입니다.",
+    category: "스파 문화",
+  },
+};
+
+const POST_OVERRIDES: Partial<Record<Locale, Record<string, LocalizedPostOverride>>> = {
+  vi: BLOG_POSTS_VI,
+  ko: BLOG_POSTS_KO,
+};
+
+function localizePost(post: BlogPost, locale: Locale): BlogPost {
+  const overrides = POST_OVERRIDES[locale];
+  if (!overrides) return post;
+  return { ...post, ...(overrides[post.id] ?? {}) };
 }
 
-export function getFeaturedPosts(limit = 3, locale: "vi" | "en" = "en"): BlogPost[] {
+export function getFeaturedPosts(limit = 3, locale: Locale = "en"): BlogPost[] {
   return BLOG_POSTS.filter((p) => p.isFeatured)
     .slice(0, limit)
     .map((post) => localizePost(post, locale));
 }
 
-export function getPostBySlug(slug: string, locale: "vi" | "en" = "en"): BlogPost | undefined {
+export function getPostBySlug(slug: string, locale: Locale = "en"): BlogPost | undefined {
   const post = BLOG_POSTS.find((p) => p.slug === slug);
   return post ? localizePost(post, locale) : undefined;
 }
 
-export function getAllPosts(locale: "vi" | "en" = "en"): BlogPost[] {
+export function getAllPosts(locale: Locale = "en"): BlogPost[] {
   return BLOG_POSTS.map((post) => localizePost(post, locale));
 }

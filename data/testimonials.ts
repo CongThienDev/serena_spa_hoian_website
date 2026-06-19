@@ -5,6 +5,8 @@
  * TODO: Replace with real customer testimonials before launch.
  */
 
+import { type Locale } from "@/lib/i18n";
+
 export type Testimonial = {
   id: string;
   name: string;
@@ -126,17 +128,52 @@ const TESTIMONIALS_VI: Record<string, LocalizedTestimonialOverride> = {
   },
 };
 
+// 한국어 임시 번역 — 검토 후 다듬어 주세요 (Korean placeholder translations — please review/refine).
+const TESTIMONIALS_KO: Record<string, LocalizedTestimonialOverride> = {
+  "t-01": {
+    country: "호주",
+    service: "Serena Signature Massage",
+    text: "동남아시아에서 받은 스파 중 단연 최고의 경험이었습니다. 공간은 매우 편안했고 테라피스트의 실력이 뛰어났으며 따뜻한 허브 찜질팩 덕분에 완전히 회복했습니다.",
+  },
+  "t-02": {
+    country: "영국",
+    service: "Couple Ritual",
+    text: "기념일을 맞아 커플 트리트먼트를 예약했는데 모든 것이 완벽했습니다. 프라이빗한 공간, 디테일에 대한 정성, 트리트먼트의 품질 모두 인상적이었습니다.",
+  },
+  "t-03": {
+    country: "대한민국",
+    service: "Facial Clay Therapy",
+    text: "호텔 컨시어지의 추천으로 세레나 스파를 찾았는데 정말 만족스러웠습니다. 페이셜 트리트먼트가 훌륭했고 트리트먼트 후 피부가 더 깨끗하고 밝아졌습니다.",
+  },
+  "t-04": {
+    country: "미국",
+    service: "Hot Stone Therapy",
+    text: "처음에는 핫 스톤 마사지에 반신반의했지만 이번 경험으로 생각이 완전히 바뀌었습니다. 돌의 열기가 뭉친 근육 깊숙이 전해져 완벽하게 이완되었습니다.",
+  },
+  "t-06": {
+    country: "프랑스",
+    service: "Foot Massage",
+    text: "호이안을 며칠 동안 걸은 뒤 정확하고 편안한 60분 발 마사지 트리트먼트로 발이 완전히 살아났습니다.",
+  },
+};
+
+const TESTIMONIAL_OVERRIDES: Partial<Record<Locale, Record<string, LocalizedTestimonialOverride>>> = {
+  vi: TESTIMONIALS_VI,
+  ko: TESTIMONIALS_KO,
+};
+
 function localizeTestimonial(
   testimonial: Testimonial,
-  locale: "vi" | "en",
+  locale: Locale,
 ): Testimonial {
-  if (locale === "en") return testimonial;
-  return { ...testimonial, ...(TESTIMONIALS_VI[testimonial.id] ?? {}) };
+  const overrides = TESTIMONIAL_OVERRIDES[locale];
+  if (!overrides) return testimonial;
+  return { ...testimonial, ...(overrides[testimonial.id] ?? {}) };
 }
 
 export function getFeaturedTestimonials(
   limit = 3,
-  locale: "vi" | "en" = "en",
+  locale: Locale = "en",
 ): Testimonial[] {
   return TESTIMONIALS.filter((t) => t.isFeatured)
     .slice(0, limit)

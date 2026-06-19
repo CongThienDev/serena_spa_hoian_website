@@ -5,7 +5,7 @@ import { generatePageMetadata } from "@/lib/metadata";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 export const metadata: Metadata = generatePageMetadata({
   title: "Wellness Philosophy — Serena Spa Hội An",
@@ -59,6 +59,25 @@ const philosophyPillarsVi = [
   },
 ];
 
+// 한국어 임시 번역 — 검토 후 다듬어 주세요.
+const philosophyPillarsKo = [
+  {
+    number: "01",
+    heading: "몸",
+    body: "우리는 몸에서 시작합니다. 베트남과 국제 기법을 익힌 숙련된 테라피스트가 정확한 압력, 따뜻한 열기, 식물성 약재로 신체의 긴장을 풀어 줍니다.",
+  },
+  {
+    number: "02",
+    heading: "마음",
+    body: "고요한 마음은 진정한 치유의 토대입니다. 세레나의 리추얼은 호흡, 향기 요법, 의도된 고요함을 결합해 깊은 회복으로 안내합니다.",
+  },
+  {
+    number: "03",
+    heading: "정신",
+    body: "몸과 마음이 편안해지면 정신도 따라옵니다. 우리는 가장 소중한 것과 다시 연결되도록 고요한 공간을 만듭니다.",
+  },
+];
+
 const approachSteps = [
   {
     step: "01",
@@ -105,6 +124,30 @@ const approachStepsVi = [
   },
 ];
 
+// 한국어 임시 번역 — 검토 후 다듬어 주세요.
+const approachStepsKo = [
+  {
+    step: "01",
+    heading: "웰컴 리추얼",
+    body: "아치형 문을 들어서는 첫걸음부터 전환이 시작됩니다. 따뜻한 족욕, 허브 웰컴 티, 잔잔한 음악이 몸에 안전하다는 신호를 보냅니다.",
+  },
+  {
+    step: "02",
+    heading: "전문 상담",
+    body: "오일 한 방울을 바르기 전에, 테라피스트가 긴장 부위와 민감도, 원하는 결과 등 몸의 필요를 충분히 파악합니다.",
+  },
+  {
+    step: "03",
+    heading: "트리트먼트",
+    body: "모든 리추얼은 온전한 집중으로 진행됩니다. 유기농 식물성 오일, 따뜻한 허브 찜질, 세대를 거쳐 다듬어진 기법을 사용합니다.",
+  },
+  {
+    step: "04",
+    heading: "마무리",
+    body: "트리트먼트가 끝나면 허브차, 따뜻한 타월 리추얼, 그리고 잠깐의 고요함으로 부드럽게 일상으로 안내합니다.",
+  },
+];
+
 const galleryImages = [
   {
     src: "/images/serena_image/z7863130216608_73332d9cd639070a514abcd33a5d3c1f.jpg",
@@ -127,9 +170,9 @@ const galleryImages = [
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
-  const vi = locale === "vi";
-  const localizedPhilosophyPillars = vi ? philosophyPillarsVi : philosophyPillars;
-  const localizedApproachSteps = vi ? approachStepsVi : approachSteps;
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
+  const localizedPhilosophyPillars = t({ en: philosophyPillars, vi: philosophyPillarsVi, ko: philosophyPillarsKo });
+  const localizedApproachSteps = t({ en: approachSteps, vi: approachStepsVi, ko: approachStepsKo });
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════════
@@ -141,7 +184,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
           minHeight: "clamp(500px, 80vh, 860px)",
           background: "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
         }}
-        aria-label={vi ? "Triết lý chăm sóc toàn diện tại Serena Spa" : "Wellness philosophy at Serena Spa"}
+        aria-label={t({ en: "Wellness philosophy at Serena Spa", vi: "Triết lý chăm sóc toàn diện tại Serena Spa", ko: "세레나 스파의 웰니스 철학" })}
       >
         <div
           className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] w-full"
@@ -163,7 +206,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   className="font-sans uppercase tracking-[0.22em] text-[var(--color-terracotta)]"
                   style={{ fontSize: "0.72rem" }}
                 >
-                  {vi ? "Triết lý của chúng tôi" : "Our Philosophy"}
+                  {t({ en: "Our Philosophy", vi: "Triết lý của chúng tôi", ko: "우리의 철학" })}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -181,8 +224,8 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                {vi ? "An dưỡng" : "Wellness"}<br />
-                {vi ? "Từ Bên Trong" : "From Within"}
+                {t({ en: "Wellness", vi: "An dưỡng", ko: "웰니스" })}<br />
+                {t({ en: "From Within", vi: "Từ Bên Trong", ko: "내면에서부터" })}
               </h1>
             </AnimatedSection>
 
@@ -207,9 +250,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 className="font-sans text-[var(--color-espresso)] mb-10"
                 style={{ fontSize: "1.0rem", lineHeight: 1.78, maxWidth: "36ch", opacity: 0.75 }}
               >
-                {vi
-                  ? "Tại Serena, chăm sóc toàn diện không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần."
-                  : "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit."}
+                {t({ vi: "Tại Serena, chăm sóc toàn diện không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần.", en: "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit.", ko: "Serena에서 웰니스는 서비스가 아닌 삶의 방식입니다. 모든 의식, 모든 공간, 모든 순간은 몸을 회복하고 마음을 고요하게 하며 정신을 깨우도록 설계되었습니다." })}
               </p>
             </AnimatedSection>
 
@@ -217,10 +258,10 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
             <AnimatedSection animation="slide-up-fade" delay={0.42}>
               <div className="flex flex-wrap gap-3">
                 <Link href={withLocalePath(locale, "/services")} className="btn btn-primary btn-lg">
-                  {vi ? "Khám phá liệu trình" : "Explore Treatments"}
+                  {t({ en: "Explore Treatments", vi: "Khám phá liệu trình", ko: "트리트먼트 둘러보기" })}
                 </Link>
                 <Link href={withLocalePath(locale, "/about")} className="btn btn-outline btn-lg">
-                  {vi ? "Câu chuyện Serena" : "Our Story"}
+                  {t({ en: "Our Story", vi: "Câu chuyện Serena", ko: "세레나 이야기" })}
                 </Link>
               </div>
             </AnimatedSection>
@@ -279,7 +320,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-round-top section-padding"
         style={{ background: "var(--color-cream)" }}
-        aria-label={vi ? "Ba trụ cột triết lý chăm sóc toàn diện" : "Our wellness philosophy pillars"}
+        aria-label={t({ en: "Our wellness philosophy pillars", vi: "Ba trụ cột triết lý chăm sóc toàn diện", ko: "웰니스 철학의 세 가지 기둥" })}
       >
         <div className="container-site">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
@@ -330,14 +371,14 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ background: "var(--color-section-warm)" }}
-        aria-label={vi ? "Không gian tại Serena Spa" : "Our spa environment"}
+        aria-label={t({ en: "Our spa environment", vi: "Không gian tại Serena Spa", ko: "세레나 스파의 공간" })}
       >
         <div className="container-site">
           {/* Heading */}
           <AnimatedSection animation="slide-up-fade" className="mb-10 md:mb-14">
             <SectionHeading
-              eyebrow={vi ? "Không gian trị liệu" : "Our Environment"}
-              title={vi ? "Không gian được thiết kế cho tĩnh tại" : "A Space Designed for Stillness"}
+              eyebrow={t({ en: "Our Environment", vi: "Không gian trị liệu", ko: "트리트먼트 공간" })}
+              title={t({ en: "A Space Designed for Stillness", vi: "Không gian được thiết kế cho tĩnh tại", ko: "고요함을 위해 설계된 공간" })}
               align="center"
             />
           </AnimatedSection>
@@ -415,14 +456,14 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ background: "var(--color-cream)" }}
-        aria-label={vi ? "Phương pháp Serena" : "The Serena method — our approach"}
+        aria-label={t({ en: "The Serena method — our approach", vi: "Phương pháp Serena", ko: "세레나 메소드 — 우리의 접근법" })}
       >
         <div className="container-site">
           {/* Heading */}
           <AnimatedSection animation="slide-up-fade" className="mb-10 md:mb-14">
             <SectionHeading
-              eyebrow={vi ? "Cách chúng tôi thực hiện" : "How We Work"}
-              title={vi ? "Phương pháp Serena" : "The Serena Method"}
+              eyebrow={t({ en: "How We Work", vi: "Cách chúng tôi thực hiện", ko: "진행 방식" })}
+              title={t({ en: "The Serena Method", vi: "Phương pháp Serena", ko: "세레나 메소드" })}
               align="center"
             />
           </AnimatedSection>
@@ -511,7 +552,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="relative section-padding"
         style={{ background: "var(--color-espresso)" }}
-        aria-label={vi ? "Bắt đầu hành trình chăm sóc toàn diện — đặt liệu trình" : "Begin your wellness journey — book a treatment"}
+        aria-label={t({ en: "Begin your wellness journey — book a treatment", vi: "Bắt đầu hành trình chăm sóc toàn diện — đặt liệu trình", ko: "웰니스 여정을 시작하세요 — 트리트먼트 예약" })}
       >
         {/* Warm tint overlay */}
         <div
@@ -536,7 +577,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 lineHeight: 1.1,
               }}
             >
-              {vi ? "Bắt đầu hành trình an dưỡng" : "Begin Your Wellness Journey"}
+              {t({ en: "Begin Your Wellness Journey", vi: "Bắt đầu hành trình an dưỡng", ko: "웰니스 여정을 시작하세요" })}
             </h2>
           </AnimatedSection>
 
@@ -550,7 +591,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 lineHeight: 1.75,
               }}
             >
-              {vi ? "Chỉ một giờ tại Serena có thể giúp bạn cảm nhận khác biệt trong nhiều ngày." : "One hour with us can change the way you feel for days."}
+              {t({ en: "One hour with us can change the way you feel for days.", vi: "Chỉ một giờ tại Serena có thể giúp bạn cảm nhận khác biệt trong nhiều ngày.", ko: "세레나에서의 한 시간이 며칠 동안의 컨디션을 바꿔 줍니다." })}
             </p>
           </AnimatedSection>
 
@@ -566,7 +607,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   border: "none",
                 }}
               >
-                {vi ? "Đặt liệu trình" : "Book a Treatment"}
+                {t({ en: "Book a Treatment", vi: "Đặt liệu trình", ko: "트리트먼트 예약" })}
               </Link>
               <Link
                 href={withLocalePath(locale, "/services")}
@@ -577,7 +618,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                   border: "1.5px solid rgba(255,255,255,0.55)",
                 }}
               >
-                {vi ? "Xem tất cả dịch vụ" : "View All Services"}
+                {t({ en: "View All Services", vi: "Xem tất cả dịch vụ", ko: "전체 서비스 보기" })}
               </Link>
             </div>
           </AnimatedSection>

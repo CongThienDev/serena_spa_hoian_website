@@ -10,8 +10,11 @@ import { getNavItems, type NavItem } from "@/data/navigation";
 import {
   localeFromPathname,
   type Locale,
+  SUPPORTED_LOCALES,
+  stripLocalePrefix,
   withLocalePath,
 } from "@/lib/i18n";
+import { LOCALE_LABELS } from "./MainNav";
 import { cn } from "@/lib/utils";
 
 export default function MobileNav() {
@@ -101,6 +104,30 @@ export default function MobileNav() {
           <a href={`tel:${CONTACT.phone}`} className="btn btn-outline w-full justify-center">
             {t.mobileNav.callUs}
           </a>
+
+          <div className="pt-2">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-warm-gray)]">
+              {t.header.switchLanguage}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {SUPPORTED_LOCALES.map((loc) => (
+                <Link
+                  key={loc}
+                  href={withLocalePath(loc, stripLocalePrefix(pathname))}
+                  hrefLang={loc}
+                  onClick={close}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-sm transition-colors duration-200",
+                    loc === locale
+                      ? "border-[var(--color-terracotta)] text-[var(--color-terracotta)] font-medium"
+                      : "border-[var(--color-sand)] text-[var(--color-espresso)] hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
+                  )}
+                >
+                  {LOCALE_LABELS[loc]}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </nav>
     </>

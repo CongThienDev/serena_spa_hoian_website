@@ -11,7 +11,7 @@ import {
   getAllServicesLocalized,
   getServiceCategories,
 } from "@/data/services";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 /* ─── Category filter pill ──────────────────────────────────────────────── */
 
@@ -20,8 +20,8 @@ type FilterId = "all" | string;
 /* ─── Page component ────────────────────────────────────────────────────── */
 
 export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
-  const vi = locale === "vi";
-  const ALL_FILTER = { id: "all", label: vi ? "Tất cả dịch vụ" : "All Services" } as const;
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
+  const ALL_FILTER = { id: "all", label: t({ en: "All Services", vi: "Tất cả dịch vụ", ko: "전체 서비스" }) } as const;
   const SERVICE_CATEGORIES = getServiceCategories(locale);
   const localizedServices = getAllServicesLocalized(locale);
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
@@ -73,7 +73,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
           background:
             "linear-gradient(135deg, var(--color-cream-dark) 0%, var(--color-cream) 55%)",
         }}
-        aria-label={vi ? "Liệu trình tại Serena Spa" : "Serena Spa Treatments & Rituals"}
+        aria-label={t({ en: "Serena Spa Treatments & Rituals", vi: "Liệu trình tại Serena Spa", ko: "세레나 스파 트리트먼트 & 리추얼" })}
       >
         <div
           className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] w-full"
@@ -100,7 +100,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                     letterSpacing: "0.22em",
                   }}
                 >
-                  {vi ? "Dịch vụ của Serena" : "Our Services"}
+                  {t({ en: "Our Services", vi: "Dịch vụ của Serena", ko: "세레나 서비스" })}
                 </span>
                 <LotusMarkSmall size={14} color="var(--color-terracotta)" />
               </div>
@@ -118,9 +118,9 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                {vi ? "Liệu trình" : "Treatments"}<br />
+                {t({ en: "Treatments", vi: "Liệu trình", ko: "트리트먼트" })}<br />
                 <span style={{ color: "var(--color-terracotta)" }}>
-                  {vi ? "& Nghi thức" : "& Rituals"}
+                  {t({ en: "& Rituals", vi: "& Nghi thức", ko: "& 리추얼" })}
                 </span>
               </h1>
             </AnimatedSection>
@@ -141,9 +141,11 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                   fontStyle: "italic",
                 }}
               >
-                {vi
-                  ? "Mỗi liệu trình là một nghi thức. Mỗi nghi thức là hành trình trở về cân bằng của chính bạn."
-                  : "Every treatment is a ritual. Every ritual, a return to yourself. Explore relaxation therapies, body and facial care, signature rituals, spa packages, nail care, and hair care."}
+                {t({
+                  en: "Every treatment is a ritual. Every ritual, a return to yourself. Explore relaxation therapies, body and facial care, signature rituals, spa packages, nail care, and hair care.",
+                  vi: "Mỗi liệu trình là một nghi thức. Mỗi nghi thức là hành trình trở về cân bằng của chính bạn.",
+                  ko: "모든 트리트먼트는 하나의 리추얼이며, 모든 리추얼은 나 자신으로 돌아가는 길입니다. 릴랙세이션 테라피, 바디·페이셜 케어, 시그니처 리추얼, 스파 패키지, 네일·헤어 케어를 만나보세요.",
+                })}
               </p>
             </AnimatedSection>
           </div>
@@ -210,7 +212,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
           borderColor: "var(--color-sand)",
           boxShadow: "0 2px 16px rgba(61,31,15,0.06)",
         }}
-        aria-label={vi ? "Lọc dịch vụ theo danh mục" : "Filter treatments by category"}
+        aria-label={t({ en: "Filter treatments by category", vi: "Lọc dịch vụ theo danh mục", ko: "카테고리별 트리트먼트 필터" })}
       >
         <div className="container-site">
           <div className="flex items-center gap-2 overflow-x-auto py-4 no-scrollbar">
@@ -237,7 +239,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ backgroundColor: "var(--color-cream)" }}
-        aria-label={vi ? "Tất cả liệu trình" : "All treatments"}
+        aria-label={t({ en: "All treatments", vi: "Tất cả liệu trình", ko: "전체 트리트먼트" })}
       >
         <div className="container-site">
           {showGrouped ? (
@@ -312,7 +314,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                   className="text-center font-sans text-[var(--color-warm-gray)] py-16"
                   style={{ fontSize: "1rem" }}
                 >
-                  {vi ? "Không có dịch vụ trong danh mục này." : "No treatments found in this category."}
+                  {t({ en: "No treatments found in this category.", vi: "Không có dịch vụ trong danh mục này.", ko: "이 카테고리에는 트리트먼트가 없습니다." })}
                 </p>
               )}
             </AnimatedSection>
@@ -324,7 +326,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
       <section
         className="section-padding"
         style={{ backgroundColor: "var(--color-sand)" }}
-        aria-label={vi ? "Đặt liệu trình" : "Book your treatment"}
+        aria-label={t({ en: "Book your treatment", vi: "Đặt liệu trình", ko: "트리트먼트 예약" })}
       >
         <div className="container-site">
           <AnimatedSection animation="slide-up-fade">
@@ -341,7 +343,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                   letterSpacing: "0.22em",
                 }}
               >
-                {vi ? "Bắt đầu hôm nay" : "Begin Today"}
+                {t({ en: "Begin Today", vi: "Bắt đầu hôm nay", ko: "오늘 시작하세요" })}
               </span>
 
               {/* Heading */}
@@ -353,7 +355,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                   lineHeight: 1.1,
                 }}
               >
-                {vi ? "Sẵn sàng bắt đầu hành trình?" : "Ready to Begin Your Journey?"}
+                {t({ en: "Ready to Begin Your Journey?", vi: "Sẵn sàng bắt đầu hành trình?", ko: "여정을 시작할 준비가 되셨나요?" })}
               </h2>
 
               {/* Tagline */}
@@ -361,7 +363,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                 className="font-sans text-[var(--color-espresso-mid)]"
                 style={{ fontSize: "1rem", lineHeight: 1.7 }}
               >
-                {vi ? "Hỗ trợ đặt lịch trong ngày · Hội An, Việt Nam" : "Same-day bookings welcome · Hội An, Vietnam"}
+                {t({ en: "Same-day bookings welcome · Hội An, Vietnam", vi: "Hỗ trợ đặt lịch trong ngày · Hội An, Việt Nam", ko: "당일 예약 환영 · 베트남 호이안" })}
               </p>
 
               {/* CTAs */}
@@ -381,7 +383,7 @@ export default function ServicesPage({ locale = "en" }: { locale?: Locale }) {
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
                     />
                   </svg>
-                  {vi ? "Đặt lịch ngay" : "Book Now"}
+                  {t({ en: "Book Now", vi: "Đặt lịch ngay", ko: "예약하기" })}
                 </Link>
 
                 <a

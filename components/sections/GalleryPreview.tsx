@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
-import { type Locale, withLocalePath } from "@/lib/i18n";
+import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 /**
  * GalleryPreview — asymmetric masonry using real Serena Spa interior photography.
@@ -10,9 +10,9 @@ import { type Locale, withLocalePath } from "@/lib/i18n";
  * Mobile: 2-column uniform grid.
  */
 export default function GalleryPreview({ locale = "en" }: { locale?: Locale }) {
-  const eyebrow = locale === "vi" ? "Không gian Serena" : "Our Space";
-  const title = locale === "vi" ? "Bên trong Serena" : "Inside Serena";
-  const buttonLabel = locale === "vi" ? "Xem toàn bộ thư viện" : "View Full Gallery";
+  const eyebrow = localize(locale, { en: "Our Space", vi: "Không gian Serena", ko: "세레나의 공간" });
+  const title = localize(locale, { en: "Inside Serena", vi: "Bên trong Serena", ko: "세레나 내부" });
+  const buttonLabel = localize(locale, { en: "View Full Gallery", vi: "Xem toàn bộ thư viện", ko: "전체 갤러리 보기" });
   return (
     <section
       className="section-padding"

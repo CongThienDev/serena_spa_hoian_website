@@ -8,9 +8,23 @@ import { getDictionary } from "@/data/i18n";
 import {
   localeFromPathname,
   type Locale,
+  SUPPORTED_LOCALES,
+  stripLocalePrefix,
   withLocalePath,
 } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: "English",
+  vi: "Tiếng Việt",
+  ko: "한국어",
+};
+
+const LOCALE_SHORT: Record<Locale, string> = {
+  en: "EN",
+  vi: "VI",
+  ko: "KO",
+};
 
 export default function MainNav() {
   const pathname = usePathname();
@@ -152,17 +166,73 @@ function LanguageSwitcher({
   label: string;
   pathname: string;
 }) {
-  const targetLocale: Locale = locale === "vi" ? "en" : "vi";
-  const nextHref = withLocalePath(targetLocale, pathname);
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const basePath = stripLocalePrefix(pathname);
+
+  function handleEnter() {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  }
+  function handleLeave() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  }
 
   return (
-    <Link
-      href={nextHref}
-      aria-label={label}
-      className="ml-3 inline-flex items-center gap-1 rounded-full border border-[var(--color-sand)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-espresso)] transition-colors duration-200 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
-    >
-      <span aria-hidden="true">🌐</span>
-      <span>{locale.toUpperCase()} | {targetLocale.toUpperCase()}</span>
-    </Link>
+    <div className="relative ml-3" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+      <button
+        type="button"
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 rounded-full border border-[var(--color-sand)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-espresso)] transition-colors duration-200 hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta)]"
+      >
+        <span aria-hidden="true">🌐</span>
+        <span>{LOCALE_SHORT[locale]}</span>
+        <svg
+          className={cn("w-3 h-3 transition-transform duration-200", open && "rotate-180")}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <div
+        role="menu"
+        aria-label={label}
+        className={cn(
+          "absolute right-0 top-full mt-2 min-w-[150px]",
+          "bg-[var(--color-warm-white)] rounded-2xl",
+          "border border-[var(--color-sand)] shadow-[var(--shadow-float)]",
+          "py-2 overflow-hidden transition-all duration-200",
+          open
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 translate-y-2 scale-[0.98] pointer-events-none"
+        )}
+      >
+        {SUPPORTED_LOCALES.map((loc) => (
+          <Link
+            key={loc}
+            href={withLocalePath(loc, basePath)}
+            role="menuitem"
+            hrefLang={loc}
+            onClick={() => setOpen(false)}
+            className={cn(
+              "block px-5 py-2.5 text-sm",
+              "text-[var(--color-espresso-mid)] hover:text-[var(--color-terracotta)]",
+              "hover:bg-[var(--color-cream)] transition-colors duration-150",
+              loc === locale && "text-[var(--color-terracotta)] font-medium"
+            )}
+          >
+            {LOCALE_LABELS[loc]}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

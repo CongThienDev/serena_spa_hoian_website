@@ -1,0 +1,50 @@
+{
+  "header": {
+    "bookNow": "예약하기",
+    "switchLanguage": "언어 변경"
+  },
+  "mobileNav": {
+    "openMenu": "메뉴 열기",
+    "closeMenu": "메뉴 닫기",
+    "callUs": "전화하기",
+    "mobileNavigation": "모바일 내비게이션",
+    "expand": "펼치기",
+    "collapse": "접기"
+  },
+  "footer": {
+    "services": "서비스",
+    "company": "회사",
+    "findUs": "오시는 길",
+    "openingHours": "영업 시간",
+    "aboutUs": "소개",
+    "faqs": "자주 묻는 질문",
+    "privacyPolicy": "개인정보 처리방침",
+    "terms": "이용약관",
+    "allRightsReserved": "모든 권리 보유."
+  },
+  "nav": {
+    "about": "소개",
+    "services": "서비스",
+    "servicesAll": "전체 서비스",
+    "servicesRelaxation": "릴랙세이션",
+    "servicesBodyTreatment": "바디 트리트먼트",
+    "servicesFaceTreatment": "스파 - 페이스 트리트먼트",
+    "servicesBodyCareTreatment": "스파 - 바디 케어 트리트먼트",
+    "servicesSignature": "세레나 시그니처",
+    "servicesPackage": "스파 패키지",
+    "servicesNailCare": "네일 케어",
+    "servicesHairCare": "헤어 케어",
+    "wellness": "웰니스",
+    "wellnessOverview": "웰니스 개요",
+    "wellnessPhilosophy": "웰니스 철학",
+    "wellnessMethod": "세레나 메소드",
+    "gallery": "갤러리",
+    "blog": "블로그",
+    "contact": "문의"
+  },
+  "metadata": {
+    "siteTitle": "세레나 스파 호이안 — 프리미엄 웰니스 & 마사지",
+    "siteDescription": "호이안 세레나 스파에서 프리미엄 웰니스 트리트먼트, 시그니처 마사지, 전인적 힐링을 경험하세요. 지금 나만의 안식 시간을 예약하세요.",
+    "siteName": "세레나 스파 호이안"
+  }
+}

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
+import { localize, type Locale, withLocalePath, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@/lib/i18n";
 
 type GalleryImage = {
   src: string;
@@ -260,14 +262,34 @@ const GALLERY_IMAGES: GalleryImage[] = [
   },
 ];
 
-const FILTER_LABELS: Record<FilterCategory, string> = {
-  all: "All",
-  treatment: "Treatment Rooms",
-  lobby: "Lobby & Reception",
-  corridors: "Private Space & Locker",
+const FILTER_LABELS: Record<Locale, Record<FilterCategory, string>> = {
+  en: {
+    all: "All",
+    treatment: "Treatment Rooms",
+    lobby: "Lobby & Reception",
+    corridors: "Private Space & Locker",
+  },
+  vi: {
+    all: "Tất cả",
+    treatment: "Phòng trị liệu",
+    lobby: "Sảnh & tiếp tân",
+    corridors: "Không gian riêng & tủ đồ",
+  },
+  ko: {
+    all: "전체",
+    treatment: "트리트먼트 룸",
+    lobby: "로비 & 리셉션",
+    corridors: "프라이빗 공간 & 락커",
+  },
 };
 
 export default function GalleryPage() {
+  const pathname = usePathname();
+  // Extract locale from pathname (e.g., '/vi/gallery' → 'vi', '/gallery' → 'en')
+  const localeFromPath = pathname.split('/')[1];
+  const locale = (SUPPORTED_LOCALES.includes(localeFromPath as Locale) ? localeFromPath : DEFAULT_LOCALE) as Locale;
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
+
   const [activeFilter, setActiveFilter] = useState<FilterCategory>("all");
 
   const filteredImages =
@@ -286,7 +308,7 @@ export default function GalleryPage() {
           <AnimatedSection animation="fade" delay={0.05}>
             <div className="flex items-center justify-center gap-2.5 mb-5">
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
-              <span className="eyebrow">Our Space</span>
+              <span className="eyebrow">{t({ en: "Our Space", vi: "Không gian của chúng tôi", ko: "우리의 공간" })}</span>
               <LotusMarkSmall size={14} color="var(--color-terracotta)" />
             </div>
           </AnimatedSection>
@@ -302,7 +324,7 @@ export default function GalleryPage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              Inside Serena
+              {t({ en: "Inside Serena", vi: "Bên trong Serena", ko: "세레나 내부" })}
             </h1>
           </AnimatedSection>
 
@@ -311,8 +333,7 @@ export default function GalleryPage() {
               className="prose-spa mx-auto mt-5 text-center"
               style={{ maxWidth: "52ch" }}
             >
-              Step inside our sanctuary. Every room, every corridor, every
-              corner — designed with intention.
+              {t({ en: "Step inside our sanctuary. Every room, every corridor, every corner — designed with intention.", vi: "Bước vào không gian thánh địa của chúng tôi. Mỗi phòng, mỗi hành lang, mỗi góc — đều được thiết kế có mục đích.", ko: "우리의 성소 안으로 들어오세요. 모든 방, 모든 복도, 모든 모서리 — 의도적으로 설계되었습니다." })}
             </p>
           </AnimatedSection>
 
@@ -384,7 +405,7 @@ export default function GalleryPage() {
                       cursor: "pointer",
                     }}
                   >
-                    {FILTER_LABELS[category]}
+                    {FILTER_LABELS[locale][category]}
                   </button>
                 )
               )}
@@ -425,24 +446,23 @@ export default function GalleryPage() {
           <AnimatedSection animation="slide-up-fade" delay={0.05}>
             <div className="flex items-center justify-center gap-2.5 mb-4">
               <LotusMarkSmall size={12} color="var(--color-terracotta)" />
-              <span className="eyebrow">Ready to Visit?</span>
+              <span className="eyebrow">{t({ en: "Ready to Visit?", vi: "Sẵn sàng ghé thăm?", ko: "방문할 준비가 되셨나요?" })}</span>
               <LotusMarkSmall size={12} color="var(--color-terracotta)" />
             </div>
             <h2
               className="font-serif text-[var(--color-espresso)] mb-3"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)", fontWeight: 500 }}
             >
-              Experience It in Person
+              {t({ en: "Experience It in Person", vi: "Trải nghiệm trực tiếp", ko: "직접 경험하세요" })}
             </h2>
             <p
               className="text-[var(--color-espresso-mid)] mb-8"
               style={{ fontSize: "1rem", maxWidth: "44ch", margin: "0.75rem auto 2rem" }}
             >
-              No photograph can capture the warmth of our welcome. Come and
-              feel it for yourself.
+              {t({ en: "No photograph can capture the warmth of our welcome. Come and feel it for yourself.", vi: "Không có bức ảnh nào có thể bắt lấy sự ấm áp của lời chào đón chúng tôi. Hãy đến và cảm nhận nó bằng chính cảm xúc của bạn.", ko: "어떤 사진도 우리의 따뜻한 환영을 담아낼 수 없습니다. 직접 와서 경험해 보세요." })}
             </p>
-            <Link href="/booking" className="btn btn-primary btn-lg">
-              Book Your Visit
+            <Link href={withLocalePath(locale, "/booking")} className="btn btn-primary btn-lg">
+              {t({ en: "Book Your Visit", vi: "Đặt lịch ghé thăm", ko: "방문 예약하기" })}
             </Link>
           </AnimatedSection>
         </div>
