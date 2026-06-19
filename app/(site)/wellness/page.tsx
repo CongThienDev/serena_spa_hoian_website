@@ -250,9 +250,7 @@ export default function WellnessPage({ locale = "en" }: { locale?: Locale }) {
                 className="font-sans text-[var(--color-espresso)] mb-10"
                 style={{ fontSize: "1.0rem", lineHeight: 1.78, maxWidth: "36ch", opacity: 0.75 }}
               >
-                {vi
-                  ? "Tại Serena, chăm sóc toàn diện không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần."
-                  : "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit."}
+                {t({ vi: "Tại Serena, chăm sóc toàn diện không chỉ là dịch vụ mà là một trạng thái sống. Mỗi nghi thức, mỗi không gian, mỗi khoảnh khắc đều được thiết kế để phục hồi cơ thể, tĩnh tâm trí và đánh thức tinh thần.", en: "At Serena, wellness is not a service — it is a way of being. Every ritual, every room, every moment is designed to restore your body, quiet your mind, and awaken your spirit.", ko: "Serena에서 웰니스는 서비스가 아닌 삶의 방식입니다. 모든 의식, 모든 공간, 모든 순간은 몸을 회복하고 마음을 고요하게 하며 정신을 깨우도록 설계되었습니다." })}
               </p>
             </AnimatedSection>
 

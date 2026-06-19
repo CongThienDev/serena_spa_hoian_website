@@ -426,9 +426,7 @@ export default async function ServiceDetailPage({
                       maxWidth: "36ch",
                     }}
                   >
-                    {vi
-                      ? "Mỗi liệu trình được thiết kế để phục hồi cân bằng ở mọi cấp độ: cơ thể, tâm trí và tinh thần."
-                      : "Each treatment is designed to restore balance on every level — body, mind, and spirit."}
+                    {t({ vi: "Mỗi liệu trình được thiết kế để phục hồi cân bằng ở mọi cấp độ: cơ thể, tâm trí và tinh thần.", en: "Each treatment is designed to restore balance on every level — body, mind, and spirit.", ko: "각 트리트먼트는 신체, 마음, 정신의 모든 수준에서 균형을 회복하도록 설계되었습니다." })}
                   </p>
                 </div>
               </AnimatedSection>
@@ -723,9 +721,7 @@ export default async function ServiceDetailPage({
               className="font-sans text-[var(--color-sand)] max-w-md"
               style={{ fontSize: "0.975rem", lineHeight: 1.75 }}
             >
-              {vi
-                ? "Serena hỗ trợ đặt lịch trong ngày. Liên hệ trực tuyến hoặc qua WhatsApp để xác nhận nhanh."
-                : "Same-day bookings warmly welcomed. Connect with us online or via WhatsApp for instant confirmation."}
+              {t({ vi: "Serena hỗ trợ đặt lịch trong ngày. Liên hệ trực tuyến hoặc qua WhatsApp để xác nhận nhanh.", en: "Same-day bookings warmly welcomed. Connect with us online or via WhatsApp for instant confirmation.", ko: "당일 예약도 환영합니다. 온라인 또는 WhatsApp으로 바로 확인하세요." })}
             </p>
           </AnimatedSection>
 

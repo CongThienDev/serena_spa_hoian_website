@@ -472,8 +472,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   activeStep={activeStep}
                   locale={locale}
                 />
-                <h2 className="font-serif text-h4">{vi ? "1. Chọn dịch vụ" : "1. Choose Services"}</h2>
-                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{vi ? "Chọn dịch vụ, chọn thời lượng, hoàn tất." : "Tap service, tap duration, done."}</p>
+                <h2 className="font-serif text-h4">{t({ vi: "1. Chọn dịch vụ", en: "1. Choose Services", ko: "1. 서비스 선택" })}</h2>
+                <p className="mt-1 text-sm text-[var(--color-warm-gray)]">{t({ vi: "Chọn dịch vụ, chọn thời lượng, hoàn tất.", en: "Tap service, tap duration, done.", ko: "서비스를 선택하고 시간을 선택하세요." })}</p>
 
                 <div className="mt-5 grid gap-2">
                   {SERVICES.map((service) => (
@@ -729,7 +729,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
 
                         <label className="block">
                           <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                            {vi ? "Hoặc chọn ngày khác" : "Or choose another date"}
+                            {t({ vi: "Hoặc chọn ngày khác", en: "Or choose another date", ko: "다른 날짜 선택" })}
                           </span>
                           <input
                             className="input"
@@ -742,16 +742,14 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         </label>
                       </div>
 
-                      <Field label={vi ? "Giờ" : "Time"} required>
+                      <Field label={t({ vi: "Giờ", en: "Time", ko: "시간" })} required>
                         <div className="space-y-3">
                           {TIME_GROUPS.map((group) => (
                             <div key={group.label}>
                               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-warm-gray)]">
-                                {vi
-                                  ? group.label === "Morning"
-                                    ? "Buổi sáng"
-                                    : "Buổi chiều"
-                                  : group.label}
+                                {group.label === "Morning"
+                                  ? t({ vi: "Buổi sáng", en: "Morning", ko: "오전" })
+                                  : t({ vi: "Buổi chiều", en: "Afternoon", ko: "오후" })}
                               </p>
                               <div className="flex flex-wrap gap-2">
                                 {group.slots.map((slot) => {
@@ -783,7 +781,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   {isCartStepLocked && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="rounded-xl border border-[var(--color-sand-dark)] bg-[var(--color-warm-white)]/95 px-4 py-3 text-center text-sm text-[var(--color-espresso-mid)] shadow-sm backdrop-blur-sm">
-                        {vi ? "Chọn dịch vụ và thời lượng ở bước 1 để mở bước này." : "Choose a service duration in Step 1 to unlock this section."}
+                        {t({ vi: "Chọn dịch vụ và thời lượng ở bước 1 để mở bước này.", en: "Choose a service duration in Step 1 to unlock this section.", ko: "1단계에서 서비스 및 시간을 선택하면 이 섹션이 열립니다." })}
                       </div>
                     </div>
                   )}
@@ -792,7 +790,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   <div className="mt-6 space-y-3 border-t border-[var(--color-sand)] pt-5">
                     {!canGoNext && (
                       <p className="rounded-xl bg-[var(--color-terracotta-muted)] px-3 py-2 text-xs text-[var(--color-espresso-mid)]">
-                        {vi ? "Vui lòng hoàn tất giỏ hàng, ngày và giờ để tiếp tục." : "Complete cart, date and time to continue."}
+                        {t({ vi: "Vui lòng hoàn tất giỏ hàng, ngày và giờ để tiếp tục.", en: "Complete cart, date and time to continue.", ko: "장바구니, 날짜 및 시간을 완성하여 계속 진행하세요." })}
                       </p>
                     )}
                     <button
@@ -801,7 +799,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={!canGoNext}
                     >
-                      {vi ? "Tiếp tục" : "Next"}
+                      {t({ vi: "Tiếp tục", en: "Next", ko: "다음" })}
                     </button>
                   </div>
                 </div>
@@ -822,7 +820,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   activeStep={activeStep}
                   locale={locale}
                 />
-                <h2 className="font-serif text-h3">{vi ? "3. Thông tin khách hàng" : "3. Guest details"}</h2>
+                <h2 className="font-serif text-h3">{t({ vi: "3. Thông tin khách hàng", en: "3. Guest details", ko: "3. 고객 정보" })}</h2>
 
                 <button
                   type="button"
@@ -831,7 +829,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   aria-expanded={summaryOpen}
                   aria-controls="booking-summary-details"
                 >
-                  <span>{selectedItems.length} {vi ? "dịch vụ" : "service item(s)"} · {totalDuration} {vi ? "phút" : "min"} · {totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
+                  <span>{selectedItems.length} {t({ vi: "dịch vụ", en: "service item(s)", ko: "서비스" })} · {totalDuration} {t({ vi: "phút", en: "min", ko: "분" })} · {totalAfterCoupon.toLocaleString("vi-VN")} VND</span>
                   <span className="text-[var(--color-terracotta)]">{summaryOpen ? "▴" : "▾"}</span>
                 </button>
 
@@ -842,7 +840,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   {selectedItems.map((item) => (
                     <div key={`${item.serviceId}-${item.durationMinutes}`} className="flex items-center justify-between gap-3 text-xs">
                       <span className="text-[var(--color-espresso-mid)]">
-                        {item.service.name} · {item.durationMinutes} {vi ? "phút" : "min"} × {item.quantity}
+                        {item.service.name} · {item.durationMinutes} {t({ vi: "phút", en: "min", ko: "분" })} × {item.quantity}
                       </span>
                       <span className="font-semibold text-[var(--color-espresso)]">{item.lineTotal.toLocaleString("vi-VN")} VND</span>
                     </div>
@@ -856,9 +854,9 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         1
                       </span>
                       <div>
-                        <h3 className="text-xl font-semibold text-[var(--color-espresso)]">{vi ? "Thông tin của bạn" : "Your Information"}</h3>
+                        <h3 className="text-xl font-semibold text-[var(--color-espresso)]">{t({ vi: "Thông tin của bạn", en: "Your Information", ko: "고객 정보" })}</h3>
                         <p className="text-sm text-[var(--color-warm-gray)]">
-                          {vi ? "Chúng tôi cần các thông tin này để xác nhận đặt lịch." : "We need these details to confirm your booking."}
+                          {t({ vi: "Chúng tôi cần các thông tin này để xác nhận đặt lịch.", en: "We need these details to confirm your booking.", ko: "예약 확인을 위해 이 정보가 필요합니다." })}
                         </p>
                       </div>
                     </div>
@@ -866,7 +864,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
-                          {vi ? "Họ và tên" : "Full name"} <span className="text-[var(--color-terracotta)]">*</span>
+                          {t({ vi: "Họ và tên", en: "Full name", ko: "성함" })} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
                           className={`input ${nameMissing ? "border-[var(--color-terracotta)]" : ""}`}
@@ -874,19 +872,19 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                           value={form.name}
                           onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
                           autoComplete="name"
-                          placeholder={vi ? "Nguyễn Văn A" : "Alex John"}
+                          placeholder={t({ vi: "Nguyễn Văn A", en: "Alex John", ko: "홍길동" })}
                           required
                         />
                         {nameMissing && (
                           <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
-                            {vi ? "Vui lòng nhập họ và tên." : "Please enter your full name."}
+                            {t({ vi: "Vui lòng nhập họ và tên.", en: "Please enter your full name.", ko: "성함을 입력해 주세요." })}
                           </p>
                         )}
                       </div>
 
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
-                          {vi ? "Email" : "Email address"} <span className="text-[var(--color-terracotta)]">*</span>
+                          {t({ vi: "Email", en: "Email address", ko: "이메일" })} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
                           className={`input ${emailMissing ? "border-[var(--color-terracotta)]" : ""}`}
@@ -899,17 +897,17 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         />
                         {emailMissing && (
                           <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
-                            {vi ? "Vui lòng nhập email." : "Please enter your email address."}
+                            {t({ vi: "Vui lòng nhập email.", en: "Please enter your email address.", ko: "이메일을 입력해 주세요." })}
                           </p>
                         )}
                         <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
-                          {vi ? "Thông tin xác nhận đặt lịch sẽ được gửi về email này." : "Booking confirmation will be sent here"}
+                          {t({ vi: "Thông tin xác nhận đặt lịch sẽ được gửi về email này.", en: "Booking confirmation will be sent here", ko: "예약 확인 메일이 이 주소로 발송됩니다." })}
                         </p>
                       </div>
 
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
-                          {vi ? "Số điện thoại" : "Phone number"} <span className="text-[var(--color-terracotta)]">*</span>
+                          {t({ vi: "Số điện thoại", en: "Phone number", ko: "전화번호" })} <span className="text-[var(--color-terracotta)]">*</span>
                         </label>
                         <input
                           className={`input ${phoneMissing ? "border-[var(--color-terracotta)]" : ""}`}
@@ -922,63 +920,59 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         />
                         {phoneMissing && (
                           <p className="mt-1 text-xs text-[var(--color-terracotta-dark)]">
-                            {vi ? "Vui lòng nhập số điện thoại." : "Please enter your phone number."}
+                            {t({ vi: "Vui lòng nhập số điện thoại.", en: "Please enter your phone number.", ko: "전화번호를 입력해 주세요." })}
                           </p>
                         )}
                         <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
-                          {vi ? "Hướng dẫn viên sẽ gọi xác nhận điểm đón vào tối hôm trước." : "Our guide will call to confirm pickup time the evening before"}
+                          {t({ vi: "Hướng dẫn viên sẽ gọi xác nhận điểm đón vào tối hôm trước.", en: "Our guide will call to confirm pickup time the evening before", ko: "가이드가 전날 저녁에 픽업 시간을 확인하기 위해 전화드립니다." })}
                         </p>
                       </div>
 
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
-                          {vi ? "Điểm đón" : "Pickup location"} <span className="font-normal text-[var(--color-warm-gray)]">({vi ? "tùy chọn" : "optional"})</span>
+                          {t({ vi: "Điểm đón", en: "Pickup location", ko: "픽업 장소" })} <span className="font-normal text-[var(--color-warm-gray)]">({t({ vi: "tùy chọn", en: "optional", ko: "선택 사항" })})</span>
                         </label>
                         <input
                           className="input"
                           type="text"
                           value={form.pickupLocation}
                           onChange={(event) => setForm((prev) => ({ ...prev, pickupLocation: event.target.value }))}
-                          placeholder={vi ? "Tên khách sạn hoặc địa chỉ" : "Hotel name or street address"}
+                          placeholder={t({ vi: "Tên khách sạn hoặc địa chỉ", en: "Hotel name or street address", ko: "호텔명 또는 주소" })}
                         />
                         <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
-                          {vi ? "Có thể để trống nếu bạn gặp chúng tôi tại spa." : "Leave blank to meet us at the office"}
+                          {t({ vi: "Có thể để trống nếu bạn gặp chúng tôi tại spa.", en: "Leave blank to meet us at the office", ko: "스파에서 직접 만나실 경우 비워두셔도 됩니다." })}
                         </p>
                       </div>
                     </div>
 
                     <div className="mt-4">
                       <label className="mb-1 block text-sm font-semibold text-[var(--color-espresso)]">
-                        {vi ? "Yêu cầu đặc biệt" : "Special requests"} <span className="font-normal text-[var(--color-warm-gray)]">({vi ? "tùy chọn" : "optional"})</span>
+                        {t({ vi: "Yêu cầu đặc biệt", en: "Special requests", ko: "특별 요청" })} <span className="font-normal text-[var(--color-warm-gray)]">({t({ vi: "tùy chọn", en: "optional", ko: "선택 사항" })})</span>
                       </label>
                       <textarea
                         className="input min-h-[110px]"
                         value={form.note}
                         onChange={(event) => setForm((prev) => ({ ...prev, note: event.target.value }))}
-                        placeholder={
-                          vi
-                            ? "Yêu cầu ăn kiêng, dị ứng, hỗ trợ đặc biệt, dịp kỷ niệm..."
-                            : "Dietary requirements, allergies, accessibility needs, special occasions..."
-                        }
+                        placeholder={t({
+                          vi: "Yêu cầu ăn kiêng, dị ứng, hỗ trợ đặc biệt, dịp kỷ niệm...",
+                          en: "Dietary requirements, allergies, accessibility needs, special occasions...",
+                          ko: "식이 요건, 알레르기, 접근성 요구, 기념일...",
+                        })}
                       />
                       <p className="mt-2 text-xs text-[var(--color-warm-gray)]">
-                        {vi ? "Chúng tôi sẽ cố gắng hỗ trợ các yêu cầu của bạn trong khả năng tốt nhất." : "We'll accommodate your requests wherever possible"}
+                        {t({ vi: "Chúng tôi sẽ cố gắng hỗ trợ các yêu cầu của bạn trong khả năng tốt nhất.", en: "We'll accommodate your requests wherever possible", ko: "가능한 모든 요청을 최대한 수용하겠습니다." })}
                       </p>
                     </div>
 
                     <div className="mt-4 rounded-xl border border-[var(--color-sand)] bg-[var(--color-warm-white)] px-4 py-3 text-[15px] leading-relaxed text-[var(--color-espresso-mid)]">
-                      <strong className="text-[var(--color-espresso)]">{vi ? "Vui lòng giữ máy điện thoại" : "Please keep your phone available"}</strong>{" "}
-                      {vi
-                        ? "để hướng dẫn viên có thể gọi xác nhận điểm đón và thời gian vào tối hôm trước. Hãy sẵn sàng liên lạc từ 18:00 trở đi."
-                        : "our guide will call the evening before your tour to confirm the exact meeting point and pickup time. Stay reachable from 6 PM onwards that day."}
+                      <strong className="text-[var(--color-espresso)]">{t({ vi: "Vui lòng giữ máy điện thoại", en: "Please keep your phone available", ko: "전화를 받을 수 있게 준비해 주세요" })}</strong>{" "}
+                      {t({ vi: "để hướng dẫn viên có thể gọi xác nhận điểm đón và thời gian vào tối hôm trước. Hãy sẵn sàng liên lạc từ 18:00 trở đi.", en: "our guide will call the evening before your tour to confirm the exact meeting point and pickup time. Stay reachable from 6 PM onwards that day.", ko: "가이드가 투어 전날 저녁에 정확한 만남 장소와 픽업 시간을 확인하기 위해 전화드립니다. 오후 6시 이후로 연락 가능하게 해주세요." })}
                     </div>
                   </div>
 
                   {showValidation && (
                     <p className="px-1 text-xs text-[var(--color-warm-gray)]">
-                      {vi
-                        ? "Vui lòng nhập đủ thông tin bắt buộc và xác nhận chính sách để đặt lịch."
-                        : "Complete required details and accept policy terms to confirm booking."}
+                      {t({ vi: "Vui lòng nhập đủ thông tin bắt buộc và xác nhận chính sách để đặt lịch.", en: "Complete required details and accept policy terms to confirm booking.", ko: "필수 항목을 모두 입력하고 정책 약관에 동의해 주세요." })}
                     </p>
                   )}
                   {submitError && (
@@ -990,23 +984,19 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                   <details className="rounded-xl border border-[var(--color-sand)] bg-[var(--color-cream-dark)] px-4 py-3">
                     <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-sand-dark)] bg-[var(--color-warm-white)] px-3 py-2 text-sm font-semibold text-[var(--color-espresso)] transition hover:border-[var(--color-terracotta)] hover:text-[var(--color-terracotta-dark)]">
                       <span>
-                        {vi
-                          ? "CHINH SACH DOI HEN VA HUY BO | THONG TIN DAT DICH VU"
-                          : "CANCELLATION POLICY | BOOKING INFORMATION"}
+                        {t({ vi: "CHINH SACH DOI HEN VA HUY BO | THONG TIN DAT DICH VU", en: "CANCELLATION POLICY | BOOKING INFORMATION", ko: "예약 취소 정책 | 예약 안내" })}
                       </span>
                       <span className="text-[var(--color-terracotta)]">▾</span>
                     </summary>
                     <div className="mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-espresso-mid)]">
                       <p>
-                        {vi
-                          ? "Viec den muon co the anh huong lich tri lieu tiep theo va co the lam thay doi hoac rut ngan thoi gian tri lieu cua quy khach. Vui long thong bao it nhat truoc 4 gio de tranh phi huy 100%."
-                          : "Late arrival may affect following guests and your treatment may be shortened. Please inform us at least 4 hours in advance to avoid a 100% cancellation fee."}
+                        {t({ vi: "Viec den muon co the anh huong lich tri lieu tiep theo va co the lam thay doi hoac rut ngan thoi gian tri lieu cua quy khach. Vui long thong bao it nhat truoc 4 gio de tranh phi huy 100%.", en: "Late arrival may affect following guests and your treatment may be shortened. Please inform us at least 4 hours in advance to avoid a 100% cancellation fee.", ko: "늦은 도착은 다음 고객의 일정에 영향을 줄 수 있으며 시술 시간이 단축될 수 있습니다. 100% 취소 수수료를 피하려면 최소 4시간 전에 알려주세요." })}
                       </p>
                       <ul className="space-y-1 text-sm">
-                        <li>{vi ? "Dat lich som de co lua chon tot nhat." : "Plan in advance to make your best choice."}</li>
-                        <li>{vi ? "Vui long den truoc 15 phut so voi lich hen." : "Please arrive 15 minutes before your appointment."}</li>
-                        <li>{vi ? "Vui long cho chung toi biet tinh trang suc khoe." : "Please let us know your health condition."}</li>
-                        <li>{vi ? "Vui long de tu trang tai phong, khong mang den spa." : "Please leave belongings in your room and do not bring them to the spa."}</li>
+                        <li>{t({ vi: "Dat lich som de co lua chon tot nhat.", en: "Plan in advance to make your best choice.", ko: "미리 예약하여 최선의 선택을 하세요." })}</li>
+                        <li>{t({ vi: "Vui long den truoc 15 phut so voi lich hen.", en: "Please arrive 15 minutes before your appointment.", ko: "예약 시간 15분 전에 도착해 주세요." })}</li>
+                        <li>{t({ vi: "Vui long cho chung toi biet tinh trang suc khoe.", en: "Please let us know your health condition.", ko: "건강 상태를 알려주세요." })}</li>
+                        <li>{t({ vi: "Vui long de tu trang tai phong, khong mang den spa.", en: "Please leave belongings in your room and do not bring them to the spa.", ko: "귀중품은 방에 두고 스파에 가져오지 마세요." })}</li>
                       </ul>
                     </div>
                   </details>
@@ -1020,14 +1010,12 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       required
                     />
                     <span>
-                      {vi
-                        ? "Toi da doc va dong y voi chinh sach doi hen, huy bo va thong tin dat dich vu."
-                        : "I have read and agree to the cancellation policy and booking information."}
+                      {t({ vi: "Toi da doc va dong y voi chinh sach doi hen, huy bo va thong tin dat dich vu.", en: "I have read and agree to the cancellation policy and booking information.", ko: "예약 취소 정책 및 예약 안내를 읽고 동의합니다." })}
                     </span>
                   </label>
                   {policyMissing && (
                     <p className="mt-1 px-1 text-xs text-[var(--color-terracotta-dark)]">
-                      {vi ? "Vui lòng xác nhận bạn đã đọc chính sách." : "Please confirm you have read the policy."}
+                      {t({ vi: "Vui lòng xác nhận bạn đã đọc chính sách.", en: "Please confirm you have read the policy.", ko: "정책을 읽었음을 확인해 주세요." })}
                     </p>
                   )}
 
@@ -1037,7 +1025,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       onClick={handleBackToBuildStep}
                       className="btn btn-outline flex-1"
                     >
-                      {vi ? "Quay lại" : "Back"}
+                      {t({ vi: "Quay lại", en: "Back", ko: "뒤로" })}
                     </button>
                     <button
                       type="submit"
@@ -1045,8 +1033,8 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                       disabled={!canSubmit || isSubmitting}
                     >
                       {isSubmitting
-                        ? (vi ? "Đang gửi..." : "Submitting...")
-                        : (vi ? "Xác nhận yêu cầu đặt lịch" : "Confirm Booking Request")}
+                        ? t({ vi: "Đang gửi...", en: "Submitting...", ko: "제출 중..." })
+                        : t({ vi: "Xác nhận yêu cầu đặt lịch", en: "Confirm Booking Request", ko: "예약 요청 확인" })}
                     </button>
                   </div>
                 </form>
@@ -1108,26 +1096,26 @@ function StepRow({
   activeStep: "build" | "contact";
   locale: Locale;
 }) {
-  const vi = locale === "vi";
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
   const steps = [
-    { label: vi ? "Dịch vụ" : "Service", done: hasCart },
-    { label: vi ? "Lịch hẹn" : "Schedule", done: isScheduleReady },
-    { label: vi ? "Liên hệ" : "Contact", done: isContactReady },
+    { label: t({ vi: "Dịch vụ", en: "Service", ko: "서비스" }), key: "service", done: hasCart },
+    { label: t({ vi: "Lịch hẹn", en: "Schedule", ko: "일정" }), key: "schedule", done: isScheduleReady },
+    { label: t({ vi: "Liên hệ", en: "Contact", ko: "연락처" }), key: "contact", done: isContactReady },
   ];
 
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-2" aria-label={vi ? "Tiến trình đặt lịch" : "Booking progress"}>
+    <div className="mb-5 flex flex-wrap items-center gap-2" aria-label={t({ vi: "Tiến trình đặt lịch", en: "Booking progress", ko: "예약 진행 상황" })}>
       {steps.map((step) => (
         <span
-          key={step.label}
+          key={step.key}
           className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]"
           style={{
             borderColor: step.done ? "var(--color-terracotta)" : "var(--color-sand-dark)",
             color: step.done ? "var(--color-terracotta-dark)" : "var(--color-warm-gray)",
             backgroundColor:
               step.done ||
-              (activeStep === "build" && step.label !== (vi ? "Liên hệ" : "Contact")) ||
-              (activeStep === "contact" && step.label === (vi ? "Liên hệ" : "Contact"))
+              (activeStep === "build" && step.key !== "contact") ||
+              (activeStep === "contact" && step.key === "contact")
                 ? "var(--color-terracotta-muted)"
                 : "transparent",
           }}
@@ -1159,12 +1147,13 @@ function isPackageService(categoryId: string) {
   return categoryId === "spa-package";
 }
 
-function getQuantityUnitLabel(serviceId: string, vi: boolean) {
+function getQuantityUnitLabel(serviceId: string, locale: Locale) {
+  const t = <T,>(v: Record<Locale, T>): T => localize(locale, v);
   if (serviceId === "serena-signature-3-days-long-stay-couple") {
-    return vi ? "Gói" : "Package";
+    return t({ vi: "Gói", en: "Package", ko: "패키지" });
   }
 
-  return vi ? "Khách" : "Guests";
+  return t({ vi: "Khách", en: "Guests", ko: "인원" });
 }
 
 function getLocalDateISO(addDays: number) {

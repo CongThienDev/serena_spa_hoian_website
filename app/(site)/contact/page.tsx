@@ -98,9 +98,7 @@ export default function ContactPage({ locale = "en" }: { locale?: Locale }) {
               className="prose-spa mx-auto mt-5 text-center"
               style={{ maxWidth: "54ch" }}
             >
-              {vi
-                ? "Dù bạn muốn đặt lịch hay chỉ cần tư vấn, Serena luôn ở đây để hỗ trợ bạn tận tâm."
-                : "We're here whenever you need us. Whether you're booking a treatment or just have a question — reach out and we'll respond warmly."}
+              {t({ vi: "Dù bạn muốn đặt lịch hay chỉ cần tư vấn, Serena luôn ở đây để hỗ trợ bạn tận tâm.", en: "We're here whenever you need us. Whether you're booking a treatment or just have a question — reach out and we'll respond warmly.", ko: "예약이든 문의든, Serena는 언제나 따뜻하게 도와드립니다." })}
             </p>
           </AnimatedSection>
         </div>

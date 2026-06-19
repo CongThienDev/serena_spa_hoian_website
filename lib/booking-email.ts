@@ -1,8 +1,9 @@
 import nodemailer from "nodemailer";
+import { localize, type Locale } from "@/lib/i18n";
 
 type BookingEmailPayload = {
   id: string;
-  locale: "vi" | "en";
+  locale: Locale;
   customer: {
     name: string;
     phone: string;
@@ -62,7 +63,7 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function formatDate(date: string, locale: "vi" | "en") {
+function formatDate(date: string, locale: Locale) {
   const [rawYear = 1970, rawMonth = 1, rawDay = 1] = date
     .split("-")
     .map((part) => Number(part));
@@ -70,7 +71,8 @@ function formatDate(date: string, locale: "vi" | "en") {
   const month = Number.isFinite(rawMonth) ? rawMonth : 1;
   const day = Number.isFinite(rawDay) ? rawDay : 1;
   const normalizedDate = new Date(Date.UTC(year, month - 1, day, 12));
-  return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
+  const intlLocale = locale === "vi" ? "vi-VN" : locale === "ko" ? "ko-KR" : "en-US";
+  return new Intl.DateTimeFormat(intlLocale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -124,7 +126,7 @@ function formatItemsText(items: BookingEmailPayload["items"]) {
 }
 
 function buildCustomerEmail(payload: BookingEmailPayload) {
-  const vi = payload.locale === "vi";
+  const t = <T,>(v: Record<Locale, T>): T => localize(payload.locale, v);
   const customerName = escapeHtml(payload.customer.name);
   const pickupLocation = payload.customer.pickupLocation?.trim();
   const note = payload.customer.note?.trim();
@@ -133,11 +135,13 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
   const couponSummary = formatCouponSummary(payload.coupon);
 
   return {
-    subject: vi
-      ? `Xác nhận yêu cầu đặt lịch #${payload.id} - Serena Spa Hội An`
-      : `Booking request confirmation #${payload.id} - Serena Spa Hoi An`,
-    text: vi
-      ? [
+    subject: t({
+      vi: `Xác nhận yêu cầu đặt lịch #${payload.id} - Serena Spa Hội An`,
+      en: `Booking request confirmation #${payload.id} - Serena Spa Hoi An`,
+      ko: `예약 요청 확인 #${payload.id} - Serena Spa Hoi An`,
+    }),
+    text: t({
+      vi: [
           `Kính chào ${payload.customer.name},`,
           "",
           "Serena Spa Hội An đã nhận được yêu cầu đặt lịch của quý khách.",
@@ -157,8 +161,8 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
           "Đội ngũ Serena sẽ liên hệ sớm để xác nhận lịch hẹn và chuẩn bị trải nghiệm chu đáo nhất cho quý khách.",
           "Trân trọng,",
           "Serena Spa Hội An",
-        ].join("\n")
-      : [
+        ].join("\n"),
+      en: [
           `Dear ${payload.customer.name},`,
           "",
           "Serena Spa Hoi An has received your booking request.",
@@ -179,14 +183,32 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
           "With warm regards,",
           "Serena Spa Hoi An",
         ].join("\n"),
+      ko: [
+          `안녕하세요 ${payload.customer.name} 고객님,`,
+          "",
+          "Serena Spa Hoi An에서 예약 요청을 받았습니다.",
+          `예약 ID: ${payload.id}`,
+          `날짜: ${formattedDate}`,
+          `시간: ${payload.schedule.time}`,
+          "",
+          "서비스:",
+          formatItemsText(payload.items),
+          "",
+          `총 시간: ${payload.totals.totalDurationMinutes}분`,
+          `총 금액: ${formatCurrency(payload.totals.totalAfterCouponVND)}`,
+          ...(couponSummary ? [`쿠폰: ${couponSummary}`] : []),
+          ...(pickupLocation ? [`픽업 장소: ${pickupLocation}`] : []),
+          ...(note ? [`메모: ${note}`] : []),
+          "",
+          "저희 팀이 곧 연락드려 예약을 확인하고 최상의 웰니스 경험을 준비하겠습니다.",
+          "감사합니다,",
+          "Serena Spa Hoi An",
+        ].join("\n"),
+    }),
     html: `
       <div style="margin:0;padding:0;background:${BRAND.cream};font-family:Arial,Helvetica,sans-serif;color:${BRAND.espresso};">
         <div style="display:none;max-height:0;overflow:hidden;color:transparent;">
-          ${
-            vi
-              ? "Serena Spa Hội An đã nhận được yêu cầu đặt lịch của quý khách."
-              : "Serena Spa Hoi An has received your booking request."
-          }
+          ${t({ vi: "Serena Spa Hội An đã nhận được yêu cầu đặt lịch của quý khách.", en: "Serena Spa Hoi An has received your booking request.", ko: "Serena Spa Hoi An에서 예약 요청을 받았습니다." })}
         </div>
         <div style="max-width:720px;margin:0 auto;padding:32px 18px;">
           <div style="background:${BRAND.warmWhite};border:1px solid ${BRAND.sand};border-radius:24px;overflow:hidden;box-shadow:0 18px 42px rgba(61,31,15,0.08);">
@@ -198,37 +220,33 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
 
             <div style="padding:30px 28px 10px;">
               <p style="margin:0 0 10px;color:${BRAND.terracottaDark};font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;">
-                ${vi ? "Yêu cầu đặt lịch đã được ghi nhận" : "Booking Request Received"}
+                ${t({ vi: "Yêu cầu đặt lịch đã được ghi nhận", en: "Booking Request Received", ko: "예약 요청이 접수되었습니다" })}
               </p>
               <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.2;font-weight:400;color:${BRAND.espresso};">
-                ${vi ? "Cảm ơn quý khách đã chọn Serena Spa Hội An" : "Thank you for choosing Serena Spa Hoi An"}
+                ${t({ vi: "Cảm ơn quý khách đã chọn Serena Spa Hội An", en: "Thank you for choosing Serena Spa Hoi An", ko: "Serena Spa Hoi An을 선택해 주셔서 감사합니다" })}
               </h1>
               <p style="margin:18px 0 0;font-size:16px;line-height:1.75;color:${BRAND.espressoMid};">
-                ${vi ? "Kính chào" : "Dear"} ${customerName},<br />
-                ${
-                  vi
-                    ? "Chúng tôi đã nhận được yêu cầu đặt lịch của quý khách. Đội ngũ Serena sẽ liên hệ sớm để xác nhận lịch hẹn và chuẩn bị trải nghiệm thư giãn một cách chu đáo."
-                    : "We have received your booking request. Our team will contact you shortly to confirm the appointment and prepare your wellness experience with care."
-                }
+                ${t({ vi: "Kính chào", en: "Dear", ko: "안녕하세요" })} ${customerName},<br />
+                ${t({ vi: "Chúng tôi đã nhận được yêu cầu đặt lịch của quý khách. Đội ngũ Serena sẽ liên hệ sớm để xác nhận lịch hẹn và chuẩn bị trải nghiệm thư giãn một cách chu đáo.", en: "We have received your booking request. Our team will contact you shortly to confirm the appointment and prepare your wellness experience with care.", ko: "예약 요청을 받았습니다. 저희 팀이 곧 연락드려 예약을 확인하고 최상의 웰니스 경험을 준비하겠습니다." })}
               </p>
             </div>
 
             <div style="padding:18px 28px 4px;">
               <div style="background:${BRAND.cream};border:1px solid ${BRAND.sand};border-radius:20px;padding:20px;">
                 <p style="margin:0 0 14px;color:${BRAND.warmGray};font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">
-                  ${vi ? "Thông tin lịch hẹn" : "Appointment Details"}
+                  ${t({ vi: "Thông tin lịch hẹn", en: "Appointment Details", ko: "예약 정보" })}
                 </p>
                 <table style="width:100%;border-collapse:collapse;">
                   <tr>
-                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${vi ? "Mã booking" : "Booking ID"}</td>
+                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${t({ vi: "Mã booking", en: "Booking ID", ko: "예약 ID" })}</td>
                     <td style="padding:8px 0;text-align:right;color:${BRAND.espresso};font-weight:700;">${escapeHtml(payload.id)}</td>
                   </tr>
                   <tr>
-                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${vi ? "Ngày" : "Date"}</td>
+                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${t({ vi: "Ngày", en: "Date", ko: "날짜" })}</td>
                     <td style="padding:8px 0;text-align:right;color:${BRAND.espresso};font-weight:700;">${escapeHtml(formattedDate)}</td>
                   </tr>
                   <tr>
-                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${vi ? "Giờ" : "Time"}</td>
+                    <td style="padding:8px 0;color:${BRAND.warmGray};font-size:13px;">${t({ vi: "Giờ", en: "Time", ko: "시간" })}</td>
                     <td style="padding:8px 0;text-align:right;color:${BRAND.espresso};font-weight:700;">${escapeHtml(payload.schedule.time)}</td>
                   </tr>
                 </table>
@@ -237,15 +255,15 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
 
             <div style="padding:20px 28px 4px;">
               <p style="margin:0 0 12px;color:${BRAND.warmGray};font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">
-                ${vi ? "Dịch vụ đã chọn" : "Selected Services"}
+                ${t({ vi: "Dịch vụ đã chọn", en: "Selected Services", ko: "선택한 서비스" })}
               </p>
               <table style="width:100%;border-collapse:separate;border-spacing:0;border:1px solid ${BRAND.sand};border-radius:18px;overflow:hidden;background:${BRAND.warmWhite};">
                 <thead style="background:#f4e6db;">
                   <tr>
-                    <th style="padding:13px 16px;text-align:left;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${vi ? "Dịch vụ" : "Service"}</th>
-                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${vi ? "Phút" : "Min"}</th>
-                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${vi ? "SL" : "Qty"}</th>
-                    <th style="padding:13px 16px;text-align:right;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${vi ? "Tổng" : "Amount"}</th>
+                    <th style="padding:13px 16px;text-align:left;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${t({ vi: "Dịch vụ", en: "Service", ko: "서비스" })}</th>
+                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${t({ vi: "Phút", en: "Min", ko: "분" })}</th>
+                    <th style="padding:13px 16px;text-align:center;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${t({ vi: "SL", en: "Qty", ko: "수량" })}</th>
+                    <th style="padding:13px 16px;text-align:right;color:${BRAND.espresso};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">${t({ vi: "Tổng", en: "Amount", ko: "금액" })}</th>
                   </tr>
                 </thead>
                 <tbody>${itemsHtml}</tbody>
@@ -256,7 +274,7 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
               <div style="background:${BRAND.espresso};border-radius:20px;padding:20px;color:${BRAND.warmWhite};">
                 <table style="width:100%;border-collapse:collapse;">
                   <tr>
-                    <td style="padding:6px 0;color:${BRAND.sand};">${vi ? "Tổng thời lượng" : "Total duration"}</td>
+                    <td style="padding:6px 0;color:${BRAND.sand};">${t({ vi: "Tổng thời lượng", en: "Total duration", ko: "총 시간" })}</td>
                     <td style="padding:6px 0;text-align:right;font-weight:700;">${payload.totals.totalDurationMinutes} min</td>
                   </tr>
                   ${
@@ -268,7 +286,7 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
                       : ""
                   }
                   <tr>
-                    <td style="padding:10px 0 0;color:${BRAND.sand};font-size:16px;">${vi ? "Tổng thanh toán" : "Total amount"}</td>
+                    <td style="padding:10px 0 0;color:${BRAND.sand};font-size:16px;">${t({ vi: "Tổng thanh toán", en: "Total amount", ko: "총 금액" })}</td>
                     <td style="padding:10px 0 0;text-align:right;font-size:22px;font-weight:700;color:${BRAND.brass};">${formatCurrency(payload.totals.totalAfterCouponVND)}</td>
                   </tr>
                 </table>
@@ -279,8 +297,8 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
               pickupLocation || note
                 ? `<div style="padding:20px 28px 4px;">
                     <div style="border-left:3px solid ${BRAND.terracotta};padding:4px 0 4px 16px;color:${BRAND.espressoMid};font-size:14px;line-height:1.65;">
-                      ${pickupLocation ? `<p style="margin:0 0 6px;"><strong>${vi ? "Điểm đón" : "Pickup location"}:</strong> ${escapeHtml(pickupLocation)}</p>` : ""}
-                      ${note ? `<p style="margin:0;"><strong>${vi ? "Ghi chú" : "Notes"}:</strong> ${escapeHtml(note)}</p>` : ""}
+                      ${pickupLocation ? `<p style="margin:0 0 6px;"><strong>${t({ vi: "Điểm đón", en: "Pickup location", ko: "픽업 장소" })}:</strong> ${escapeHtml(pickupLocation)}</p>` : ""}
+                      ${note ? `<p style="margin:0;"><strong>${t({ vi: "Ghi chú", en: "Notes", ko: "메모" })}:</strong> ${escapeHtml(note)}</p>` : ""}
                     </div>
                   </div>`
                 : ""
@@ -288,14 +306,10 @@ function buildCustomerEmail(payload: BookingEmailPayload) {
 
             <div style="padding:24px 28px 30px;">
               <div style="background:${BRAND.cream};border-radius:18px;padding:18px;color:${BRAND.espressoMid};font-size:15px;line-height:1.7;">
-                ${
-                  vi
-                    ? "Đây là email xác nhận Serena đã nhận được yêu cầu đặt lịch. Lịch hẹn sẽ được xác nhận chính thức sau khi đội ngũ của chúng tôi liên hệ lại với quý khách."
-                    : "This email confirms that Serena has received your booking request. Your appointment will be officially confirmed after our team contacts you."
-                }
+                ${t({ vi: "Đây là email xác nhận Serena đã nhận được yêu cầu đặt lịch. Lịch hẹn sẽ được xác nhận chính thức sau khi đội ngũ của chúng tôi liên hệ lại với quý khách.", en: "This email confirms that Serena has received your booking request. Your appointment will be officially confirmed after our team contacts you.", ko: "이 이메일은 Serena가 예약 요청을 받았음을 확인합니다. 저희 팀이 연락드린 후 예약이 공식적으로 확인됩니다." })}
               </div>
               <p style="margin:22px 0 0;color:${BRAND.espressoMid};font-size:15px;line-height:1.7;">
-                ${vi ? "Trân trọng," : "With warm regards,"}<br />
+                ${t({ vi: "Trân trọng,", en: "With warm regards,", ko: "감사합니다," })}<br />
                 <strong style="color:${BRAND.espresso};">Serena Spa Hoi An</strong>
               </p>
             </div>
