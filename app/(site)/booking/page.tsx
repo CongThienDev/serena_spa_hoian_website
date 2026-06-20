@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { LotusMarkSmall } from "@/components/ui/LotusIcon";
-import { SERVICES, getServiceBySlug } from "@/data/services";
+import { SERVICES, getServiceBySlug, getServicePriceVND } from "@/data/services";
 import { localize, type Locale, withLocalePath } from "@/lib/i18n";
 
 type CartItem = {
@@ -85,7 +85,7 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
         .map((item) => {
           const service = SERVICES.find((s) => s.id === item.serviceId);
           if (!service) return null;
-          const unitPrice = service.priceVND ?? Math.round(service.price * 25000);
+          const unitPrice = getServicePriceVND(service, item.durationMinutes);
           return {
             ...item,
             service,
@@ -492,10 +492,10 @@ export default function BookingPage({ locale = "en" }: { locale?: Locale }) {
                         backgroundColor:
                           activeServiceId === service.id ? "var(--color-terracotta-muted)" : "transparent",
                       }}
-                    >
+                        >
                       <span className="min-w-0 flex-1 font-sans text-sm text-[var(--color-espresso)]">{service.name}</span>
                       <span className="shrink-0 font-sans text-xs text-[var(--color-warm-gray)]">
-                        {t({ en: "From", vi: "Từ", ko: "최소" })} {service.priceVND?.toLocaleString("vi-VN") ?? `${service.price} USD`}
+                        {t({ en: "From", vi: "Từ", ko: "최소" })} {getServicePriceVND(service).toLocaleString("vi-VN")} VND
                       </span>
                     </button>
                   ))}

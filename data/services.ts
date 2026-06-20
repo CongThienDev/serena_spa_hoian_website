@@ -23,6 +23,7 @@ export type Service = {
   duration: number[]; // in minutes — multiple options
   price: number;      // base price in USD
   priceVND?: number;  // price in VND
+  priceByDurationVND?: Partial<Record<number, number>>;
   image: string;      // path relative to /public
   gallery?: string[];
   benefits?: string[];
@@ -112,6 +113,10 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 10,
     priceVND: 250000,
+    priceByDurationVND: {
+      30: 250000,
+      60: 450000,
+    },
     image: "/images/serena_image/z7863130080318_bd46759e1d082e30adb7e1b0a0e90bd0.jpg",
     isFeatured: true,
   },
@@ -126,6 +131,10 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 13,
     priceVND: 320000,
+    priceByDurationVND: {
+      30: 320000,
+      60: 500000,
+    },
     image: "/images/serena_image/z7863130176379_c5ca367025c871384fcc1d77b7468dc8.jpg",
     isFeatured: true,
   },
@@ -140,6 +149,10 @@ export const SERVICES: Service[] = [
     duration: [60, 90],
     price: 22,
     priceVND: 550000,
+    priceByDurationVND: {
+      60: 550000,
+      90: 800000,
+    },
     image: "/images/serena_image/z7863130203764_6bc950cfa0128b88f9da0f0e14fc8264.jpg",
     isFeatured: true,
   },
@@ -181,6 +194,10 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 16,
     priceVND: 400000,
+    priceByDurationVND: {
+      30: 400000,
+      60: 700000,
+    },
     image: "/images/serena_image/premium_photo-1661490015867-61413eaef4a5.avif",
   },
   {
@@ -194,6 +211,10 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 16,
     priceVND: 400000,
+    priceByDurationVND: {
+      30: 400000,
+      60: 700000,
+    },
     image: "/images/serena_image/dear-scrub-GEGPGa7lYMc-unsplash.jpg",
   },
   {
@@ -207,6 +228,10 @@ export const SERVICES: Service[] = [
     duration: [60, 90],
     price: 28,
     priceVND: 700000,
+    priceByDurationVND: {
+      60: 700000,
+      90: 1100000,
+    },
     image: "/images/serena_image/Himalayan-Salt-Massage-Hero-800x1000.jpg",
     isSignature: true,
     isFeatured: true,
@@ -320,6 +345,10 @@ export const SERVICES: Service[] = [
     duration: [30, 60],
     price: 14,
     priceVND: 350000,
+    priceByDurationVND: {
+      30: 350000,
+      60: 550000,
+    },
     image: "/images/serena_image/z7863130399936_a16c4518ce69d94cc60728eb569ee3ae.jpg",
   },
   {
@@ -785,6 +814,16 @@ function localizeService(service: Service, locale: Locale): Service {
   const overrides = SERVICE_OVERRIDES[locale];
   if (!overrides) return service;
   return { ...service, ...(overrides[service.id] ?? {}) };
+}
+
+export function getServicePriceVND(service: Service, durationMinutes?: number): number {
+  if (durationMinutes != null) {
+    const durationPrice = service.priceByDurationVND?.[durationMinutes];
+    if (durationPrice != null) return durationPrice;
+  }
+
+  if (service.priceVND != null) return service.priceVND;
+  return Math.round(service.price * 25000);
 }
 
 export function getServiceCategories(locale: Locale = "en"): ServiceCategory[] {
