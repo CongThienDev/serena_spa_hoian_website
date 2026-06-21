@@ -182,8 +182,8 @@ const HOME_COPY: Record<Locale, HomeCopy> = {
   ko: {
     hero: {
       eyebrow: "당신이 빛나는 공간",
-      title: ["프리미엄", "릴랙세이션", "& 힐링"],
-      tagline: "에너지를 깨우고 스트레스를 내려놓으며 당신의 자연스러운 광채가 빛나게 하세요.",
+      title: ["고품격", "휴식", "& 힐링"],
+      tagline: "지친 일상에서 벗어나 몸과 마음에 새로운 활력을 불어넣으세요.",
       ctaPrimary: "예약하기",
       ctaSecondary: "서비스 둘러보기",
     },
@@ -199,7 +199,8 @@ const HOME_COPY: Record<Locale, HomeCopy> = {
     treatments: {
       eyebrow: "시그니처 트리트먼트",
       title: "시그니처 트리트먼트",
-      subtitle: "각 트리트먼트는 회복하고 재생하며 빛을 더하기 위해 정교하게 설계된 하나의 리추얼입니다.",
+      subtitle:
+        "각 트리트먼트는 지친 몸과 마음을 회복시키고, 새로운 에너지를 채워 본연의 아름다움을 더욱 빛나게 하기 위해 세심하게 디자인되었습니다.",
       bookingEyebrow: "웰니스 예약",
       bookingTitle: "당신의 웰니스 여정을 예약하세요",
       bookingDesc: "온라인으로 예약하거나 WhatsApp으로 직접 문의하세요. 당일 예약도 환영합니다.",

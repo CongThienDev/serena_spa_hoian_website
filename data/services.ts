@@ -664,7 +664,7 @@ const CATEGORY_LABELS_KO: Record<string, { label: string; description: string }>
 // 한국어 임시 번역 — 검토 후 다듬어 주세요 (Korean placeholder translations — please review/refine).
 const SERVICES_KO: Record<string, LocalizedServiceOverride> = {
   "foot-reflexology": {
-    name: "발 반사 요법",
+    name: "발 지압 마사지",
     tagline: "릴랙세이션",
     description:
       "발바닥의 반사 지점을 자극해 혈액 순환을 촉진하고 몸의 에너지 균형을 맞춰 주는 트리트먼트입니다.",
@@ -676,7 +676,7 @@ const SERVICES_KO: Record<string, LocalizedServiceOverride> = {
       "긴장이 쌓이기 쉬운 등·목·어깨·머리를 집중적으로 풀어 주어 장시간 업무, 이동, 잘못된 자세로 인한 통증을 완화합니다.",
   },
   "swedish-therapy-treatment": {
-    name: "스웨디시 테라피",
+    name: "릴랙싱 오일 마사지",
     tagline: "바디 트리트먼트",
     description:
       "부드러운 동작의 전신 릴랙싱 마사지로 근육 긴장을 풀고 혈액 순환을 개선하며 몸과 마음에 편안함을 선사합니다.",
@@ -727,13 +727,13 @@ const SERVICES_KO: Record<string, LocalizedServiceOverride> = {
     name: "세레나 리뉴얼 바디 리추얼 패키지",
     tagline: "스파 패키지",
     description:
-      "30분 스크럽 또는 영양 랩과 90분 스웨디시 마사지로 구성된 120분 트리트먼트로 에너지를 재충전하고 깊은 이완을 선사합니다.",
+      "30분 스크럽 또는 영양 랩과 90분 릴랙싱 오일 마사지로 구성된 120분 트리트먼트로 에너지를 재충전하고 깊은 이완을 선사합니다.",
   },
   "serena-glow-balance-couples": {
     name: "글로우·밸런스 커플 패키지",
     tagline: "스파 패키지",
     description:
-      "2인을 위한 150분 트리트먼트로 스크럽/영양 랩, 전신 스웨디시 마사지, 안티에이징 페이셜로 구성됩니다.",
+      "2인을 위한 150분 트리트먼트로 스크럽/영양 랩, 전신 릴랙싱 오일 마사지, 안티에이징 페이셜로 구성됩니다.",
   },
   "serena-grand-harmony-package": {
     name: "그랜드 하모니 밸런스 패키지",
